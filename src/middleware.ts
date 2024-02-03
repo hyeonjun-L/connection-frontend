@@ -54,7 +54,6 @@ const testAPI2 = (headers: Record<string, string>, point: string) => {
 export const middleware = (request: NextRequest) => {
   const user = request.cookies.get('userAccessToken')?.value;
   const lecturer = request.cookies.get('lecturerAccessToken')?.value;
-  let clientResponse: NextResponse<unknown> | null = null;
 
   if (user || lecturer) {
     const point = user ? 'user-access-token' : 'lecturer-access-token';
@@ -64,17 +63,22 @@ export const middleware = (request: NextRequest) => {
       'Accept-Encoding': 'zlib',
     };
 
-    testAPI(headers, point).then((response) => {
-      if (response) {
-        console.log('성공');
-      } else {
-        console.log('실패');
-      }
-    });
+    return Promise.all([testAPI(headers, point), testAPI2(headers, point)])
+      .then((responses) => {
+        const [response1, response2] = responses;
 
-    testAPI2(headers, point).then((response2) => {
-      console.log('2::::', response2);
-    });
+        if (response1) {
+          console.log('성공');
+        } else {
+          console.log('실패');
+        }
+
+        console.log('2::::', response2);
+      })
+      .catch((error) => {
+        console.error(error);
+        return NextResponse.next(); // 에러 발생 시 처리. 필요에 따라 수정해주세요.
+      });
   }
 
   if (LOGIN_REQUIRED_URLS.includes(request.nextUrl.pathname)) {
