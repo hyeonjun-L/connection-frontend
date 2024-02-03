@@ -76,6 +76,7 @@ export const accessTokenReissuance = (): Promise<{
     headers: {
       'Content-Type': 'application/json',
       Cookie: `refreshToken=${refreshToken}`,
+      'Accept-Encoding': 'zlib',
     },
   }).then((response) => {
     if (!response.ok) {
@@ -115,7 +116,10 @@ export const checkAccessToken = (
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${authorization}`,
+    'Accept-Encoding': 'zlib',
   };
+
+  console.log(new URL(`${END_POINT}/auth/token/verify/${point}`).href);
 
   return fetch(new URL(`${END_POINT}/auth/token/verify/${point}`).href, {
     method: 'GET',
@@ -125,6 +129,8 @@ export const checkAccessToken = (
     if (!response.ok) {
       throw new Error(`Token check error: ${response.status}`);
     }
+
+    console.log('hello');
 
     return response.json();
   });
