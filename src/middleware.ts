@@ -5,8 +5,6 @@ import {
   NON_ACCESSIBLE_AFTER_LOGIN,
   USER_NO_ACCESS,
 } from './constants/constants';
-import { accessTokenReissuance } from './lib/apis/serverApis/userApi';
-import { FetchError } from './types/types';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
@@ -36,13 +34,18 @@ export const middleware = (request: NextRequest) => {
       headers,
     })
       .then((response) => {
+        console.log('hi1');
+
         if (!response.ok) {
           throw response;
         }
+        console.log('hi2');
 
-        return response.json().then(() => {
+        return response.json().then((data) => {
+          console.log(data);
           if (user && USER_NO_ACCESS.includes(request.nextUrl.pathname)) {
             // 유저가 가면 안되는 lecturer 링크
+            console.log('user');
             return NextResponse.redirect(new URL('/', request.url));
           } else if (
             lecturer &&
@@ -56,6 +59,8 @@ export const middleware = (request: NextRequest) => {
             //로그인해서 가면 안되는 링크
             return NextResponse.redirect(new URL('/', request.url));
           } else {
+            console.log('next');
+
             return NextResponse.next();
           }
         });
