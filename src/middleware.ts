@@ -30,11 +30,34 @@ const checkAccessToken = (headers: Record<string, string>, point: string) => {
 };
 
 const testAPI = async (headers: Record<string, string>, point: string) => {
-  return await fetch(new URL(`${END_POINT}/auth/token/verify/${point}`).href, {
-    method: 'GET',
-    credentials: 'include',
-    headers,
-  });
+  const response = await fetch(
+    new URL(`${END_POINT}/auth/token/verify/${point}`).href,
+    {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    },
+  );
+
+  return response.ok ? true : false;
+};
+
+const testAPI2 = async (headers: Record<string, string>, point: string) => {
+  const response = await fetch(
+    new URL(`${END_POINT}/auth/token/verify/${point}`).href,
+    {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    },
+  );
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  } else {
+    return false;
+  }
 };
 
 export const middleware = async (request: NextRequest) => {
@@ -50,15 +73,18 @@ export const middleware = async (request: NextRequest) => {
       'Accept-Encoding': 'zlib',
     };
 
-    try {
-      const response = await testAPI(headers, point);
+    const response = await testAPI(headers, point);
+
+    if (response) {
       console.log('성공');
-      if (!response.ok) {
-        throw new Error('sss');
-      }
-    } catch (error) {
-      console.log('error:::', error);
     }
+
+    if (!response) {
+      console.log('실패');
+    }
+
+    const response2 = await testAPI2(headers, point);
+    console.log('2::::', response2);
   }
 
   if (LOGIN_REQUIRED_URLS.includes(request.nextUrl.pathname)) {
