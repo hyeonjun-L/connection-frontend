@@ -34,15 +34,7 @@ export const middleware = (request: NextRequest) => {
       headers,
     })
       .then((response) => {
-        response.text().then(console.log);
-        console.log(response);
-        console.log('hi1');
-
-        if (!response.ok) {
-          throw response;
-        }
-        console.log('hi2');
-
+        console.log('hi');
         return response.json().then((data) => {
           console.log(data);
           if (user && USER_NO_ACCESS.includes(request.nextUrl.pathname)) {
