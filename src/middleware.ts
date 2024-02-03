@@ -29,7 +29,15 @@ const checkAccessToken = (headers: Record<string, string>, point: string) => {
     });
 };
 
-export const middleware = (request: NextRequest) => {
+const testAPI = async (headers: Record<string, string>, point: string) => {
+  return await fetch(new URL(`${END_POINT}/auth/token/verify/${point}`).href, {
+    method: 'GET',
+    credentials: 'include',
+    headers,
+  });
+};
+
+export const middleware = async (request: NextRequest) => {
   const user = request.cookies.get('userAccessToken')?.value;
   const lecturer = request.cookies.get('lecturerAccessToken')?.value;
   let clientResponse: NextResponse<unknown> | null = null;
@@ -45,6 +53,9 @@ export const middleware = (request: NextRequest) => {
     checkAccessToken(headers, point).then((test) => {
       console.log('aaa:::', test);
     });
+
+    const test = await testAPI(headers, point);
+    console.log(test);
   }
 
   if (LOGIN_REQUIRED_URLS.includes(request.nextUrl.pathname)) {
