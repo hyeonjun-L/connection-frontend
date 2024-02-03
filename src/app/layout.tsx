@@ -40,12 +40,14 @@ export default async function RootLayout({
     if (user) {
       const userProfile = await getMyProfile();
       authUser = convertToProfileInfo(userProfile);
+
       userType = 'user';
     }
 
     if (lecturer) {
       const instructorProfile = await getInstructorProfile();
       authUser = convertToProfileInfo(instructorProfile);
+
       userType = 'lecturer';
     }
   } catch (error) {
