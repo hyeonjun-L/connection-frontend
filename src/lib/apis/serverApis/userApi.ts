@@ -117,14 +117,11 @@ export const checkAccessToken = (
     Authorization: `Bearer ${authorization}`,
   };
 
-  return fetch(
-    new URL(END_POINT + `${END_POINT}/auth/token/verify/${point}`).href,
-    {
-      method: 'GET',
-      credentials: 'include',
-      headers,
-    },
-  ).then((response) => {
+  return fetch(new URL(`${END_POINT}/auth/token/verify/${point}`).href, {
+    method: 'GET',
+    credentials: 'include',
+    headers,
+  }).then((response) => {
     if (!response.ok) {
       throw new Error(`Token check error: ${response.status}`);
     }
