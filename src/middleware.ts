@@ -50,10 +50,6 @@ export const middleware = async (request: NextRequest) => {
       'Accept-Encoding': 'zlib',
     };
 
-    checkAccessToken(headers, point).then((test) => {
-      console.log('aaa:::', test);
-    });
-
     const test = await testAPI(headers, point);
     console.log(test);
   }
