@@ -34,6 +34,8 @@ export const middleware = (request: NextRequest) => {
       headers,
     })
       .then((response) => {
+        response.text().then(console.log);
+        console.log(response);
         console.log('hi1');
 
         if (!response.ok) {
