@@ -50,8 +50,15 @@ export const middleware = async (request: NextRequest) => {
       'Accept-Encoding': 'zlib',
     };
 
-    const test = await testAPI(headers, point);
-    console.log(test);
+    try {
+      const response = await testAPI(headers, point);
+      console.log('성공');
+      if (!response.ok) {
+        throw new Error('sss');
+      }
+    } catch (error) {
+      console.log('error:::', error);
+    }
   }
 
   if (LOGIN_REQUIRED_URLS.includes(request.nextUrl.pathname)) {
