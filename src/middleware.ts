@@ -5,11 +5,10 @@ import {
   NON_ACCESSIBLE_AFTER_LOGIN,
   USER_NO_ACCESS,
 } from './constants/constants';
-import {
-  checkAccessToken,
-  accessTokenReissuance,
-} from './lib/apis/serverApis/userApi';
+import { accessTokenReissuance } from './lib/apis/serverApis/userApi';
 import { FetchError } from './types/types';
+
+const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
 const setCookie = (response: NextResponse, name: string, value: string) => {
   response.cookies.set(name, value, {
@@ -25,12 +24,23 @@ export const middleware = (request: NextRequest) => {
   const lecturer = request.cookies.get('lecturerAccessToken')?.value;
 
   if (user || lecturer) {
-    const tokenCheckPromise = user
-      ? checkAccessToken('userAccessToken')
-      : checkAccessToken('lecturerAccessToken');
+    const point = user ? 'user-access-token' : 'lecturer-access-token';
 
-    return tokenCheckPromise
-      .then(() => {
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${user || lecturer}`,
+      'Accept-Encoding': 'zlib',
+    };
+
+    return fetch(new URL(`${END_POINT}/auth/token/verify/${point}`).href, {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Token check error: ${response.status}`);
+        }
+
         if (user && USER_NO_ACCESS.includes(request.nextUrl.pathname)) {
           // 유저가 가면 안되는 lecturer 링크
           return NextResponse.redirect(new URL('/', request.url));

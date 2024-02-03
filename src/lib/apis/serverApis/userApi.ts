@@ -104,34 +104,29 @@ export const accessTokenReissuance = (): Promise<{
   });
 };
 
-export const checkAccessToken = (
-  tokenType: 'userAccessToken' | 'lecturerAccessToken',
-): Promise<any> => {
-  const cookieStore = cookies();
-  const authorization = cookieStore.get(tokenType)?.value;
-  const point =
-    tokenType === 'userAccessToken'
-      ? 'user-access-token'
-      : 'lecturer-access-token';
+// export const checkAccessToken = (
+//   tokenType: 'userAccessToken' | 'lecturerAccessToken',
+// ): Promise<any> => {
+//   const cookieStore = cookies();
+//   const authorization = cookieStore.get(tokenType)?.value;
+//   const point =
+//     tokenType === 'userAccessToken'
+//       ? 'user-access-token'
+//       : 'lecturer-access-token';
 
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${authorization}`,
-    'Accept-Encoding': 'zlib',
-  };
+//   console.log(new URL(`${END_POINT}/auth/token/verify/${point}`).href);
 
-  console.log(new URL(`${END_POINT}/auth/token/verify/${point}`).href);
+//   return fetch(new URL(`${END_POINT}/auth/token/verify/${point}`).href, {
+//     method: 'GET',
+//     credentials: 'include',
+//     headers,
+//   }).then((response) => {
+//     if (!response.ok) {
+//       throw new Error(`Token check error: ${response.status}`);
+//     }
 
-  return fetch(new URL(`${END_POINT}/auth/token/verify/${point}`).href, {
-    method: 'GET',
-    credentials: 'include',
-    headers,
-  }).then((response) => {
-    if (!response.ok) {
-      throw new Error(`Token check error: ${response.status}`);
-    }
+//     console.log('hello');
 
-    console.log('hello');
-
-    return response.json();
-  });
-};
+//     return response.json();
+//   });
+// };
