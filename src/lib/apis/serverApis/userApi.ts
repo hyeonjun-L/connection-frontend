@@ -60,51 +60,52 @@ export const getMyProfile = async (): Promise<userProfile> => {
   return data.data.myProfile;
 };
 
-export const accessTokenReissuance = async (): Promise<{
+export const accessTokenReissuance = (): Promise<{
   accessToken: string;
   refreshToken: string;
 }> => {
   const cookieStore = cookies();
   const refreshToken = cookieStore.get('refreshToken')?.value;
 
-  const response = await fetch(END_POINT + '/auth/token/refresh', {
+  if (!refreshToken) {
+    return Promise.reject(new Error('Refresh token is not available'));
+  }
+
+  return fetch(new URL(END_POINT + '/auth/token/refresh').href, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       Cookie: `refreshToken=${refreshToken}`,
     },
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error(`refresh 조회 에러: ${response.status}`);
+    }
+
+    return response.json().then((json) => {
+      const userAccessToken = json.data.userAccessToken;
+      const lecturerAccessToken = json.data.lecturerAccessToken;
+
+      if (userAccessToken) {
+        return {
+          accessToken: userAccessToken,
+          refreshToken: refreshToken,
+        };
+      } else if (lecturerAccessToken) {
+        return {
+          accessToken: lecturerAccessToken,
+          refreshToken: refreshToken,
+        };
+      } else {
+        throw new Error('엑세스 토큰 미 발급');
+      }
+    });
   });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(
-      `refresh 조회 에러: ${errorData.message || ''}, status: ${
-        response.status
-      }`,
-    );
-  }
-
-  const resCookies = response.headers.get('set-cookie')?.split('; ');
-  const refreshTokenCookie = resCookies!.find((cookie) =>
-    cookie.startsWith('refreshToken='),
-  );
-  const data = await response.json();
-  const userAccessToken = data.data.userAccessToken;
-  const lecturerAccessToken = data.data.lecturerAccessToken;
-  const resRefreshToken = refreshTokenCookie!.split('=')[1];
-
-  if (userAccessToken) {
-    return { accessToken: userAccessToken, refreshToken: resRefreshToken };
-  } else if (lecturerAccessToken) {
-    return { accessToken: lecturerAccessToken, refreshToken: resRefreshToken };
-  } else {
-    throw new Error('엑세스 토큰 미 발급');
-  }
 };
 
-export const checkAccessToken = async (
+export const checkAccessToken = (
   tokenType: 'userAccessToken' | 'lecturerAccessToken',
-) => {
+): Promise<any> => {
   const cookieStore = cookies();
   const authorization = cookieStore.get(tokenType)?.value;
   const point =
@@ -116,18 +117,18 @@ export const checkAccessToken = async (
     Authorization: `Bearer ${authorization}`,
   };
 
-  const response = await fetch(`${END_POINT}/auth/token/verify/${point}`, {
-    method: 'GET',
-    credentials: 'include',
-    headers,
+  return fetch(
+    new URL(END_POINT + `${END_POINT}/auth/token/verify/${point}`).href,
+    {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    },
+  ).then((response) => {
+    if (!response.ok) {
+      throw new Error(`Token check error: ${response.status}`);
+    }
+
+    return response.json();
   });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    const error: FetchError = new Error(errorData.message || '');
-    error.status = response.status;
-    throw error;
-  }
-
-  return response.json();
 };
