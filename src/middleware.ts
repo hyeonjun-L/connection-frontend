@@ -29,38 +29,29 @@ const checkAccessToken = (headers: Record<string, string>, point: string) => {
     });
 };
 
-const testAPI = async (headers: Record<string, string>, point: string) => {
-  const response = await fetch(
-    new URL(`${END_POINT}/auth/token/verify/${point}`).href,
-    {
-      method: 'GET',
-      credentials: 'include',
-      headers,
-    },
-  );
-
-  return response.ok ? true : false;
+const testAPI = (headers: Record<string, string>, point: string) => {
+  return fetch(new URL(`${END_POINT}/auth/token/verify/${point}`).href, {
+    method: 'GET',
+    credentials: 'include',
+    headers,
+  }).then((response) => response.ok);
 };
 
-const testAPI2 = async (headers: Record<string, string>, point: string) => {
-  const response = await fetch(
-    new URL(`${END_POINT}/auth/token/verify/${point}`).href,
-    {
-      method: 'GET',
-      credentials: 'include',
-      headers,
-    },
-  );
-
-  if (response.ok) {
-    const data = await response.json();
-    return data;
-  } else {
-    return false;
-  }
+const testAPI2 = (headers: Record<string, string>, point: string) => {
+  return fetch(new URL(`${END_POINT}/auth/token/verify/${point}`).href, {
+    method: 'GET',
+    credentials: 'include',
+    headers,
+  }).then((response) => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      return false;
+    }
+  });
 };
 
-export const middleware = async (request: NextRequest) => {
+export const middleware = (request: NextRequest) => {
   const user = request.cookies.get('userAccessToken')?.value;
   const lecturer = request.cookies.get('lecturerAccessToken')?.value;
   let clientResponse: NextResponse<unknown> | null = null;
@@ -73,18 +64,17 @@ export const middleware = async (request: NextRequest) => {
       'Accept-Encoding': 'zlib',
     };
 
-    const response = await testAPI(headers, point);
+    testAPI(headers, point).then((response) => {
+      if (response) {
+        console.log('성공');
+      } else {
+        console.log('실패');
+      }
+    });
 
-    if (response) {
-      console.log('성공');
-    }
-
-    if (!response) {
-      console.log('실패');
-    }
-
-    const response2 = await testAPI2(headers, point);
-    console.log('2::::', response2);
+    testAPI2(headers, point).then((response2) => {
+      console.log('2::::', response2);
+    });
   }
 
   if (LOGIN_REQUIRED_URLS.includes(request.nextUrl.pathname)) {
