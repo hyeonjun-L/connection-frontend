@@ -52,16 +52,25 @@ export const middleware = async (request: NextRequest) => {
   const user = request.cookies.get('userAccessToken')?.value;
   const lecturer = request.cookies.get('lecturerAccessToken')?.value;
 
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${user || lecturer}`,
+  };
+
   console.log('user:::', user);
   console.log('lecturer:::', lecturer);
 
   if (user || lecturer) {
     try {
       if (user) {
+        console.log('user in');
+
         const accessTokenCheckResponse = await checkAccessToken(
           'userAccessToken',
           user,
         );
+
+        console.log(accessTokenCheckResponse);
+
         const userAccessTokenCheckData = await accessTokenCheckResponse.json();
 
         if (USER_NO_ACCESS.includes(request.nextUrl.pathname)) {
@@ -69,7 +78,15 @@ export const middleware = async (request: NextRequest) => {
           return NextResponse.redirect(new URL('/', request.url));
         }
       } else if (lecturer) {
-        console.log(await checkAccessToken('lecturerAccessToken', lecturer));
+        // console.log(await checkAccessToken('lecturerAccessToken', lecturer));
+
+        console.log(
+          fetch(`${END_POINT}/auth/token/verify/lecturer-access-token`, {
+            method: 'GET',
+            credentials: 'include',
+            headers,
+          }).then((data) => data.json()),
+        );
 
         if (LECTURER_NO_ACCESS.includes(request.nextUrl.pathname)) {
           // 강사가 가면 안되는 user 링크 확인
@@ -118,7 +135,7 @@ export const middleware = async (request: NextRequest) => {
           }
         }
       }
-      return NextResponse.redirect(new URL('/', request.url)); //추후 서버 에러 페이지로 이동
+      return NextResponse.redirect(new URL('/error', request.url)); //추후 서버 에러 페이지로 이동
     }
   }
 
