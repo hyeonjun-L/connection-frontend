@@ -35,12 +35,13 @@ export const middleware = (request: NextRequest) => {
       credentials: 'include',
       headers,
     })
-      .then(async (response) => {
+      .then((response) => {
         if (!response.ok) {
-          const errorData = await response.json();
-          const error: FetchError = new Error(errorData.message || '');
-          error.status = response.status;
-          throw error;
+          response.json().then((errorData) => {
+            const error: FetchError = new Error(errorData.message || '');
+            error.status = response.status;
+            throw error;
+          });
         }
 
         return response.json().then(() => {
@@ -74,12 +75,13 @@ export const middleware = (request: NextRequest) => {
               Cookie: `refreshToken=${refreshToken}`,
             },
           })
-            .then(async (response) => {
+            .then((response) => {
               if (!response.ok) {
-                const errorData = await response.json();
-                const error: FetchError = new Error(errorData.message || '');
-                error.status = response.status;
-                throw error;
+                response.json().then((errorData) => {
+                  const error: FetchError = new Error(errorData.message || '');
+                  error.status = response.status;
+                  throw error;
+                });
               }
 
               const resCookies = response.headers
