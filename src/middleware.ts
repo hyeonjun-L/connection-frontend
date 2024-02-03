@@ -37,9 +37,13 @@ export const middleware = (request: NextRequest) => {
       headers,
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Token check error: ${response.status}`);
-        }
+        response.json().then((data) => {
+          console.log(data);
+        });
+
+        // if (!response.ok) {
+        //   throw new Error(`Token check error: ${response.status}`);
+        // }
 
         if (user && USER_NO_ACCESS.includes(request.nextUrl.pathname)) {
           // 유저가 가면 안되는 lecturer 링크
