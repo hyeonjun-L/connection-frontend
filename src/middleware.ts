@@ -36,15 +36,8 @@ export const middleware = (request: NextRequest) => {
       headers,
     })
       .then((response) => {
-        response.text().then(console.log);
-        response.json().then(console.log);
-
         if (!response.ok) {
-          response.json().then((errorData) => {
-            const error: FetchError = new Error(errorData.message || '');
-            error.status = response.status;
-            throw error;
-          });
+          throw response;
         }
 
         return response.json().then(() => {
@@ -67,7 +60,7 @@ export const middleware = (request: NextRequest) => {
           }
         });
       })
-      .catch((error: FetchError) => {
+      .catch((error) => {
         if (error.status === 401) {
           const refreshToken = request.cookies.get('refreshToken')?.value;
 
@@ -80,11 +73,7 @@ export const middleware = (request: NextRequest) => {
           })
             .then((response) => {
               if (!response.ok) {
-                response.json().then((errorData) => {
-                  const error: FetchError = new Error(errorData.message || '');
-                  error.status = response.status;
-                  throw error;
-                });
+                throw response;
               }
 
               const resCookies = response.headers
