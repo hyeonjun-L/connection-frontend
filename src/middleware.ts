@@ -20,6 +20,7 @@ const setCookie = (response: NextResponse, name: string, value: string) => {
 export const middleware = (request: NextRequest) => {
   const user = request.cookies.get('userAccessToken')?.value;
   const lecturer = request.cookies.get('lecturerAccessToken')?.value;
+  let response: NextResponse<unknown> | null = null;
 
   if (user || lecturer) {
     const point = user ? 'user-access-token' : 'lecturer-access-token';
@@ -35,27 +36,28 @@ export const middleware = (request: NextRequest) => {
     })
       .then((response) => {
         console.log('hi');
-        return response.json().then((data) => {
+
+        response.json().then((data) => {
           console.log(data);
           if (user && USER_NO_ACCESS.includes(request.nextUrl.pathname)) {
             // 유저가 가면 안되는 lecturer 링크
             console.log('user');
-            return NextResponse.redirect(new URL('/', request.url));
+            response = NextResponse.redirect(new URL('/', request.url));
           } else if (
             lecturer &&
             LECTURER_NO_ACCESS.includes(request.nextUrl.pathname)
           ) {
             // 강사가 가면 안되는 user 링크 확인
-            return NextResponse.redirect(new URL('/', request.url));
+            response = NextResponse.redirect(new URL('/', request.url));
           } else if (
             NON_ACCESSIBLE_AFTER_LOGIN.includes(request.nextUrl.pathname)
           ) {
             //로그인해서 가면 안되는 링크
-            return NextResponse.redirect(new URL('/', request.url));
+            response = NextResponse.redirect(new URL('/', request.url));
           } else {
             console.log('next');
 
-            return NextResponse.next();
+            response = NextResponse.next();
           }
         });
       })
@@ -128,6 +130,10 @@ export const middleware = (request: NextRequest) => {
           return NextResponse.redirect(new URL('/error', request.url));
         }
       });
+  }
+
+  if (response) {
+    response;
   }
 
   if (LOGIN_REQUIRED_URLS.includes(request.nextUrl.pathname)) {
