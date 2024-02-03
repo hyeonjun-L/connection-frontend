@@ -36,12 +36,10 @@ export const middleware = (request: NextRequest) => {
       headers,
     })
       .then((response) => {
+        console.log('hello');
+
         if (!response.ok) {
-          response.json().then((errorData) => {
-            const error: FetchError = new Error(errorData.message || '');
-            error.status = response.status;
-            throw error;
-          });
+          console.log('ok');
         }
 
         return response.json().then(() => {
@@ -64,7 +62,8 @@ export const middleware = (request: NextRequest) => {
           }
         });
       })
-      .catch((error: FetchError) => {
+      .catch((error) => {
+        console.log('에러용::::', error);
         if (error.status === 401) {
           const refreshToken = request.cookies.get('refreshToken')?.value;
 
@@ -76,14 +75,6 @@ export const middleware = (request: NextRequest) => {
             },
           })
             .then((response) => {
-              if (!response.ok) {
-                response.json().then((errorData) => {
-                  const error: FetchError = new Error(errorData.message || '');
-                  error.status = response.status;
-                  throw error;
-                });
-              }
-
               const resCookies = response.headers
                 .get('set-cookie')
                 ?.split('; ');
