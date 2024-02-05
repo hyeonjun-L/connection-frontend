@@ -63,6 +63,7 @@ export const middleware = (request: NextRequest) => {
       'Accept-Encoding': 'zlib',
     };
 
+<<<<<<< HEAD
     return Promise.all([testAPI(headers, point), testAPI2(headers, point)])
       .then((responses) => {
         const [response1, response2] = responses;
@@ -71,6 +72,74 @@ export const middleware = (request: NextRequest) => {
           console.log('성공');
         } else {
           console.log('실패');
+=======
+    return fetch(new URL(`${END_POINT}/auth/token/verify/${point}`).href, {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    })
+      .then((response) => {
+        response.json().then((data) => {
+          console.log(data);
+        });
+
+        // if (!response.ok) {
+        //   throw new Error(`Token check error: ${response.status}`);
+        // }
+
+        if (user && USER_NO_ACCESS.includes(request.nextUrl.pathname)) {
+          // 유저가 가면 안되는 lecturer 링크
+          return NextResponse.redirect(new URL('/', request.url));
+        } else if (
+          lecturer &&
+          LECTURER_NO_ACCESS.includes(request.nextUrl.pathname)
+        ) {
+          // 강사가 가면 안되는 user 링크 확인
+          return NextResponse.redirect(new URL('/', request.url));
+        } else if (
+          NON_ACCESSIBLE_AFTER_LOGIN.includes(request.nextUrl.pathname)
+        ) {
+          //로그인해서 가면 안되는 링크
+          return NextResponse.redirect(new URL('/', request.url));
+        } else {
+          return NextResponse.next();
+        }
+      })
+      .catch((error: FetchError) => {
+        if (error.status === 401) {
+          return accessTokenReissuance()
+            .then(({ accessToken, refreshToken }) => {
+              const response = NextResponse.redirect(request.url);
+
+              const tokenName = user
+                ? 'userAccessToken'
+                : 'lecturerAccessToken';
+
+              setCookie(response, tokenName, accessToken);
+              setCookie(response, 'refreshToken', refreshToken);
+
+              return response;
+            })
+            .catch(() => {
+              const includes = LOGIN_REQUIRED_URLS.includes(
+                request.nextUrl.pathname,
+              );
+
+              const response = includes
+                ? NextResponse.redirect(new URL('/login', request.url))
+                : NextResponse.redirect(request.url);
+
+              if (!includes) response.cookies.set('reload', 'true');
+
+              response.cookies.delete('userAccessToken');
+              response.cookies.delete('lecturerAccessToken');
+              response.cookies.delete('refreshToken');
+
+              return response;
+            });
+        } else {
+          return NextResponse.redirect(new URL('/error', request.url)); //추후 서버 에러 페이지로 이동
+>>>>>>> parent of e6e7333 (미들웨어 수정)
         }
 
         console.log('2::::', response2);
@@ -82,7 +151,9 @@ export const middleware = (request: NextRequest) => {
   }
 
   if (LOGIN_REQUIRED_URLS.includes(request.nextUrl.pathname)) {
-    //강사 & 유저 토큰이 필요한 링크(로그인이 필요한 링크)
+    //강사 토큰이 필요한 링크
+    //유저 토큰이 필요한 링크
+    // 로그인이 필요한 링크
     return Promise.resolve(
       NextResponse.redirect(new URL('/login', request.url)),
     );
@@ -92,7 +163,7 @@ export const middleware = (request: NextRequest) => {
 };
 
 export const config = {
-  matcher: ['/my/:path*', '/', '/aaa', '/instructor/apply', '/class/create'], // '/login', '/api/my/:path*', '/api/auth/logout
+  matcher: ['/my/:path*', '/', '/instructor/apply', '/class/create'], // '/login', '/api/my/:path*', '/api/auth/logout
 };
 
 // .then((response) => {
