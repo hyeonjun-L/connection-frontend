@@ -17,7 +17,7 @@ const setCookie = (response: NextResponse, name: string, value: string) => {
   });
 };
 
-export const middleware = (request: NextRequest) => {
+export const middleware = async (request: NextRequest) => {
   const user = request.cookies.get('userAccessToken')?.value;
   const lecturer = request.cookies.get('lecturerAccessToken')?.value;
 
@@ -28,11 +28,14 @@ export const middleware = (request: NextRequest) => {
       Authorization: `Bearer ${user || lecturer}`,
     };
 
-    return fetch(new URL(`${END_POINT}/auth/token/verify/${point}`).href, {
-      method: 'GET',
-      credentials: 'include',
-      headers,
-    }).then((response) => {
+    return await fetch(
+      new URL(`${END_POINT}/auth/token/verify/${point}`).href,
+      {
+        method: 'GET',
+        credentials: 'include',
+        headers,
+      },
+    ).then((response) => {
       console.log('hi');
 
       return response.json().then((data) => {
