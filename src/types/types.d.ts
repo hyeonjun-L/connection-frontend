@@ -227,3 +227,9 @@ export interface IUserSearchKeywords {
   id: number;
   searchTerm: string;
 }
+
+export interface IPopularKeyword {
+  id: number;
+  searchTerm: string;
+  searchCount: number;
+}
