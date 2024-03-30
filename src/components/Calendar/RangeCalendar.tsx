@@ -10,8 +10,8 @@ import {
 import { FormattedCaption } from '../../utils/calendarUtils/CalendarCaption';
 import {
   DAY_MODIFIERS_CLASSNAMES,
-  DISABLED_AFTER,
   DISABLED_BEFORE,
+  DISABLED_AFTER,
 } from '../../utils/calendarUtils/dateUtils';
 import 'react-day-picker/dist/style.css';
 import '../../styles/calendar.css';
@@ -23,14 +23,11 @@ interface IRangeCalendarProps {
   numberOfMonths?: number;
 }
 
-const RangeCalendar = ({
-  mode,
-  selectedRange,
-  handleRangeSelect,
-  numberOfMonths = 2,
-}: IRangeCalendarProps) => {
+const RangeCalendar = (props: IRangeCalendarProps) => {
+  const { mode, selectedRange, handleRangeSelect, numberOfMonths = 2 } = props;
   const modifiers = mode === 'class' ? DISABLED_BEFORE : DISABLED_AFTER;
-  const defaultMonth = mode === 'class' ? new Date() : subMonths(new Date(), 1);
+  const defaultMonth =
+    mode === 'class' ? selectedRange?.from : subMonths(new Date(), 1);
 
   return (
     <DayPicker
