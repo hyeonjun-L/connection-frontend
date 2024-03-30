@@ -33,11 +33,10 @@ const ConfirmedLocation = ({
   useEffect(() => {
     const receiveMessage = (event: MessageEvent) => {
       if (
-        process.env.NODE_ENV === 'development' &&
-        (event.origin !== window.origin ||
-          event.data.source === 'react-devtools-content-script' ||
-          event.data.source === 'react-devtools-backend-manager' ||
-          event.data.source === 'react-devtools-bridge')
+        event.origin !== window.origin ||
+        event.data.source === 'react-devtools-content-script' ||
+        event.data.source === 'react-devtools-backend-manager' ||
+        event.data.source === 'react-devtools-bridge'
       )
         return;
 
