@@ -33,3 +33,21 @@ export interface ProcessedJuso {
   detailAddress: string;
   bdNm: string;
 }
+
+export interface RoadAddrPoint {
+  id: number;
+  address: {
+    bldnm: string;
+    bldnmdc: string;
+    category: 'ROAD' | 'PLACE' | 'ADDRESS' | 'DISTRICT';
+    parcel: string;
+    road: string;
+    zipcode: number;
+  };
+  point: Point;
+}
+
+export interface Point {
+  x: number;
+  y: number;
+}

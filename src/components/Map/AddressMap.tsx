@@ -12,6 +12,8 @@ import {
   Container as MapDiv,
 } from 'react-naver-maps';
 import errorImg from '@/images/ErrorImg.webp';
+import { searchAddressPoint } from '@/lib/apis/searchAddress';
+import { Point } from '@/types/address';
 
 interface MapProps {
   address: string;
@@ -21,57 +23,17 @@ interface MapProps {
 const StudioLocationMap = ({ address, studioName }: MapProps) => {
   const navermaps = useNavermaps();
 
-  const convertToLatLngAndXY = (y: string, x: string) => {
-    const latLng = new naver.maps.LatLng(Number(y), Number(x));
+  const convertToLatLngAndXY = ({ y, x }: Point) => {
+    const latLng = new naver.maps.LatLng(y, x);
     const { x: convertedX, y: convertedY } =
       navermaps.TransCoord.fromLatLngToEPSG3857(latLng);
     return { latLng, x: convertedX, y: convertedY };
   };
 
-  const geocodeAddress = (query: string, subQuery: string) => {
-    return new Promise<{ latLng: naver.maps.LatLng; x: number; y: number }>(
-      (resolve, reject) => {
-        const processGeocodeResponse = (
-          searchQuery: string,
-          response: naver.maps.Service.GeocodeResponse,
-        ) => {
-          if (response.v2.errorMessage) {
-            reject(
-              new Error(
-                `Geocode Error, error: ${response.v2.errorMessage} address: ${searchQuery}`,
-              ),
-            );
-            return;
-          }
-          if (response.v2.meta.totalCount === 0) {
-            if (searchQuery === subQuery) {
-              reject(new Error('No results found'));
-              return;
-            } else {
-              searchAddress(subQuery);
-              return;
-            }
-          }
-
-          const item = response.v2.addresses[0];
-          resolve(convertToLatLngAndXY(item.y, item.x));
-        };
-
-        const searchAddress = (searchQuery: string) => {
-          navermaps.Service.geocode(
-            { query: searchQuery },
-            (status, response) => processGeocodeResponse(searchQuery, response),
-          );
-        };
-
-        searchAddress(query);
-      },
-    );
-  };
-
   const { data, isLoading, isError } = useQuery({
     queryKey: ['map', address],
-    queryFn: () => geocodeAddress(address, studioName),
+    queryFn: async () =>
+      convertToLatLngAndXY(await searchAddressPoint(address)),
   });
 
   return isLoading ? (
