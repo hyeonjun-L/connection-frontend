@@ -83,7 +83,10 @@ const ConfirmedLocation = ({
             })}
           />
           <div className=" h-[18.25rem]">
-            <Map address={location.roadAddr} studioName={location.bdNm} />
+            <Map
+              address={location.roadAddr}
+              studioName={(location as Juso).bdNm || (location as Juso).emdNm}
+            />
           </div>
         </section>
       )}
