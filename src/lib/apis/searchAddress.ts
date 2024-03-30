@@ -1,4 +1,4 @@
-import { AddressData, Point } from '@/types/address';
+import { AddressData, Point, RoadAddrPoint } from '@/types/address';
 import { FetchError } from '@/types/types';
 
 export const searchAddress = async (keyword: string, page: number | string) => {
@@ -18,7 +18,9 @@ export const searchAddress = async (keyword: string, page: number | string) => {
   }
 };
 
-export const searchAddressPoint = async (query: string): Promise<Point> => {
+export const searchAddressPoint = async (
+  query: string,
+): Promise<RoadAddrPoint> => {
   try {
     const response = await fetch(`/api/map/point?query=${query}`);
 
@@ -30,7 +32,8 @@ export const searchAddressPoint = async (query: string): Promise<Point> => {
     }
 
     const data = await response.json();
-    return data.response.result.items[0].point;
+
+    return data.response;
   } catch (error) {
     console.error('주소 좌표값 조회 오류', error);
     throw error;

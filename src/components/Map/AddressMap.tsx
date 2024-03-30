@@ -23,17 +23,40 @@ interface MapProps {
 const StudioLocationMap = ({ address, studioName }: MapProps) => {
   const navermaps = useNavermaps();
 
-  const convertToLatLngAndXY = ({ y, x }: Point) => {
+  const convertToLatLngAndXY = ({ x, y }: Point) => {
     const latLng = new naver.maps.LatLng(y, x);
+
     const { x: convertedX, y: convertedY } =
       navermaps.TransCoord.fromLatLngToEPSG3857(latLng);
+
     return { latLng, x: convertedX, y: convertedY };
+  };
+
+  const geocodeAddress = async (query: string) => {
+    const { status, result } = await searchAddressPoint(query);
+    if (status === 'NOT_FOUND' || status === 'ERROR') {
+      throw new Error(status);
+    }
+    return result.items[0].point;
+  };
+
+  const fetchGeocodeAndConvert = async () => {
+    try {
+      const point = await geocodeAddress(address);
+      return convertToLatLngAndXY(point);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'NOT_FOUND') {
+        const point = await geocodeAddress(studioName);
+        return convertToLatLngAndXY(point);
+      } else {
+        throw error;
+      }
+    }
   };
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['map', address],
-    queryFn: async () =>
-      convertToLatLngAndXY(await searchAddressPoint(address)),
+    queryFn: fetchGeocodeAndConvert,
   });
 
   return isLoading ? (

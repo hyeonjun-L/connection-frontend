@@ -35,16 +35,23 @@ export interface ProcessedJuso {
 }
 
 export interface RoadAddrPoint {
-  id: number;
-  address: {
-    bldnm: string;
-    bldnmdc: string;
-    category: 'ROAD' | 'PLACE' | 'ADDRESS' | 'DISTRICT';
-    parcel: string;
-    road: string;
-    zipcode: number;
+  status: 'NOT_FOUND' | 'OK' | 'ERROR';
+  result: {
+    items: [
+      {
+        id: number;
+        address: {
+          bldnm: string;
+          bldnmdc: string;
+          category: 'ROAD' | 'PLACE' | 'ADDRESS' | 'DISTRICT';
+          parcel: string;
+          road: string;
+          zipcode: number;
+        };
+        point: Point;
+      },
+    ];
   };
-  point: Point;
 }
 
 export interface Point {
