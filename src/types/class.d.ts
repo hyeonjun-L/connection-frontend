@@ -73,7 +73,7 @@ type day = '일' | '월' | '화' | '수' | '목' | '금' | '토';
 
 export interface IDayTimeList {
   day: day[];
-  dateTime: string[];
+  dateTime: string;
 }
 
 export interface IDateTimeList {
@@ -308,7 +308,7 @@ export interface IClassSchedule {
 
 export interface IRegularClassSchedule {
   id: number;
-  day: string[];
+  day: day[];
   dateTime: string;
   numberOfParticipants: number;
   regularLectureSchedule: IRegularSchedule[];
@@ -322,13 +322,7 @@ export interface IClassScheduleResponse {
   regularLectureStatus?: IRegularClassSchedule[];
   schedules?: IClassSchedule[];
   holidays: string[];
-  daySchedule?: IDaySchedule[];
-}
-
-export interface IClassScheduleData {
-  schedule: IClassSchedule[];
-  holidayArr: Date[];
-  daySchedule?: IDaySchedule[];
+  daySchedules?: IDaySchedule[];
 }
 
 export interface IDaySchedule {
@@ -508,7 +502,7 @@ export interface IClassEditData
     IClassDetailResponse {}
 
 export interface IClassEditPageData
-  extends IClassScheduleData,
+  extends IClassScheduleResponse,
     IClassPreviewResponse,
     IClassDetailResponse {}
 

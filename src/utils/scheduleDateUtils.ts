@@ -43,15 +43,13 @@ export const calculateFinalDates = (
     const getDateTime = dayTimeSchedules.reduce((acc: Date[], schedule) => {
       const days = schedule.day.map((dayStr) => dayMapping[dayStr]);
 
-      schedule.dateTime.forEach((time) => {
-        allDatesInRange.forEach((date) => {
-          const day = getDay(date);
+      allDatesInRange.forEach((date) => {
+        const day = getDay(date);
 
-          if (days.includes(day)) {
-            const newDate = makeNewDate(date, time);
-            acc.push(newDate);
-          }
-        });
+        if (days.includes(day)) {
+          const newDate = makeNewDate(date, schedule.dateTime);
+          acc.push(newDate);
+        }
       });
 
       return acc;
@@ -99,23 +97,20 @@ export const calculateRegularFinalClass = (
 
   schedules.forEach((schedule) => {
     const days = schedule.day.map((dayStr) => dayMapping[dayStr]);
+    const startDateTime: Date[] = [];
 
-    schedule.dateTime.forEach((time) => {
-      const startDateTime: Date[] = [];
+    allDates.forEach((date) => {
+      const day = getDay(date);
+      if (days.includes(day)) {
+        const newDate = makeNewDate(date, schedule.dateTime);
+        startDateTime.push(newDate);
+      }
+    });
 
-      allDates.forEach((date) => {
-        const day = getDay(date);
-        if (days.includes(day)) {
-          const newDate = makeNewDate(date, time);
-          startDateTime.push(newDate);
-        }
-      });
-
-      results.push({
-        day: schedule.day,
-        dateTime: time,
-        startDateTime,
-      });
+    results.push({
+      day: schedule.day,
+      dateTime: schedule.dateTime,
+      startDateTime,
     });
   });
 
