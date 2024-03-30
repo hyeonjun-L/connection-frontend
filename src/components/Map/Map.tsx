@@ -2,6 +2,7 @@
 import '../../styles/mapInfowindow.css';
 import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import {
   InfoWindow,
@@ -10,6 +11,7 @@ import {
   useNavermaps,
   Container as MapDiv,
 } from 'react-naver-maps';
+import errorImg from '@/images/ErrorImg.webp';
 
 interface MapProps {
   address: string;
@@ -55,8 +57,18 @@ const StudioLocationMap = ({ address, studioName }: MapProps) => {
       ),
   });
 
-  return isLoading || isError || !data ? (
-    <div>로딩중</div>
+  return isLoading ? (
+    <div className="size-full animate-pulse bg-gray-700" />
+  ) : isError || !data ? (
+    <div className="flex size-full flex-col items-center justify-center gap-3">
+      <Image
+        src={errorImg}
+        alt="지도 데이터 오류 이미지"
+        priority={true}
+        className="h-auto w-auto flex-shrink object-cover"
+      />
+      <p>장소의 올바른 위치를 찾지 못했습니다.</p>
+    </div>
   ) : (
     <StudioInfoWindow {...data} studioName={studioName} address={address} />
   );
@@ -121,7 +133,7 @@ const StudioInfoWindow = ({
 
 const Map = dynamic(() => Promise.resolve(StudioLocationMap), {
   ssr: false,
-  loading: () => <div>로딩</div>,
+  loading: () => <div className="size-full animate-pulse bg-gray-700" />,
 });
 
 export default Map;
