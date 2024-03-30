@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { LocationSVG, SearchSVG } from '@/icons/svg';
-import Map from '@/components/Map/Map';
+import AddressMap from '@/components/Map/AddressMap';
 import { Juso, ProcessedJuso } from '@/types/address';
 
 interface ConfirmedLocationProps {
@@ -83,7 +83,7 @@ const ConfirmedLocation = ({
             })}
           />
           <div className=" h-[18.25rem]">
-            <Map
+            <AddressMap
               address={location.roadAddr}
               studioName={(location as Juso).bdNm || (location as Juso).emdNm}
             />

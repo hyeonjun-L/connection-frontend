@@ -148,9 +148,9 @@ const StudioInfoWindow = ({
   );
 };
 
-const Map = dynamic(() => Promise.resolve(StudioLocationMap), {
+const AddressMap = dynamic(() => Promise.resolve(StudioLocationMap), {
   ssr: false,
   loading: () => <div className="size-full animate-pulse bg-gray-700" />,
 });
 
-export default Map;
+export default AddressMap;

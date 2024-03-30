@@ -1,6 +1,6 @@
 import { LocationSVG } from '@/icons/svg';
 import { formatLocationToString } from '@/utils/parseUtils';
-import Map from '@/components/Map/Map';
+import AddressMap from '@/components/Map/AddressMap';
 import { IApplyDetailResponse } from '@/types/class';
 
 const ClassLocation = (props: IApplyDetailResponse) => {
@@ -17,7 +17,7 @@ const ClassLocation = (props: IApplyDetailResponse) => {
         <>
           <p className="mb-2.5">서울특별시 성동구 뚝섬</p>
           <div className="h-[18.25rem] max-w-[40rem] bg-slate-100">
-            {/* <Map address={locationDetail} studioName={studioName} /> */}
+            {/* <AddressMap address={locationDetail} studioName={studioName} /> */}
           </div>
           {locationDescription && (
             <p className="mt-2 font-normal">{locationDescription}</p>
