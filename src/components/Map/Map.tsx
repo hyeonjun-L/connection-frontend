@@ -21,40 +21,57 @@ interface MapProps {
 const StudioLocationMap = ({ address, studioName }: MapProps) => {
   const navermaps = useNavermaps();
 
+  const convertToLatLngAndXY = (y: string, x: string) => {
+    const latLng = new naver.maps.LatLng(Number(y), Number(x));
+    const { x: convertedX, y: convertedY } =
+      navermaps.TransCoord.fromLatLngToEPSG3857(latLng);
+    return { latLng, x: convertedX, y: convertedY };
+  };
+
+  const geocodeAddress = (query: string, subQuery: string) => {
+    return new Promise<{ latLng: naver.maps.LatLng; x: number; y: number }>(
+      (resolve, reject) => {
+        const processGeocodeResponse = (
+          searchQuery: string,
+          response: naver.maps.Service.GeocodeResponse,
+        ) => {
+          if (response.v2.errorMessage) {
+            reject(
+              new Error(
+                `Geocode Error, error: ${response.v2.errorMessage} address: ${searchQuery}`,
+              ),
+            );
+            return;
+          }
+          if (response.v2.meta.totalCount === 0) {
+            if (searchQuery === subQuery) {
+              reject(new Error('No results found'));
+              return;
+            } else {
+              searchAddress(subQuery);
+              return;
+            }
+          }
+
+          const item = response.v2.addresses[0];
+          resolve(convertToLatLngAndXY(item.y, item.x));
+        };
+
+        const searchAddress = (searchQuery: string) => {
+          navermaps.Service.geocode(
+            { query: searchQuery },
+            (status, response) => processGeocodeResponse(searchQuery, response),
+          );
+        };
+
+        searchAddress(query);
+      },
+    );
+  };
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ['map', address],
-    queryFn: () =>
-      new Promise<{ latLng: naver.maps.LatLng; x: number; y: number }>(
-        (resolve, reject) => {
-          navermaps.Service.geocode(
-            {
-              query: address,
-            },
-            (status, response) => {
-              if (status === navermaps.Service.Status.ERROR) {
-                reject(new Error('Geocode Error, address:' + address));
-              }
-              if (response.v2.meta.totalCount === 0) {
-                reject(new Error('No results found'));
-              }
-
-              const item = response.v2.addresses[0];
-              const latLng = new navermaps.LatLng(
-                Number(item.y),
-                Number(item.x),
-              );
-              const { x, y } =
-                navermaps.TransCoord.fromLatLngToEPSG3857(latLng);
-
-              resolve({
-                latLng,
-                x,
-                y,
-              });
-            },
-          );
-        },
-      ),
+    queryFn: () => geocodeAddress(address, studioName),
   });
 
   return isLoading ? (
