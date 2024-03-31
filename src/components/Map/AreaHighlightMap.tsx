@@ -20,16 +20,16 @@ const AreaLocationMap = () => {
   );
 
   const getPolyline = async () => {
-    const polylineList = [];
-    for (const [province, district] of Object.entries(addresses)) {
-      const result = await searchAddressPolyline(
+    const promises = Object.entries(addresses).map(([province, district]) =>
+      searchAddressPolyline(
         province,
         WARD_LIST[province].length === district.length
           ? 'province'
           : 'district',
-      );
-      polylineList.push(result);
-    }
+      ),
+    );
+
+    const polylineList = await Promise.all(promises);
     return polylineList;
   };
 
