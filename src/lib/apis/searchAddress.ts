@@ -1,4 +1,4 @@
-import { AddressData, Point, RoadAddrPoint } from '@/types/address';
+import { AddressData, RoadAddrPoint } from '@/types/address';
 import { FetchError } from '@/types/types';
 
 export const searchAddress = async (keyword: string, page: number | string) => {
@@ -36,6 +36,31 @@ export const searchAddressPoint = async (
     return data.response;
   } catch (error) {
     console.error('주소 좌표값 조회 오류', error);
+    throw error;
+  }
+};
+
+export const searchAddressPolyline = async (
+  query: string,
+  type: 'province' | 'district',
+): Promise<any> => {
+  try {
+    const response = await fetch(
+      `/api/map/polyline?query=${query}&type=${type}`,
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const error: FetchError = new Error(errorData.message || '');
+      error.status = response.status;
+      throw error;
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error('주소 좌표 경계값 조회 오류', error);
     throw error;
   }
 };
