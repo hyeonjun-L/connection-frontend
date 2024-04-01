@@ -44,7 +44,7 @@ export const searchAddressPolyline = async (
   query: string,
   type: 'province' | 'district',
   district: string[] | null,
-): Promise<[number, number][] | [number, number][][]> => {
+): Promise<[number, number][][] | [number, number][][][]> => {
   try {
     const response = await fetch(
       `/api/map/polyline?query=${query}&type=${type}`,

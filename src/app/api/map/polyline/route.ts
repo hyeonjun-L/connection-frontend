@@ -50,9 +50,8 @@ export const POST = async (request: NextRequest) => {
     .features as Polyline[];
 
   if (isProvince) {
-    console.log(responseData[0].geometry.coordinates);
     return NextResponse.json(
-      flattenCoordinates(responseData[0].geometry.coordinates),
+      responseData[0].geometry.coordinates.flatMap((a) => a),
     );
   }
 
@@ -60,28 +59,7 @@ export const POST = async (request: NextRequest) => {
     .filter(({ properties }) =>
       data.district.includes((properties as District).sig_kor_nm),
     )
-    .map(({ geometry }) => flattenCoordinates(geometry.coordinates));
+    .map(({ geometry }) => geometry.coordinates.flatMap((a) => a));
 
   return NextResponse.json(polylineData);
 };
-
-function flattenCoordinates(arr, result = []) {
-  arr.forEach((item) => {
-    if (Array.isArray(item)) {
-      flattenCoordinates(item, result);
-    } else {
-      if (
-        typeof item === 'number' &&
-        result.length > 0 &&
-        Array.isArray(result[result.length - 1]) &&
-        result[result.length - 1].length === 1
-      ) {
-        result[result.length - 1].push(item);
-      } else {
-        result.push([item]);
-      }
-    }
-  });
-
-  return result;
-}
