@@ -1,4 +1,4 @@
-import { AddressData, RoadAddrPoint } from '@/types/address';
+import { AddressData, Polyline, RoadAddrPoint } from '@/types/address';
 import { FetchError } from '@/types/types';
 
 export const searchAddress = async (keyword: string, page: number | string) => {
@@ -43,10 +43,20 @@ export const searchAddressPoint = async (
 export const searchAddressPolyline = async (
   query: string,
   type: 'province' | 'district',
-): Promise<any> => {
+  district: string[] | null,
+): Promise<[number, number][] | [number, number][][]> => {
   try {
     const response = await fetch(
       `/api/map/polyline?query=${query}&type=${type}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          district,
+        }),
+      },
     );
 
     if (!response.ok) {
