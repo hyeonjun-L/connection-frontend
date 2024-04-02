@@ -53,3 +53,21 @@
 .destination-button:hover {
   color: var(--sub-color1);
 }
+
+.markerBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 85px;
+  height: 30px;
+  font-size: 0.7rem;
+  background-color: black;
+  border-radius: 0.31rem;
+  border-color: white;
+  border-style: solid;
+  border-width: 1px;
+  font-weight: 600;
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
