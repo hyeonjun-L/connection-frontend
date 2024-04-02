@@ -1,7 +1,7 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import { Fragment, useMemo } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import {
   NaverMap,
   Container as MapDiv,
@@ -15,14 +15,23 @@ import { searchAddressPolyline } from '@/lib/apis/searchAddress';
 import ErrorMap from './ErrorMap';
 import { IClassRegionResponse } from '@/types/class';
 
-const AreaLocationMap = (regions: IClassRegionResponse[]) => {
+const AreaLocationMap = (rega: IClassRegionResponse[]) => {
+  const [map, setMap] = useState<naver.maps.Map | null>(null);
+
   useNavermaps();
+  const regions = [
+    {
+      region: { administrativeDistrict: '세종특별자치시', district: '전 지역' },
+    },
+    { region: { administrativeDistrict: '부산광역시', district: '중구' } },
+    { region: { administrativeDistrict: '부산광역시', district: '서구' } },
+  ];
 
   const addresses = useMemo(
     () =>
       regions.reduce(
         (
-          acc: { [key: string]: string[] },
+          acc: { [kye: string]: string[] },
           { region: { administrativeDistrict, district } },
         ) => {
           if (acc[administrativeDistrict]) {
@@ -37,7 +46,7 @@ const AreaLocationMap = (regions: IClassRegionResponse[]) => {
     [],
   );
 
-  const getDefaultCenter = (addresses: { [key: string]: string[] }) => {
+  const getDefaultCenter = (addresses: { [kye: string]: string[] }) => {
     const administrativeDistrictList = Object.keys(addresses);
     if (administrativeDistrictList.length === 1) {
       const [lng, lat] = EPSG_PROVINCE[administrativeDistrictList[0]];
@@ -87,6 +96,13 @@ const AreaLocationMap = (regions: IClassRegionResponse[]) => {
     return { polylineList: convertedPolylineList, markerPoint };
   };
 
+  const selectMarker = (latLnt: naver.maps.LatLng) => {
+    if (map) {
+      map.setZoom(9);
+      map.panTo(latLnt);
+    }
+  };
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ['polyline', 'classID?'],
     queryFn: getPolyline,
@@ -105,6 +121,7 @@ const AreaLocationMap = (regions: IClassRegionResponse[]) => {
       }}
     >
       <NaverMap
+        ref={setMap}
         zoom={Object.keys(addresses).length === 1 ? 8 : 3}
         center={getDefaultCenter(addresses)}
       >
@@ -112,6 +129,7 @@ const AreaLocationMap = (regions: IClassRegionResponse[]) => {
           <Marker
             key={x}
             position={new naver.maps.LatLng(y, x)}
+            onClick={() => selectMarker(new naver.maps.LatLng(y, x))}
             icon={{
               content: `<div class="markerBox">${markerName[index]}</div>`,
             }}
