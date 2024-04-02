@@ -776,7 +776,7 @@ interface IApplyDetailResponse {
       detailAddress: string;
       buildingName: string;
     };
-    region?: IRegion[];
+    region: IRegion[];
     locationDescription: string | null;
   };
   lecturer: {
