@@ -13,26 +13,24 @@ import {
 import { EPSG_PROVINCE } from '@/constants/administrativeDistrict';
 import { searchAddressPolyline } from '@/lib/apis/searchAddress';
 import ErrorMap from './ErrorMap';
-import { IClassRegionResponse } from '@/types/class';
+import { IRegion } from '@/types/types';
 
-const AreaLocationMap = (rega: IClassRegionResponse[]) => {
+interface AreaLocationMapProps {
+  id?: string;
+  regions: IRegion[];
+}
+
+const AreaLocationMap = ({ regions, id }: AreaLocationMapProps) => {
   const [map, setMap] = useState<naver.maps.Map | null>(null);
 
   useNavermaps();
-  const regions = [
-    {
-      region: { administrativeDistrict: '세종특별자치시', district: '전 지역' },
-    },
-    { region: { administrativeDistrict: '부산광역시', district: '중구' } },
-    { region: { administrativeDistrict: '부산광역시', district: '서구' } },
-  ];
 
   const addresses = useMemo(
     () =>
       regions.reduce(
         (
           acc: { [kye: string]: string[] },
-          { region: { administrativeDistrict, district } },
+          { administrativeDistrict, district },
         ) => {
           if (acc[administrativeDistrict]) {
             acc[administrativeDistrict].push(district);
@@ -56,10 +54,8 @@ const AreaLocationMap = (rega: IClassRegionResponse[]) => {
     return new naver.maps.LatLng(lat, lng);
   };
 
-  const markerName = regions.map(({ region }) =>
-    region.district === '전 지역'
-      ? region.administrativeDistrict
-      : region.district,
+  const markerName = regions.map(({ administrativeDistrict, district }) =>
+    district === '전 지역' ? administrativeDistrict : district,
   );
 
   const getPolyline = async () => {
@@ -104,9 +100,9 @@ const AreaLocationMap = (rega: IClassRegionResponse[]) => {
   };
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['polyline', 'classID?'],
+    queryKey: ['polyline', id],
     queryFn: getPolyline,
-    retry: false,
+    staleTime: Infinity,
   });
 
   return isLoading ? (

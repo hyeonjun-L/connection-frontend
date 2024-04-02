@@ -9,7 +9,7 @@ import {
   getClassDetail,
   getClassSchedules,
 } from '@/lib/apis/serverApis/classPostApis';
-import { formatDate } from '@/utils/parseUtils';
+import { formatDate, formatLocationToString } from '@/utils/parseUtils';
 import { sanitizeHtmlString } from '@/utils/sanitizeHtmlString';
 import Apply from './Apply';
 import ReadMore from './ReadMore';
@@ -46,6 +46,7 @@ const ClassDetail = async ({ id }: { id: string }) => {
     maxCapacity,
     duration,
     stars,
+    lectureToRegion,
   } = classDetail;
 
   const { schedules, regularLectureStatus } = classSchedule;
@@ -170,7 +171,7 @@ const ClassDetail = async ({ id }: { id: string }) => {
             />
             {isDetailLocation
               ? location.detailAddress
-              : '강사와 상의하여 지도에 표시된 구역 내에서 수업이 진행됩니다.'}
+              : formatLocationToString(lectureToRegion)}
           </span>
 
           <div className="h-[18.25rem] max-w-[40rem] bg-slate-100">
@@ -180,8 +181,10 @@ const ClassDetail = async ({ id }: { id: string }) => {
                 studioName={location.buildingName}
               />
             ) : (
-              // <AreaHighlightMap />
-              <>s</>
+              <AreaHighlightMap
+                id={id}
+                regions={lectureToRegion.map(({ region }) => region)}
+              />
             )}
           </div>
           <p className="text-sm font-normal">{locationDescription}</p>

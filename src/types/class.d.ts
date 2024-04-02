@@ -375,12 +375,13 @@ export interface IClassDetailResponse {
   minCapacity: number;
   reviewCount: number;
   locationDescription: string | null;
-  location: {
+  location?: {
     id: number;
     address: string;
     detailAddress: string;
     buildingName: string;
   };
+  lectureToRegion: IClassRegionResponse[];
   duration: number;
   stars: number;
 }

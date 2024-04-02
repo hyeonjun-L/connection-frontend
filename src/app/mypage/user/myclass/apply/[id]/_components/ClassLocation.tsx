@@ -20,7 +20,7 @@ const ClassLocation = (props: IApplyDetailResponse) => {
         )}
       </h2>
       <p className="mb-2.5">
-        {location ? location.address : formatLocationToString(region)}
+        {location ? location.detailAddress : formatLocationToString(region)}
       </p>
       <div className="h-[18.25rem] max-w-[40rem] bg-slate-100">
         {location ? (
