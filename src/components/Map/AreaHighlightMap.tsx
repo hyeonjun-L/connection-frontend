@@ -10,24 +10,19 @@ import {
   Polygon,
   Marker,
 } from 'react-naver-maps';
+import { EPSG_PROVINCE } from '@/constants/administrativeDistrict';
 import { searchAddressPolyline } from '@/lib/apis/searchAddress';
 import ErrorMap from './ErrorMap';
+import { IClassRegionResponse } from '@/types/class';
 
-const AreaLocationMap = () => {
-  const navermaps = useNavermaps();
-  const regions = [
-    {
-      region: { administrativeDistrict: '세종특별자치시', district: '전 지역' },
-    },
-    { region: { administrativeDistrict: '부산광역시', district: '중구' } },
-    { region: { administrativeDistrict: '부산광역시', district: '서구' } },
-  ];
+const AreaLocationMap = (regions: IClassRegionResponse[]) => {
+  useNavermaps();
 
   const addresses = useMemo(
     () =>
       regions.reduce(
         (
-          acc: { [kye: string]: string[] },
+          acc: { [key: string]: string[] },
           { region: { administrativeDistrict, district } },
         ) => {
           if (acc[administrativeDistrict]) {
@@ -41,6 +36,16 @@ const AreaLocationMap = () => {
       ),
     [],
   );
+
+  const getDefaultCenter = (addresses: { [key: string]: string[] }) => {
+    const administrativeDistrictList = Object.keys(addresses);
+    if (administrativeDistrictList.length === 1) {
+      const [lng, lat] = EPSG_PROVINCE[administrativeDistrictList[0]];
+      return new naver.maps.LatLng(lat, lng);
+    }
+    const [lng, lat] = EPSG_PROVINCE.default;
+    return new naver.maps.LatLng(lat, lng);
+  };
 
   const markerName = regions.map(({ region }) =>
     region.district === '전 지역'
@@ -99,7 +104,10 @@ const AreaLocationMap = () => {
         height: '100%',
       }}
     >
-      <NaverMap zoom={7} center={new naver.maps.LatLng(36.4203004, 128.31796)}>
+      <NaverMap
+        zoom={Object.keys(addresses).length === 1 ? 8 : 3}
+        center={getDefaultCenter(addresses)}
+      >
         {data.markerPoint.map(([x, y], index) => (
           <Marker
             key={x}

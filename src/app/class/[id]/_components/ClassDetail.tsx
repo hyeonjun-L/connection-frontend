@@ -153,9 +153,16 @@ const ClassDetail = async ({ id }: { id: string }) => {
         </section>
 
         <section id="location-section" className="mb-14 scroll-mt-16">
-          <h2 className={CLASS_HSTYLE.h2}>진행 장소</h2>
+          <div className="flex items-center gap-2">
+            <h2 className={CLASS_HSTYLE.h2}>진행 장소</h2>
+            {!isDetailLocation && (
+              <p className="mb-2 text-sm text-sub-color1">
+                *정확한 위치는 강사에게 문의하세요
+              </p>
+            )}
+          </div>
 
-          <span className="mb-2 mt-2 flex items-center gap-0.5 text-sm sm:text-base">
+          <span className="mb-2 flex items-center gap-0.5 text-sm sm:text-base">
             <LocationSVG
               width={21}
               height={21}
@@ -173,7 +180,8 @@ const ClassDetail = async ({ id }: { id: string }) => {
                 studioName={location.buildingName}
               />
             ) : (
-              <AreaHighlightMap />
+              // <AreaHighlightMap />
+              <>s</>
             )}
           </div>
           <p className="text-sm font-normal">{locationDescription}</p>

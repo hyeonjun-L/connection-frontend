@@ -20,7 +20,8 @@ export const CITY_LIST: CityList[] = [
   '제주',
 ];
 
-export const EPSG_PROVINCE = {
+export const EPSG_PROVINCE: { [key: string]: [number, number] } = {
+  default: [127.998046, 35.752456],
   서울특별시: [126.974101, 37.565136],
   경기도: [127.225342, 37.609155],
   부산광역시: [129.075623, 35.179047],
