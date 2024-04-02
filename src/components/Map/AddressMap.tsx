@@ -19,7 +19,7 @@ interface MapProps {
   studioName: string;
 }
 
-const StudioLocationMap = ({ address, studioName }: MapProps) => {
+export const StudioLocationMap = ({ address, studioName }: MapProps) => {
   const navermaps = useNavermaps();
 
   const convertToLatLngAndXY = ({ x, y }: Point) => {

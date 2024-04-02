@@ -6,7 +6,7 @@ import { IApplyDetailResponse } from '@/types/class';
 
 const ClassLocation = (props: IApplyDetailResponse) => {
   const { lecture } = props;
-  const { location, region, locationDescription } = lecture;
+  const { location, region, locationDescription, id } = lecture;
 
   return (
     <section className="mt-5 text-sm">
@@ -29,7 +29,7 @@ const ClassLocation = (props: IApplyDetailResponse) => {
             studioName={location.buildingName}
           />
         ) : (
-          <AreaHighlightMap regions={region} />
+          <AreaHighlightMap regions={region} id={id} />
         )}
       </div>
       {locationDescription && (

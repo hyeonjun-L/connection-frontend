@@ -16,7 +16,7 @@ import ErrorMap from './ErrorMap';
 import { IRegion } from '@/types/types';
 
 interface AreaLocationMapProps {
-  id?: string;
+  id: string | number;
   regions: IRegion[];
 }
 
