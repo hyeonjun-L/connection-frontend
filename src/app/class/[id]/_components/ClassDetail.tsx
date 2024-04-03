@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Apply from './Apply';
 import ReadMore from './ReadMore';
 import RegularApply from './RegularApply';
+import ChatButton from '@/components/Chat/ChatButton';
 import Notice from '@/components/ClassNotice/Notice';
 import Map from '@/components/Map/Map';
 import Nav from '@/components/Nav/Nav';
@@ -80,9 +81,10 @@ const ClassDetail = async ({ id }: { id: string }) => {
               강사 프로필
             </Link>
 
-            <Link
-              href={`/chat/${lecturer.id}`}
-              className={`h-[28px] ${ButtonStyles.secondary}`}
+            <ChatButton
+              btnClassName={`h-[28px] ${ButtonStyles.secondary}`}
+              targetId={lecturer.id}
+              targetType="lecturer"
             >
               <ChatSVG
                 width="17"
@@ -91,7 +93,7 @@ const ClassDetail = async ({ id }: { id: string }) => {
                 className="mr-[3px]"
               />
               문의하기
-            </Link>
+            </ChatButton>
           </div>
         </div>
 

@@ -4,6 +4,12 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useDebounce } from 'react-use';
+import { ChatSVG } from '@/icons/svg';
+import { getScheduleRegisterLists } from '@/lib/apis/classApis';
+import { patchMemberMemo } from '@/lib/apis/instructorApi';
+import { formatDateTimeNoSec } from '@/utils/dateTimeUtils';
+import { getRegularScheduleTime } from '@/utils/scheduleDateUtils';
+import ChatButton from '@/components/Chat/ChatButton';
 import Modal from '@/components/Modal/Modal';
 import UserProfileMenu from '@/components/Profile/UserProfileMenu';
 import Spinner from '@/components/Spinner/Spinner';
@@ -12,11 +18,6 @@ import {
   IScheduleLearnerList,
   IRegularClassSchedule,
 } from '@/types/class';
-import { ChatSVG } from '@/icons/svg';
-import { getScheduleRegisterLists } from '@/lib/apis/classApis';
-import { patchMemberMemo } from '@/lib/apis/instructorApi';
-import { formatDateTimeNoSec } from '@/utils/dateTimeUtils';
-import { getRegularScheduleTime } from '@/utils/scheduleDateUtils';
 
 interface EnrollmentModalProps {
   isOpen: boolean;
@@ -234,14 +235,13 @@ const ScheduleLearnerList = (props: ScheduleLearnerListProps) => {
           신고
         </Link>
 
-        <Link
-          href={`/chat/${userId}`}
+        <ChatButton
+          targetType="user"
+          targetId={userId}
           aria-label="유저와 채팅"
-          className="cursor-pointer"
-          prefetch={false}
         >
           <ChatSVG fill="black" width="29" height="30" />
-        </Link>
+        </ChatButton>
       </div>
 
       <div className="flex w-full items-center justify-end">
