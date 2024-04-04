@@ -1,16 +1,15 @@
 import Link from 'next/link';
-import { dummyUserInfo } from '@/constants/dummy';
-import { AlarmSVG, ChatSVG, SearchSVG } from '@/icons/svg';
+import { SearchSVG } from '@/icons/svg';
+import NotificationIndicator from './NotificationIndicator';
 import Profile from './Profile';
-import { profileInfo } from '@/types/auth';
+import { profileInfo, userType } from '@/types/auth';
 
 interface UserProfileLinksProps {
   authUser: profileInfo | null;
+  userType: userType | null;
 }
 
-const UserProfileLinks = ({ authUser }: UserProfileLinksProps) => {
-  const { alarmCount, commentCount } = dummyUserInfo;
-
+const UserProfileLinks = ({ authUser, userType }: UserProfileLinksProps) => {
   return (
     <div className="flex items-end gap-3">
       <h2 className="text-0 overflow-hidden indent-[-9999px]">
@@ -27,21 +26,9 @@ const UserProfileLinks = ({ authUser }: UserProfileLinksProps) => {
         </Link>
       )}
 
-      {authUser && (
+      {authUser && userType && (
         <>
-          <button className="relative">
-            <AlarmSVG className="fill-black pt-0.5" width="31" height="31" />
-            <span className="absolute -right-1.5 top-0 min-w-[1rem] rounded-full bg-main-color px-1 text-xs font-bold text-white">
-              {alarmCount}
-            </span>
-          </button>
-
-          <button className="relative">
-            <ChatSVG fill="black" width="29" height="30" />
-            <span className="absolute -right-1.5 top-0 min-w-[1rem] rounded-full bg-main-color px-1 text-xs font-bold text-white">
-              {commentCount}
-            </span>
-          </button>
+          <NotificationIndicator id={authUser.id} userType={userType} />
 
           <Profile defaultProfileImg={authUser.profileImage} />
         </>

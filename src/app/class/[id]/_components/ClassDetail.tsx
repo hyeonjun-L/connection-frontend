@@ -14,6 +14,7 @@ import { sanitizeHtmlString } from '@/utils/sanitizeHtmlString';
 import Apply from './Apply';
 import ReadMore from './ReadMore';
 import RegularApply from './RegularApply';
+import ChatButton from '@/components/Chat/ChatButton';
 import Notice from '@/components/ClassNotice/Notice';
 import AddressMap from '@/components/Map/AddressMap';
 import AreaHighlightMap from '@/components/Map/AreaHighlightMap';
@@ -84,9 +85,10 @@ const ClassDetail = async ({ id }: { id: string }) => {
               강사 프로필
             </Link>
 
-            <Link
-              href={`/chat/${lecturer.id}`}
-              className={`h-[28px] ${ButtonStyles.secondary}`}
+            <ChatButton
+              btnClassName={`h-[28px] ${ButtonStyles.secondary}`}
+              targetId={lecturer.id}
+              targetType="lecturer"
             >
               <ChatSVG
                 width="17"
@@ -95,7 +97,7 @@ const ClassDetail = async ({ id }: { id: string }) => {
                 className="mr-[3px]"
               />
               문의하기
-            </Link>
+            </ChatButton>
           </div>
         </div>
 

@@ -1,15 +1,6 @@
-import { cookies } from 'next/headers';
 import Link from 'next/link';
-import ClassList from './_components/ClassList';
-import InstructorCarousel from './_components/InstructorCarousel';
-import { OptionButtons } from '@/components/Button';
-import Like from '@/components/Like/Like';
-import Nav from '@/components/Nav/Nav';
-import { Review } from '@/components/Review';
-import ReviewSection from '@/components/uis/ReviewSection';
-import type { Metadata } from 'next';
 import { INSTRUCTOR_SECTIONS } from '@/constants/constants';
-import { InstagramSVG, YoutubeSVG, LinkSVG } from '@/icons/svg';
+import { InstagramSVG, YoutubeSVG, LinkSVG, ChatSVG } from '@/icons/svg';
 import {
   getInstructor,
   getInstructorClassLists,
@@ -21,6 +12,15 @@ import {
   formatGenreToString,
 } from '@/utils/parseUtils';
 import { sanitizeHtmlString } from '@/utils/sanitizeHtmlString';
+import ClassList from './_components/ClassList';
+import InstructorCarousel from './_components/InstructorCarousel';
+import { OptionButtons } from '@/components/Button';
+import ChatButton from '@/components/Chat/ChatButton';
+import Like from '@/components/Like/Like';
+import Nav from '@/components/Nav/Nav';
+import { Review } from '@/components/Review';
+import ReviewSection from '@/components/uis/ReviewSection';
+import type { Metadata } from 'next';
 
 export const generateMetadata = async ({
   params,
@@ -28,7 +28,7 @@ export const generateMetadata = async ({
   params: { id: string };
 }): Promise<Metadata> => {
   const { id } = params;
-  const profile = await getInstructor(id, false);
+  const profile = await getInstructor(id);
 
   if (profile instanceof Error || !profile) {
     return {
@@ -50,10 +50,7 @@ const InstructorDetailPage = async ({
 }: {
   params: { id: string };
 }) => {
-  const cookieStore = cookies();
-  const user = cookieStore.get('userAccessToken')?.value;
-
-  const profile = getInstructor(id, !!user);
+  const profile = getInstructor(id);
   const classLists = getInstructorClassLists(id);
   const passLists = getLecturerPassList(id);
 
@@ -106,7 +103,10 @@ const InstructorDetailPage = async ({
               {nickname}
               <Like type="instructor" id={id} isLiked={isLiked} />
             </h1>
-            <div className="absolute right-0 flex gap-3">
+            <div className="absolute right-0 flex gap-2">
+              <ChatButton targetType="lecturer" targetId={Number(id)}>
+                <ChatSVG width="23" height="23" className="fill-gray-300" />
+              </ChatButton>
               <OptionButtons
                 mode="instructor"
                 title={nickname}
