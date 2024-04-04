@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { Arrow } from '@/../public/icons/svg';
+import { CarouselProps } from '@/types/cariusel';
 
 /**
  * CarouselProps Interface
@@ -46,31 +47,6 @@ import { Arrow } from '@/../public/icons/svg';
  * @property {boolean} [movePause = false] - 캐러셀의 움직임을 true 동안 일시정지 (기본값 = false)
  * @property {boolean} [gotoIndex = null] - 캐러셀의 인덱스를 변경 하는 선택적 플래그 (number)
  */
-
-interface Props {
-  move: boolean;
-  arrow?: boolean;
-  priority?: number;
-  showCurrentElement?: boolean;
-  showCurrentElementBackGround?: boolean;
-  gap?: number;
-  carouselMoveIntervalTime?: number;
-  arrowPushMoveWaitTime?: number;
-  movePause?: boolean;
-  gotoIndex?: number;
-}
-
-interface ChildrenProps extends Props {
-  children: React.ReactNode;
-  imgURL?: string[];
-}
-
-interface ImgURLProps extends Props {
-  imgURL: string[];
-  children?: React.ReactNode;
-}
-
-type CarouselProps = ChildrenProps | ImgURLProps;
 
 const Carousel = ({
   imgURL,
