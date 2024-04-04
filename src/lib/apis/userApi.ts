@@ -1,7 +1,7 @@
 import { toast } from 'react-toastify';
 import { userProfile, userType, userProfileupdate } from '@/types/auth';
-import { IRegisterForm } from '@/types/form';
 import { social } from '@/types/auth';
+import { IRegisterForm } from '@/types/form';
 import { FetchError } from '@/types/types';
 
 export const checkUserNickname = async (nickname: string) => {
@@ -137,6 +137,7 @@ export const accessTokenReissuance = async () => {
 
     if (response.type === 'opaqueredirect') {
       window.location.href = response.url;
+      throw '세션 종료';
     }
 
     return response;
