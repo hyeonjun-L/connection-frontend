@@ -7,6 +7,7 @@ import {
   getInstructorProfile,
   getMyProfile,
 } from '@/lib/apis/serverApis/userApi';
+import NaverMapsProviders from '@/lib/provider/NaverMapsProviders';
 import Providers from '@/lib/provider/providers';
 import { convertToProfileInfo } from '@/utils/apiDataProcessor';
 import ChatModal from './_components/chat/ChatModal';
@@ -92,9 +93,9 @@ export default async function RootLayout({
             pauseOnHover
             theme="light"
           />
+          <NaverMapsProviders>{children}</NaverMapsProviders>
           {children}
           <ControlOptions />
-
           <Footer />
           <MobileNav />
         </Providers>

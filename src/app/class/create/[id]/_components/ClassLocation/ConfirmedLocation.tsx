@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { LocationSVG, SearchSVG } from '@/icons/svg';
-import Map from '@/components/Map/Map';
+import AddressMap from '@/components/Map/AddressMap';
 import { Juso, ProcessedJuso } from '@/types/address';
 
 interface ConfirmedLocationProps {
@@ -33,11 +33,10 @@ const ConfirmedLocation = ({
   useEffect(() => {
     const receiveMessage = (event: MessageEvent) => {
       if (
-        process.env.NODE_ENV === 'development' &&
-        (event.origin !== window.origin ||
-          event.data.source === 'react-devtools-content-script' ||
-          event.data.source === 'react-devtools-backend-manager' ||
-          event.data.source === 'react-devtools-bridge')
+        event.origin !== window.origin ||
+        event.data.source === 'react-devtools-content-script' ||
+        event.data.source === 'react-devtools-backend-manager' ||
+        event.data.source === 'react-devtools-bridge'
       )
         return;
 
@@ -84,7 +83,10 @@ const ConfirmedLocation = ({
             })}
           />
           <div className=" h-[18.25rem]">
-            <Map address={location.roadAddr} studioName={location.bdNm} />
+            <AddressMap
+              address={location.roadAddr}
+              studioName={(location as Juso).bdNm || (location as Juso).emdNm}
+            />
           </div>
         </section>
       )}

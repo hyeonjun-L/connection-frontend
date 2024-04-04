@@ -1,9 +1,9 @@
 import { StoryObj, Meta } from '@storybook/react';
-import Map from './Map';
+import AddressMap from './AddressMap';
 
-const meta: Meta<typeof Map> = {
+const meta: Meta<typeof AddressMap> = {
   title: 'Components/Map',
-  component: Map,
+  component: AddressMap,
   tags: ['autodocs'],
   argTypes: {
     address: {
@@ -20,12 +20,12 @@ const meta: Meta<typeof Map> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof Map>;
+type Story = StoryObj<typeof AddressMap>;
 
 export const 기본: Story = {
   render: (args) => (
     <div className=" h-96 w-full ">
-      <Map {...args} />
+      <AddressMap {...args} />
     </div>
   ),
 };
