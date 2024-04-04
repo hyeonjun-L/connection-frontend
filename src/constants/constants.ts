@@ -520,4 +520,19 @@ export const HIDE_NAV_PATH = [
   '^/instructor/[\\w-]+/edit$',
 ];
 
+export const CHATS_TAKE = 12 as const;
+
+export const CHAT_INTERSECT_REF_OPTIONS = {
+  root: null,
+  rootMargin: '0px',
+  threshold: 0.1,
+} as const;
+
+export const CHAT_BOX_SIZE_LIMITS = {
+  MIN_HEIGHT: 242,
+  MIN_WIDTH: 300,
+  MAX_HEIGHT: 644,
+  MAX_WIDTH: 608,
+} as const;
+
 export const SEARCH_LOCAL_STORAGE_KEY = 'searchKeys';
