@@ -521,3 +521,5 @@ export const HIDE_NAV_PATH = [
 ];
 
 export const SEARCH_LOCAL_STORAGE_KEY = 'searchKeys';
+
+export const FRONT_DOMAIN = 'https://connection-frontend.vercel.app' as const;

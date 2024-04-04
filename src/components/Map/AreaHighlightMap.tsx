@@ -29,7 +29,7 @@ const AreaLocationMap = ({ regions, id }: AreaLocationMapProps) => {
     () =>
       regions.reduce(
         (
-          acc: { [kye: string]: string[] },
+          acc: { [key: string]: string[] },
           { administrativeDistrict, district },
         ) => {
           if (acc[administrativeDistrict]) {
@@ -44,7 +44,7 @@ const AreaLocationMap = ({ regions, id }: AreaLocationMapProps) => {
     [],
   );
 
-  const getDefaultCenter = (addresses: { [kye: string]: string[] }) => {
+  const getDefaultCenter = (addresses: { [key: string]: string[] }) => {
     const administrativeDistrictList = Object.keys(addresses);
     if (administrativeDistrictList.length === 1) {
       const [lng, lat] = EPSG_PROVINCE[administrativeDistrictList[0]];
