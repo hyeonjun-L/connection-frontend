@@ -1,35 +1,54 @@
-import isSameDay from 'date-fns/isSameDay';
-import { generateDatesFromNewEndDate } from '@/utils/parseUtils';
-import { IDaySchedule } from '@/types/class';
+import { calculateFinalDates } from '@/utils/scheduleDateUtils';
+import {
+  IDaySchedule,
+  IRegularClassSchedule,
+  IRegularScheduleData,
+  IClassSchedule,
+} from '@/types/class';
 
 export const filteredAddedSchedules = (
-  originSchedule: Date[],
-  newSchedules: Date[],
-  daySchedule: IDaySchedule[],
+  originSchedule: IClassSchedule[],
+  newSchedules: IDaySchedule[],
+  startDate: string,
   newEndDate: string,
-  newRange: { startDate: string; endDate: string },
+  holidays: Date[],
 ) => {
-  const originDates = originSchedule.map((date) => date.toISOString());
-  const newValDates = newSchedules.reduce((acc: string[], date) => {
-    if (date !== null) {
-      acc.push(date.toISOString());
-    }
-    return acc;
-  }, []);
+  const originDates = originSchedule.map(
+    (date) => new Date(date.startDateTime),
+  );
+  const newSchedulesDates = calculateFinalDates(
+    startDate,
+    newEndDate,
+    newSchedules,
+    holidays,
+  );
 
-  const differenceSchedules = newValDates
-    .filter((date) => !originDates.includes(date))
-    .map((date) => new Date(date));
+  const datesInclude = (arr: Date[], date: Date) => {
+    return arr.some((d) => d.getTime() === date.getTime());
+  };
 
-  return daySchedule
-    ? newEndDate && isSameDay(new Date(newRange.endDate), new Date(newEndDate))
-      ? {}
-      : {
-          schedules: generateDatesFromNewEndDate(
-            newRange.endDate,
-            newEndDate,
-            daySchedule,
-          ),
-        }
-    : { schedules: differenceSchedules };
+  const filteredNewSchedules = newSchedulesDates.filter(
+    (date) => !datesInclude(originDates, date),
+  );
+
+  return filteredNewSchedules;
+};
+
+export const getNewRegularSchedule = (
+  originalSchedules: IRegularClassSchedule[],
+  newSchedules: IRegularScheduleData[],
+) => {
+  const originScheduleSet = new Set(
+    originalSchedules.map((item) =>
+      JSON.stringify({ day: item.day, dateTime: item.dateTime }),
+    ),
+  );
+
+  const newScheduleData = newSchedules.filter((item) => {
+    return !originScheduleSet.has(
+      JSON.stringify({ day: item.day, dateTime: item.dateTime }),
+    );
+  });
+
+  return newScheduleData;
 };
