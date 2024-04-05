@@ -1,14 +1,4 @@
 import Link from 'next/link';
-import Apply from './Apply';
-import ReadMore from './ReadMore';
-import RegularApply from './RegularApply';
-import Notice from '@/components/ClassNotice/Notice';
-import Map from '@/components/Map/Map';
-import Nav from '@/components/Nav/Nav';
-import ProfileImage from '@/components/Profile/ProfileImage';
-import RegularScheduleView from '@/components/ScheduleView/RegularScheduleView';
-import ScheduleView from '@/components/ScheduleView/ScheduleView';
-import ReviewSection from '@/components/uis/ReviewSection';
 import {
   ButtonStyles,
   CLASS_SECTIONS,
@@ -19,8 +9,20 @@ import {
   getClassDetail,
   getClassSchedules,
 } from '@/lib/apis/serverApis/classPostApis';
-import { formatDate } from '@/utils/parseUtils';
+import { formatDate, formatLocationToString } from '@/utils/parseUtils';
 import { sanitizeHtmlString } from '@/utils/sanitizeHtmlString';
+import Apply from './Apply';
+import ReadMore from './ReadMore';
+import RegularApply from './RegularApply';
+import ChatButton from '@/components/Chat/ChatButton';
+import Notice from '@/components/ClassNotice/Notice';
+import AddressMap from '@/components/Map/AddressMap';
+import AreaHighlightMap from '@/components/Map/AreaHighlightMap';
+import Nav from '@/components/Nav/Nav';
+import ProfileImage from '@/components/Profile/ProfileImage';
+import RegularScheduleView from '@/components/ScheduleView/RegularScheduleView';
+import ScheduleView from '@/components/ScheduleView/ScheduleView';
+import ReviewSection from '@/components/uis/ReviewSection';
 
 const ClassDetail = async ({ id }: { id: string }) => {
   const classDetailData = getClassDetail(id);
@@ -45,9 +47,12 @@ const ClassDetail = async ({ id }: { id: string }) => {
     maxCapacity,
     duration,
     stars,
+    lectureToRegion,
   } = classDetail;
 
   const { schedules, regularLectureStatus } = classSchedule;
+
+  const isDetailLocation = !!location;
 
   return (
     <>
@@ -80,9 +85,10 @@ const ClassDetail = async ({ id }: { id: string }) => {
               강사 프로필
             </Link>
 
-            <Link
-              href={`/chat/${lecturer.id}`}
-              className={`h-[28px] ${ButtonStyles.secondary}`}
+            <ChatButton
+              btnClassName={`h-[28px] ${ButtonStyles.secondary}`}
+              targetId={lecturer.id}
+              targetType="lecturer"
             >
               <ChatSVG
                 width="17"
@@ -91,7 +97,7 @@ const ClassDetail = async ({ id }: { id: string }) => {
                 className="mr-[3px]"
               />
               문의하기
-            </Link>
+            </ChatButton>
           </div>
         </div>
 
@@ -150,13 +156,38 @@ const ClassDetail = async ({ id }: { id: string }) => {
         </section>
 
         <section id="location-section" className="mb-14 scroll-mt-16">
-          <h2 className={CLASS_HSTYLE.h2}>진행 장소</h2>
-          <span className="mb-2 mt-2 flex items-center gap-0.5">
-            <LocationSVG width={21} height={21} className="fill-sub-color1" />{' '}
-            {/* detailAddress*/}
+          <div className="flex items-center gap-2">
+            <h2 className={CLASS_HSTYLE.h2}>진행 장소</h2>
+            {!isDetailLocation && (
+              <p className="mb-2 text-sm text-sub-color1">
+                *정확한 위치는 강사에게 문의하세요
+              </p>
+            )}
+          </div>
+
+          <span className="mb-2 flex items-center gap-0.5 text-sm sm:text-base">
+            <LocationSVG
+              width={21}
+              height={21}
+              className="flex-shrink-0 fill-sub-color1"
+            />
+            {isDetailLocation
+              ? location.detailAddress
+              : formatLocationToString(lectureToRegion)}
           </span>
+
           <div className="h-[18.25rem] max-w-[40rem] bg-slate-100">
-            {/* <Map address={locationDetail} studioName={studioName} /> */}
+            {isDetailLocation ? (
+              <AddressMap
+                address={location.address}
+                studioName={location.buildingName}
+              />
+            ) : (
+              <AreaHighlightMap
+                id={id}
+                regions={lectureToRegion.map(({ region }) => region)}
+              />
+            )}
           </div>
           <p className="text-sm font-normal">{locationDescription}</p>
         </section>
