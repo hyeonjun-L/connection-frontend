@@ -112,45 +112,6 @@ export const formatScheduleDays = (
   });
 };
 
-export const generateDatesFromNewEndDate = (
-  startDate: string,
-  endDate: string,
-  schedules: IDaySchedule[],
-) => {
-  const dayMapping: {
-    [key in '일' | '월' | '화' | '수' | '목' | '금' | '토']: number;
-  } = { 일: 0, 월: 1, 화: 2, 수: 3, 목: 4, 금: 5, 토: 6 };
-
-  let allDates = eachDayOfInterval({
-    start: new Date(startDate),
-    end: new Date(endDate),
-  });
-
-  if (schedules.length === 0) return [];
-
-  return schedules.reduce((acc: Date[], schedule) => {
-    const days = schedule.day.map((dayStr) => dayMapping[dayStr]);
-
-    schedule.dateTime.forEach((time) => {
-      const [hourStr, minuteStr] = time.split(':');
-
-      allDates.forEach((date) => {
-        const day = getDay(date);
-
-        if (days.includes(day)) {
-          const hour = parseInt(hourStr, 10);
-          const minute = parseInt(minuteStr, 10);
-          const newDate = set(date, { hours: hour, minutes: minute });
-
-          acc.push(newDate);
-        }
-      });
-    });
-
-    return acc;
-  }, []);
-};
-
 export const calculateEndTime = (start: string, duration: number) => {
   if (!start || start.trim() === '') {
     return '--:-- --';
