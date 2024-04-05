@@ -21,7 +21,7 @@ const BigCalendarToolBar = ({
   onView,
 }: IToolbarProps) => (
   <div className="mb-2.5 flex items-center justify-between">
-    <div className="grid h-[1.875rem] w-[8.7rem] grid-cols-4 divide-x divide-solid overflow-hidden rounded-md border border-solid border-gray-500">
+    <div className="grid h-[1.875rem] w-32 grid-cols-4 divide-x divide-solid overflow-hidden rounded-md border border-solid border-gray-500">
       <button onClick={() => onNavigate('PREV')} className={NavButtonStyle}>
         <ArrowUpSVG className="h-7 w-full origin-center -rotate-90 fill-black" />
       </button>
@@ -31,7 +31,10 @@ const BigCalendarToolBar = ({
       >
         Today
       </button>
-      <button onClick={() => onNavigate('NEXT')} className={NavButtonStyle}>
+      <button
+        onClick={() => onNavigate('NEXT')}
+        className={`h-7 ${NavButtonStyle}`}
+      >
         <ArrowUpSVG className="h-7 w-full origin-center rotate-90 fill-black" />
       </button>
     </div>
@@ -56,7 +59,7 @@ const NavButtonStyle =
   'flex w-full h-full items-center justify-center hover:bg-gray-700';
 
 const getButtonClass = (isActive: boolean) =>
-  `flex h-7 w-[4.25rem] items-center justify-center rounded-md border border-solid ${
+  `flex h-7 w-[4.25rem] items-center justify-center rounded-md border border-solid px-2 ${
     isActive
       ? 'border-black'
       : 'border-gray-500 text-gray-500 hover:border-gray-500 hover:bg-gray-700 hover:text-gray-500'
