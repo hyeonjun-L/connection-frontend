@@ -5,6 +5,8 @@ import {
   IDateTimeList,
   IRegularClassSchedule,
   IClassSchedule,
+  IRegularScheduleData,
+  day,
 } from '@/types/class';
 
 const dayMapping: {
@@ -23,9 +25,11 @@ export const calculateFinalDates = (
   startDate: string,
   endDate: string,
   schedules: IDayTimeList[] | IDateTimeList[],
-  holidays: {
-    holiday: string;
-  }[],
+  holidays:
+    | {
+        holiday: string;
+      }[]
+    | Date[],
 ) => {
   if (schedules.length === 0) return [];
 
@@ -34,7 +38,10 @@ export const calculateFinalDates = (
     end: new Date(endDate),
   });
 
-  const holidayDates = holidays.map((holiday) => new Date(holiday.holiday));
+  const holidayDates = holidays.map((holiday) => {
+    if (holiday instanceof Date) return holiday;
+    else return new Date(holiday.holiday);
+  });
 
   if ('day' in schedules[0]) {
     // 요일별 선택 시
@@ -43,13 +50,15 @@ export const calculateFinalDates = (
     const getDateTime = dayTimeSchedules.reduce((acc: Date[], schedule) => {
       const days = schedule.day.map((dayStr) => dayMapping[dayStr]);
 
-      allDatesInRange.forEach((date) => {
-        const day = getDay(date);
+      schedule.dateTime.forEach((time) => {
+        allDatesInRange.forEach((date) => {
+          const day = getDay(date);
 
-        if (days.includes(day)) {
-          const newDate = makeNewDate(date, schedule.dateTime);
-          acc.push(newDate);
-        }
+          if (days.includes(day)) {
+            const newDate = makeNewDate(date, time);
+            acc.push(newDate);
+          }
+        });
       });
 
       return acc;
@@ -79,7 +88,7 @@ export const calculateRegularFinalClass = (
   holidays: {
     holiday: string;
   }[],
-) => {
+): IRegularScheduleData[] => {
   if (schedules.length === 0) return [];
   const holidayDates = holidays.map((holiday) => new Date(holiday.holiday));
   const allDatesInRange = eachDayOfInterval({
@@ -90,27 +99,30 @@ export const calculateRegularFinalClass = (
   const allDates = calculateUnSelectedDate(allDatesInRange, holidayDates);
 
   const results: {
-    day: string[];
+    day: day[];
     dateTime: string;
     startDateTime: Date[];
   }[] = [];
 
   schedules.forEach((schedule) => {
     const days = schedule.day.map((dayStr) => dayMapping[dayStr]);
-    const startDateTime: Date[] = [];
 
-    allDates.forEach((date) => {
-      const day = getDay(date);
-      if (days.includes(day)) {
-        const newDate = makeNewDate(date, schedule.dateTime);
-        startDateTime.push(newDate);
-      }
-    });
+    schedule.dateTime.forEach((time) => {
+      const startDateTime: Date[] = [];
 
-    results.push({
-      day: schedule.day,
-      dateTime: schedule.dateTime,
-      startDateTime,
+      allDates.forEach((date) => {
+        const day = getDay(date);
+        if (days.includes(day)) {
+          const newDate = makeNewDate(date, time);
+          startDateTime.push(newDate);
+        }
+      });
+
+      results.push({
+        day: schedule.day,
+        dateTime: time,
+        startDateTime,
+      });
     });
   });
 

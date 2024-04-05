@@ -71,14 +71,23 @@ export interface IDateTime {
 
 type day = '일' | '월' | '화' | '수' | '목' | '금' | '토';
 
-export interface IDayTimeList {
+export interface IRegularDayTimeList {
   day: day[];
   dateTime: string;
+}
+
+export interface IDayTimeList {
+  day: day[];
+  dateTime: string[];
 }
 
 export interface IDateTimeList {
   date: Date;
   dateTime: string[];
+}
+
+export interface IEditScheduleList extends IDayTimeList {
+  totalClass?: number;
 }
 
 export interface IGetClassDrafts {
@@ -585,6 +594,12 @@ export interface IRegularSchedule {
   day: number;
   startDateTime: string;
   endDateTime: string;
+}
+
+export interface IRegularScheduleData {
+  day: day[];
+  dateTime: string;
+  startDateTime: Date[];
 }
 
 export interface IUserApplyClass {
