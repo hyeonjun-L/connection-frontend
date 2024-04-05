@@ -5,6 +5,7 @@ import { DateRange, SelectRangeEventHandler } from 'react-day-picker';
 import { toast } from 'react-toastify';
 import { useClickAway } from 'react-use';
 import { TimeSVG, BasicCalendarSVG } from '@/icons/svg';
+import { useClassScheduleStore } from '@/store';
 import {
   formatDateWithHyphens,
   parseHyphenatedDate,
@@ -38,14 +39,16 @@ const EditClassRange = (props: EditClassRangeProps) => {
   const fromValue = defaultValue.startDate;
   const [toValue, setToValue] = useState<string>(defaultValue.endDate);
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+  const { setClassRange } = useClassScheduleStore();
   const calendarRef = useRef(null);
   const initialEndDateRef = useRef(defaultValue.endDate);
 
   useEffect(() => {
     if (toValue !== defaultValue.endDate) {
       onChange({ startDate: fromValue, endDate: toValue });
+      setClassRange({ from: new Date(fromValue), to: new Date(toValue) });
     }
-  }, [toValue, fromValue, defaultValue.endDate, onChange]);
+  }, [toValue, fromValue, defaultValue.endDate, onChange, setClassRange]);
 
   useClickAway(calendarRef, () => {
     setIsCalendarVisible(false);
