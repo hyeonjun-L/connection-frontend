@@ -20,12 +20,8 @@ interface ICalendarProps {
   handleSelected?: (value: Date[]) => void;
 }
 
-const BasicCalendar = ({
-  mode,
-  selectableDates = [],
-  selectedDates = selectableDates,
-  handleSelected,
-}: ICalendarProps) => {
+const BasicCalendar = (props: ICalendarProps) => {
+  const { mode, selectableDates = [], selectedDates, handleSelected } = props;
   const [selected, setSelected] = useState<Date[] | undefined>(selectedDates);
 
   useEffect(() => {
@@ -35,15 +31,13 @@ const BasicCalendar = ({
   }, [selected?.length]);
 
   useEffect(() => {
-    if (mode === 'preview') {
-      if (JSON.stringify(selected) !== JSON.stringify(selectedDates)) {
-        setSelected(selectedDates);
-      }
+    if (selectedDates?.length) {
+      setSelected(selectedDates);
     }
-  }, [selected?.length, selectedDates.length]);
+  }, [selectedDates]);
 
   const disabledDays = (date: Date) =>
-    !selectedDates.some((clickableDate) => isSameDay(clickableDate, date));
+    !selectedDates?.some((clickableDate) => isSameDay(clickableDate, date));
 
   const modifiers = getBasicCalendarModifiers(mode, selectableDates);
   const modifiersClassNames = getBasicCalendarModifiersClassNames(mode);
@@ -57,7 +51,7 @@ const BasicCalendar = ({
       showOutsideDays
       selected={selected}
       onSelect={setSelected}
-      defaultMonth={selectedDates[0] || new Date()}
+      defaultMonth={selectedDates ? selectedDates[0] : new Date()}
       disabled={disabled}
       modifiers={modifiers}
       modifiersClassNames={modifiersClassNames}
