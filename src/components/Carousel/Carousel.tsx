@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { Arrow } from '@/../public/icons/svg';
-import { CarouselProps } from '@/types/cariusel';
+import { Props } from '@/types/cariusel';
 
 /**
  * CarouselProps Interface
@@ -48,6 +48,10 @@ import { CarouselProps } from '@/types/cariusel';
  * @property {boolean} [gotoIndex = null] - 캐러셀의 인덱스를 변경 하는 선택적 플래그 (number)
  */
 
+interface CarouselProps extends Props {
+  touchDistanceX: number;
+}
+
 const Carousel = ({
   imgURL,
   move,
@@ -61,6 +65,7 @@ const Carousel = ({
   arrowPushMoveWaitTime = 2000,
   movePause = false,
   gotoIndex,
+  touchDistanceX,
 }: CarouselProps) => {
   const childrenArray = React.Children.toArray(children);
 
@@ -178,7 +183,7 @@ const Carousel = ({
 
     const index =
       direction === 'FORWARD'
-        ? currentIndex >= carouselLength - priority
+        ? currentIndex >= carouselLength - priority - 1
           ? 0
           : currentIndex + 1
         : currentIndex <= 0
@@ -192,12 +197,16 @@ const Carousel = ({
     <>
       <ul
         className={`flex h-full ${
-          isAnimating && 'transition-transform duration-[1600ms] ease-out'
+          !touchDistanceX &&
+          isAnimating &&
+          'transition-transform duration-[1600ms] ease-out'
         }`}
         style={{
-          transform: `translateX(calc(-${100 * currentIndex}% - ${
-            gap * currentIndex
-          }rem)`,
+          transform: touchDistanceX
+            ? `translateX(${touchDistanceX}px)`
+            : `translateX(calc(-${100 * currentIndex}% - ${
+                gap * currentIndex
+              }rem)`,
         }}
       >
         {carouselElements.slice(0, loadedElementCount).map((element, index) => (

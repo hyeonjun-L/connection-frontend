@@ -1,7 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import React from 'react';
 import Carousel from './Carousel';
-import { CarouselProps } from '@/types/cariusel';
+import { Props } from '@/types/cariusel';
 
 /**
  * SingleItemCarousel Interface
@@ -24,35 +25,100 @@ import { CarouselProps } from '@/types/cariusel';
  * @property {boolean} [focusAutoStop = true] - 캐러셀 초점시 캐러셀 움직임을 멈추게 하는 선택적 플래그 (boolean)
  */
 
-const SingleItemCarousel = (props: CarouselProps) => {
+interface SingleItemCarousel extends Props {
+  itemStyle?: string;
+  carouselContainerStyle?: string;
+  mobileShowCurrentElement?: boolean;
+}
+
+const SingleItemCarousel = (props: SingleItemCarousel) => {
   const {
     move,
+    imgURL,
+    children,
     itemStyle,
     carouselContainerStyle,
     focusAutoStop = true,
+    mobileShowCurrentElement = true,
   } = props;
+  const [touchStartPosition, setTouchStartPosition] = useState(0);
   const [focus, setFocus] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [touchDistanceX, setTouchDistanceX] = useState(0);
+  const [loadPriority, setLoadPriority] = useState(false);
+  const [isFirstTouch, setIsFirstTouch] = useState(true);
+  const itemRef = useRef<HTMLDivElement>(null);
 
-  const onFocus = () => {
-    if (!focusAutoStop) return;
-    setFocus(true);
+  const childrenArray = React.Children.toArray(children);
+
+  const getItemWidth = () => itemRef.current?.clientWidth;
+
+  const onFocus = () => focusAutoStop && setFocus(true);
+
+  const offFocus = () => setFocus(false);
+
+  const touchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    const touch = e.touches[0];
+    const startPosition = isFirstTouch
+      ? touch.clientX
+      : touch.clientX - touchDistanceX;
+    setTouchStartPosition(startPosition);
+    if (isFirstTouch) {
+      setLoadPriority(true);
+      setIsFirstTouch(false);
+    }
   };
 
-  const offFocus = () => {
-    setFocus(false);
+  const touchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    setLoadPriority(false);
+    const itemWidth = getItemWidth();
+    if (itemWidth) {
+      const itemLength = Math.max(childrenArray.length, imgURL?.length ?? 0);
+      const totalWidth = itemWidth * itemLength;
+
+      const touch = e.touches[0];
+      const currentTouchPosition = touch.clientX;
+      const distanceX = currentTouchPosition - touchStartPosition;
+
+      const currentIndex = Math.round(Math.abs(distanceX) / itemWidth);
+
+      setCarouselIndex(currentIndex > itemLength - 1 ? 0 : currentIndex);
+
+      setTouchDistanceX(
+        distanceX > 0
+          ? -totalWidth
+          : Math.abs(distanceX) > totalWidth
+          ? 1
+          : distanceX,
+      );
+    }
   };
 
-  const touchStart = () => {};
+  const touchEnd = () => {
+    const itemWidth = getItemWidth();
+    if (itemWidth) {
+      setTouchDistanceX(carouselIndex * -itemWidth || 1);
+    }
+  };
 
   return (
     <div
       className={carouselContainerStyle}
       onMouseOver={onFocus}
       onMouseLeave={offFocus}
+      onTouchStart={touchStart}
+      onTouchMove={touchMove}
+      onTouchEnd={touchEnd}
     >
-      <div className={itemStyle}>
-        <Carousel {...props} move={move ? move : focus} />
+      <div ref={itemRef} className={itemStyle}>
+        <Carousel
+          {...props}
+          move={move || loadPriority}
+          gotoIndex={carouselIndex}
+          touchDistanceX={touchDistanceX}
+          showCurrentElement={mobileShowCurrentElement}
+          movePause={focus}
+        />
       </div>
     </div>
   );
