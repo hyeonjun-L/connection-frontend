@@ -26,6 +26,7 @@
     "@types/node": "20.5.9",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
+    "@types/ua-parser-js": "^0.7.39",
     "chart.js": "^4.4.0",
     "date-fns": "^2.30.0",
     "esbuild": "^0.19.11",
@@ -53,6 +54,7 @@
     "suneditor-react": "^3.6.1",
     "tailwind-scrollbar": "^3.0.5",
     "typescript": "5.2.2",
+    "ua-parser-js": "^1.0.37",
     "zustand": "^4.4.3"
   },
   "devDependencies": {
