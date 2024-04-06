@@ -49,7 +49,7 @@ import { Props } from '@/types/cariusel';
  */
 
 interface CarouselProps extends Props {
-  touchDistanceX: number;
+  touchDistanceX?: number;
 }
 
 const Carousel = ({
@@ -250,7 +250,7 @@ const Carousel = ({
           ))}
         </div>
       )}
-
+      {/* 이놈 다이나믹으로 처리 하자 */}
       {arrow && carouselLength > 1 && (
         <>
           <Arrow

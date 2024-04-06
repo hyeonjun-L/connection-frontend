@@ -1,9 +1,9 @@
 'use client';
 import { useRef, useState } from 'react';
 import React from 'react';
+import { useUserStore } from '@/store';
 import Carousel from './Carousel';
 import { Props } from '@/types/cariusel';
-
 /**
  * SingleItemCarousel Interface
  *
@@ -38,9 +38,15 @@ const SingleItemCarousel = (props: SingleItemCarousel) => {
     children,
     itemStyle,
     carouselContainerStyle,
+    showCurrentElement,
     focusAutoStop = true,
     mobileShowCurrentElement = true,
   } = props;
+
+  const { isMobile } = useUserStore((state) => ({
+    isMobile: state.isMobile,
+  }));
+
   const [touchStartPosition, setTouchStartPosition] = useState(0);
   const [focus, setFocus] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -50,6 +56,7 @@ const SingleItemCarousel = (props: SingleItemCarousel) => {
   const itemRef = useRef<HTMLDivElement>(null);
 
   const childrenArray = React.Children.toArray(children);
+  const itemLength = Math.max(childrenArray.length, imgURL?.length ?? 0);
 
   const getItemWidth = () => itemRef.current?.clientWidth;
 
@@ -70,10 +77,11 @@ const SingleItemCarousel = (props: SingleItemCarousel) => {
   };
 
   const touchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (itemLength === 1) return;
+
     setLoadPriority(false);
     const itemWidth = getItemWidth();
     if (itemWidth) {
-      const itemLength = Math.max(childrenArray.length, imgURL?.length ?? 0);
       const totalWidth = itemWidth * itemLength;
 
       const touch = e.touches[0];
@@ -116,7 +124,9 @@ const SingleItemCarousel = (props: SingleItemCarousel) => {
           move={move || loadPriority}
           gotoIndex={carouselIndex}
           touchDistanceX={touchDistanceX}
-          showCurrentElement={mobileShowCurrentElement}
+          showCurrentElement={
+            showCurrentElement || (mobileShowCurrentElement && !!isMobile)
+          }
           movePause={focus}
         />
       </div>
