@@ -37,7 +37,7 @@ const EditClassRange = (props: EditClassRangeProps) => {
     onChange,
   } = props;
   const fromValue = defaultValue.startDate;
-  const [toValue, setToValue] = useState<string>(defaultValue.endDate);
+  const [toValue, setToValue] = useState(defaultValue.endDate);
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
   const { setClassRange } = useClassScheduleStore();
   const calendarRef = useRef(null);
