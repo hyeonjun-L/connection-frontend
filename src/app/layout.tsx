@@ -94,7 +94,6 @@ export default async function RootLayout({
             theme="light"
           />
           <NaverMapsProviders>{children}</NaverMapsProviders>
-          {children}
           <ControlOptions />
           <Footer />
           <MobileNav />

@@ -130,8 +130,10 @@ export const calculateRegularFinalClass = (
 };
 
 export const getDatesFromSchedules = (
-  schedules: IRegularClassSchedule[] | IClassSchedule[],
+  schedules?: IRegularClassSchedule[] | IClassSchedule[],
 ) => {
+  if (!schedules) return [];
+
   if ('regularLectureSchedule' in schedules[0]) {
     return (schedules as IRegularClassSchedule[])
       .flatMap((schedule) => schedule.regularLectureSchedule)
