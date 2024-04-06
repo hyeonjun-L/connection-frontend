@@ -1,16 +1,16 @@
 import { useEffect } from 'react';
 import { Controller, FieldErrors, FieldValues } from 'react-hook-form';
-import EditClassRange from './EditClassRange';
-import EditDayoff from './EditDayoff';
-import EditSchedules from './schedule';
-import ScheduleViewer from './ScheduleViewer';
-import { IClassEditPageData } from '@/types/class';
 import { CLASS_EDIT_STYLE } from '@/constants/constants';
 import { useClassScheduleStore } from '@/store';
 import {
   formatDateWithHyphens,
   parseHyphenatedDate,
 } from '@/utils/dateTimeUtils';
+import EditClassRange from './EditClassRange';
+import EditDayoff from './EditDayoff';
+import EditSchedules from './schedule';
+import ScheduleViewer from './ScheduleViewer';
+import { IClassEditPageData } from '@/types/class';
 
 interface PlanSectionProps {
   control: any;
@@ -198,9 +198,6 @@ const PlanSection = (props: PlanSectionProps) => {
         name="reservationComment"
         control={control}
         defaultValue={reservationComment}
-        rules={{
-          required: '예약 시 유의사항',
-        }}
         render={({ field }) => (
           <div className={`${CLASS_EDIT_STYLE.border} py-6`}>
             <h2
