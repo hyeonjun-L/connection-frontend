@@ -257,7 +257,7 @@ export const classOutputDataProcess = async (
       const location = {
         detailAddress: detail,
         address: address?.roadAddr,
-        buildingName: address?.bdNm,
+        buildingName: address?.bdNm || address?.emdNm,
         administrativeDistrict: address?.siNm,
         district: address?.sggNm,
       };

@@ -375,7 +375,13 @@ export interface IClassDetailResponse {
   minCapacity: number;
   reviewCount: number;
   locationDescription: string | null;
-  location: string | null;
+  location?: {
+    id: number;
+    address: string;
+    detailAddress: string;
+    buildingName: string;
+  };
+  lectureToRegion: IClassRegionResponse[];
   duration: number;
   stars: number;
 }
@@ -771,7 +777,7 @@ interface IApplyDetailResponse {
       detailAddress: string;
       buildingName: string;
     };
-    region?: IRegion[];
+    region: IRegion[];
     locationDescription: string | null;
   };
   lecturer: {

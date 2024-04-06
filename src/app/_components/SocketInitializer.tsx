@@ -13,7 +13,7 @@ import {
   ExitUserData,
 } from '@/types/chat';
 
-const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT ?? '';
+const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT_DOMAIN ?? '';
 
 interface SocketInitializerProps {
   userType: userType | null;
