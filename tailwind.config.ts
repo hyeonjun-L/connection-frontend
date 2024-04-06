@@ -6,7 +6,11 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  safelist: ['hover:bg-main-color-transparent', 'accent-main-color'],
+  safelist: [
+    'hover:bg-main-color-transparent',
+    'accent-main-color',
+    'grid-cols-4',
+  ],
   theme: {
     extend: {
       colors: {

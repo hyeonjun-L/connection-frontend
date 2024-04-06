@@ -27,11 +27,10 @@ const ClassDates = ({ id }: { id: string | number }) => {
       if (showCalendar) {
         const data = await getClassSchedules(id);
         const { schedules, regularLectureStatus } = data;
-        if (!schedules || !regularLectureStatus) return;
+        if (!schedules && !regularLectureStatus) return Promise.resolve([]);
         const selectedDatesFromSchedule = getDatesFromSchedules(
           schedules || regularLectureStatus,
         );
-
         setSelectedDates(selectedDatesFromSchedule);
       }
 
