@@ -13,6 +13,8 @@ export const filteredAddedSchedules = (
   newEndDate: string,
   holidays: Date[],
 ) => {
+  if (!('dateTime' in newSchedules[0])) return null;
+
   const originDates = originSchedule.map(
     (date) => new Date(date.startDateTime),
   );
