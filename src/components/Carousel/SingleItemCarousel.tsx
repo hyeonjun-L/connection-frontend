@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import React from 'react';
 import { useUserStore } from '@/store';
 import Carousel from './Carousel';
@@ -29,6 +29,7 @@ interface SingleItemCarouselProps extends Props {
   itemStyle?: string;
   carouselContainerStyle?: string;
   mobileShowCurrentElement?: boolean;
+  changeCarouselIndexEvent?: (value: number) => void;
 }
 
 const SingleItemCarousel = (props: SingleItemCarouselProps) => {
@@ -39,8 +40,8 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
     itemStyle,
     carouselContainerStyle,
     showCurrentElement,
-    focusAutoStop = true,
     mobileShowCurrentElement = true,
+    changeCarouselIndexEvent,
   } = props;
 
   const { isMobile } = useUserStore((state) => ({
@@ -51,7 +52,6 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [loadPriority, setLoadPriority] = useState(false);
 
-  const [focus, setFocus] = useState(false);
   const [touchStartPosition, setTouchStartPosition] = useState(0);
   const [touchDistanceX, setTouchDistanceX] = useState(0);
   const [isFirstTouch, setIsFirstTouch] = useState(true);
@@ -62,15 +62,10 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
 
   const getItemWidth = () => itemRef.current?.clientWidth;
 
-  const onFocus = () => focusAutoStop && setFocus(true);
-
-  const offFocus = () => setFocus(false);
-
   const touchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     const touch = e.touches[0];
     const startPosition = touch.clientX - touchDistanceX;
 
-    setFocus(true);
     setIsAnimating(false);
     setTouchStartPosition(startPosition);
     if (isFirstTouch) {
@@ -90,10 +85,11 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
       const currentTouchPosition = touch.clientX;
       const distanceX = currentTouchPosition - touchStartPosition;
 
+      const adjustedItemWidth = itemWidth - itemWidth / 4;
       const currentIndex =
         distanceX > 0
-          ? itemLength - Math.round(Math.abs(distanceX) / itemWidth)
-          : Math.round(Math.abs(distanceX) / itemWidth);
+          ? itemLength - Math.round(Math.abs(distanceX) / adjustedItemWidth)
+          : Math.round(Math.abs(distanceX) / adjustedItemWidth);
 
       setCarouselIndex(currentIndex > itemLength - 1 ? 0 : currentIndex);
 
@@ -112,7 +108,6 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
     if (itemWidth) {
       setTouchDistanceX(carouselIndex * -itemWidth || 0);
     }
-    setFocus(false);
   };
 
   const changeCarouselIndex = (index: number) => {
@@ -127,11 +122,17 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
     setIsAnimating(state);
   };
 
+  useEffect(() => {
+    if (changeCarouselIndexEvent) {
+      changeCarouselIndexEvent(
+        itemLength === carouselIndex ? 0 : carouselIndex,
+      );
+    }
+  }, [carouselIndex, changeCarouselIndexEvent, itemLength]);
+
   return (
     <div
       className={carouselContainerStyle}
-      onMouseOver={onFocus}
-      onMouseLeave={offFocus}
       onTouchStart={touchStart}
       onTouchMove={touchMove}
       onTouchEnd={touchEnd}
@@ -147,7 +148,6 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
           showCurrentElement={
             showCurrentElement || (mobileShowCurrentElement && !!isMobile)
           }
-          movePause={focus}
           changeisAnimating={changeisAnimating}
           isAnimating={isAnimating}
         />
