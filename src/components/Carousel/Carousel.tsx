@@ -33,6 +33,7 @@ const Carousel = ({
   const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
   const currentIndexRef = useRef(currentIndex);
   const intervalTimeRef = useRef(carouselMoveIntervalTime);
+  const loadedCountRef = useRef(priority > 1 ? priority : 1);
 
   const childrenArray = Children.toArray(children);
 
@@ -57,9 +58,12 @@ const Carousel = ({
   const carouselLength = carouselElements.length;
 
   const loadedElementCount = useMemo(() => {
-    const loadedCount = priority > 1 ? priority : 1;
-    return move && loadedCount < carouselLength ? carouselLength : loadedCount;
-  }, [carouselLength, move, priority]);
+    if (move) {
+      loadedCountRef.current = carouselLength;
+    }
+
+    return loadedCountRef.current;
+  }, [carouselLength, move]);
 
   const changeCarouselIndexHandler = useCallback(
     (index: number) => {

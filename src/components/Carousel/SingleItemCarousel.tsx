@@ -80,8 +80,8 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
   };
 
   const touchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (itemLength === 1) return;
     setLoadPriority(false);
+    if (itemLength === 1) return;
     const itemWidth = getItemWidth();
     if (itemWidth) {
       const totalWidth = itemWidth * itemLength;
