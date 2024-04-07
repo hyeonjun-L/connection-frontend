@@ -66,7 +66,7 @@ const Carousel = ({
   }, [carouselLength, move]);
 
   const changeCarouselIndexHandler = useCallback(
-    (index: number) => {
+    (index: number, isNotAnimation?: boolean) => {
       let newIndex = index;
       const lastIndex = originalElements.length;
       const currentIndex = currentIndexRef.current;
@@ -85,7 +85,9 @@ const Carousel = ({
           : carouselMoveIntervalTime;
       changeCurrentIndex(newIndex);
 
-      changeisAnimating(Math.abs(currentIndex - newIndex) === 1);
+      changeisAnimating(
+        !isNotAnimation && Math.abs(currentIndex - newIndex) === 1,
+      );
     },
     [
       carouselMoveIntervalTime,
@@ -104,14 +106,14 @@ const Carousel = ({
 
     const index =
       direction === 'FORWARD'
-        ? currentIndex >= carouselLength - priority - 1
+        ? currentIndex === originalElements.length - 1
           ? 0
           : currentIndex + 1
-        : currentIndex <= 0
-        ? carouselLength - priority
+        : currentIndex === 0
+        ? originalElements.length - 1
         : currentIndex - 1;
 
-    changeCarouselIndexHandler(index);
+    changeCarouselIndexHandler(index, true);
   };
 
   useEffect(() => {
@@ -132,7 +134,7 @@ const Carousel = ({
   useEffect(() => {
     if (gotoIndex === undefined) return;
     changeCarouselIndexHandler(gotoIndex);
-  }, [gotoIndex]);
+  }, [changeCarouselIndexHandler, gotoIndex]);
 
   useEffect(() => {
     currentIndexRef.current = currentIndex;
