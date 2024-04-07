@@ -1,26 +1,24 @@
+'use client';
 import Image from 'next/image';
-import {
-  useState,
-  Children,
-  useMemo,
-  useEffect,
-  useRef,
-  useCallback,
-} from 'react';
+import { Children, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Arrow } from '@/icons/svg';
 import { Props } from '@/types/cariusel';
 
 interface CarouselProps extends Props {
+  isAnimating: boolean;
   currentIndex: number;
   touchDistanceX: number;
   changeCurrentIndex: (index: number) => void;
+  changeisAnimating: (state: boolean) => void;
 }
 
 const Carousel = ({
+  isAnimating,
   imgURL,
   children,
   currentIndex,
   changeCurrentIndex,
+  changeisAnimating,
   priority = 1,
   move,
   movePause,
@@ -32,7 +30,6 @@ const Carousel = ({
   showCurrentElement = true,
   showCurrentElementBackGround = true,
 }: CarouselProps) => {
-  const [isAnimating, setIsAnimating] = useState(true);
   const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
   const currentIndexRef = useRef(currentIndex);
   const intervalTimeRef = useRef(carouselMoveIntervalTime);
@@ -84,9 +81,14 @@ const Carousel = ({
           : carouselMoveIntervalTime;
       changeCurrentIndex(newIndex);
 
-      setIsAnimating(Math.abs(currentIndex - newIndex) === 1);
+      changeisAnimating(Math.abs(currentIndex - newIndex) === 1);
     },
-    [carouselMoveIntervalTime, changeCurrentIndex, originalElements.length],
+    [
+      carouselMoveIntervalTime,
+      changeCurrentIndex,
+      changeisAnimating,
+      originalElements.length,
+    ],
   );
 
   const changeImage = (
@@ -127,6 +129,10 @@ const Carousel = ({
     if (gotoIndex === undefined) return;
     changeCarouselIndexHandler(gotoIndex);
   }, [gotoIndex]);
+
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
 
   return (
     <>
