@@ -35,6 +35,7 @@ const Carousel = ({
   const [isAnimating, setIsAnimating] = useState(true);
   const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
   const currentIndexRef = useRef(currentIndex);
+  const intervalTimeRef = useRef(carouselMoveIntervalTime);
 
   const childrenArray = Children.toArray(children);
 
@@ -77,11 +78,15 @@ const Carousel = ({
 
       currentIndexRef.current = newIndex;
 
+      intervalTimeRef.current =
+        newIndex === 0
+          ? carouselMoveIntervalTime / 2
+          : carouselMoveIntervalTime;
       changeCurrentIndex(newIndex);
 
       setIsAnimating(Math.abs(currentIndex - newIndex) === 1);
     },
-    [changeCurrentIndex, originalElements.length],
+    [carouselMoveIntervalTime, changeCurrentIndex, originalElements.length],
   );
 
   const changeImage = (
@@ -111,7 +116,7 @@ const Carousel = ({
 
     intervalIdRef.current = setInterval(() => {
       changeCarouselIndexHandler(currentIndexRef.current + 1);
-    }, carouselMoveIntervalTime);
+    }, intervalTimeRef.current);
 
     return () => {
       if (intervalIdRef.current) clearInterval(intervalIdRef.current);
