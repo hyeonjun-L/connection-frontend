@@ -1,8 +1,8 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-import ImagesViewer from './ImagesViewer';
 import { StarSVG } from '../../../public/icons/svg';
+import SingleItemCarousel from '../Carousel/SingleItemCarousel';
 import Like from '../Like/Like';
 import { Review } from '../Review';
 import { InstructorCardProps } from '@/types/types';
@@ -21,7 +21,13 @@ const InstructorCard = (props: InstructorCardProps) => {
     isLiked,
     likeEvent,
   } = props;
+
   const [focus, setFocus] = useState(false);
+  const [imageViewIndex, setImageViewIndex] = useState(0);
+
+  const changeImageViewIndex = (index: number) => {
+    setImageViewIndex(index);
+  };
 
   const onFocus = () => {
     setFocus(true);
@@ -66,7 +72,16 @@ const InstructorCard = (props: InstructorCardProps) => {
       </div>
 
       <Link href={href}>
-        <ImagesViewer imgURL={imgURL} focus={focus} />
+        <SingleItemCarousel
+          imgURL={imgURL}
+          move={focus}
+          carouselContainerStyle="flex h-full w-full"
+          itemStyle="h-full w-full"
+          arrow={imgURL.length > 1 && focus}
+          showCurrentElement={focus}
+          mobileShowCurrentElement={false}
+          changeCarouselIndexEvent={changeImageViewIndex}
+        />
       </Link>
 
       {!focus && (
@@ -77,7 +92,7 @@ const InstructorCard = (props: InstructorCardProps) => {
                 <span
                   key={img + index}
                   className={`mr-1.5 inline-block h-1.5 w-1.5 rounded-full ${
-                    index === 0 ? 'bg-white' : 'bg-neutral-500'
+                    index <= imageViewIndex ? 'bg-white' : 'bg-neutral-500'
                   }`}
                 />
               );

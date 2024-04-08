@@ -117,7 +117,7 @@ const Carousel = ({
   };
 
   useEffect(() => {
-    if (!move || movePause) {
+    if (!move || movePause || originalElements.length === 1) {
       if (intervalIdRef.current) clearInterval(intervalIdRef.current);
       return;
     }
@@ -129,7 +129,13 @@ const Carousel = ({
     return () => {
       if (intervalIdRef.current) clearInterval(intervalIdRef.current);
     };
-  }, [carouselMoveIntervalTime, changeCarouselIndexHandler, move, movePause]);
+  }, [
+    carouselMoveIntervalTime,
+    changeCarouselIndexHandler,
+    move,
+    movePause,
+    originalElements.length,
+  ]);
 
   useEffect(() => {
     if (gotoIndex === undefined) return;

@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { StarSVG } from '@/icons/svg';
-import Carousel from '../Carousel/Carousel';
+import SingleItemCarousel from '../Carousel/SingleItemCarousel';
 import ProfileImage from '../Profile/ProfileImage';
 import { ClassCardType } from '@/types/class';
 
@@ -37,9 +37,11 @@ const ResponsiveClassPreview = (props: ClassCardType) => {
           darkMode && 'border border-solid border-white'
         }`}
       >
-        <Carousel
+        <SingleItemCarousel
           imgURL={imgURL}
           move={focus}
+          carouselContainerStyle="flex h-full w-full"
+          itemStyle="relative w-full overflow-hidden"
           arrow={imgURL.length > 1 && focus}
           showCurrentElement={focus}
         />

@@ -85,11 +85,10 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
       const currentTouchPosition = touch.clientX;
       const distanceX = currentTouchPosition - touchStartPosition;
 
-      const adjustedItemWidth = itemWidth - itemWidth / 4;
       const currentIndex =
         distanceX > 0
-          ? itemLength - Math.round(Math.abs(distanceX) / adjustedItemWidth)
-          : Math.round(Math.abs(distanceX) / adjustedItemWidth);
+          ? itemLength - Math.round(Math.abs(distanceX) / itemWidth)
+          : Math.round(Math.abs(distanceX) / itemWidth);
 
       setCarouselIndex(currentIndex > itemLength - 1 ? 0 : currentIndex);
 

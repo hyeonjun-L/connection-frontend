@@ -8,7 +8,6 @@ export interface Props {
   carouselMoveIntervalTime?: number;
   arrowPushMoveWaitTime?: number;
   movePause?: boolean;
-  focusAutoStop?: boolean;
   gotoIndex?: number;
   children?: React.ReactNode;
   imgURL?: string[];

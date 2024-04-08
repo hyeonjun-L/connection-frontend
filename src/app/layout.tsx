@@ -80,7 +80,7 @@ export default async function RootLayout({
           <UserStoreInitializer
             authUser={authUser}
             userType={userType}
-            isMobile={device.type === 'mobile'}
+            isMobile={device.type === 'mobile' || device.type === 'tablet'}
           />
           <SocketInitializer
             userType={userType}
