@@ -152,6 +152,7 @@ const PassView = ({ passList: reqPassList }: PassViewProps) => {
                 gap={16}
                 showCurrentElement={false}
                 carouselMoveIntervalTime={3000}
+                mobileShowCurrentElement={false}
                 gotoIndex={carouselIndex}
               >
                 {(passList.length < 4

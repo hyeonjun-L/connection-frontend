@@ -16,7 +16,7 @@ import {
 } from '@/utils/parseUtils';
 import DiscountCouponBanner from './DiscountCouponBanner';
 import OptionButton from './OptionButton';
-import SingleItemCarousel from '@/components/Carousel/SingleItemCarousel';
+import CarouselContainer from '@/components/Carousel/CarouselContainer';
 import { Review } from '@/components/Review';
 
 const ClassPreview = async ({ id }: { id: string }) => {
@@ -50,7 +50,7 @@ const ClassPreview = async ({ id }: { id: string }) => {
       {/* 클래스 이미지 */}
       <div className="mb-5 flex h-[18rem] w-full justify-center px-10">
         {lectureImage.length >= 2 ? (
-          <SingleItemCarousel
+          <CarouselContainer
             imgURL={lectureImage.map((image) => image.imageUrl)}
             move={true}
             priority={3}
@@ -63,7 +63,10 @@ const ClassPreview = async ({ id }: { id: string }) => {
           />
         ) : (
           lectureImage.map((img, index) => (
-            <div key={img.imageUrl + index} className="relative h-full w-1/3">
+            <div
+              key={img.imageUrl + index}
+              className="relative h-full w-full sm:w-1/2 lg:w-1/3"
+            >
               <Image
                 src={img.imageUrl}
                 alt="Connection 댄스 춤 이미지"

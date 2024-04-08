@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { StarSVG } from '../../../public/icons/svg';
-import SingleItemCarousel from '../Carousel/SingleItemCarousel';
+import CarouselContainer from '../Carousel/CarouselContainer';
 import Like from '../Like/Like';
 import { Review } from '../Review';
 import { InstructorCardProps } from '@/types/types';
@@ -72,7 +72,7 @@ const InstructorCard = (props: InstructorCardProps) => {
       </div>
 
       <Link href={href}>
-        <SingleItemCarousel
+        <CarouselContainer
           imgURL={imgURL}
           move={focus}
           carouselContainerStyle="flex h-full w-full"

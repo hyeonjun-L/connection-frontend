@@ -1,11 +1,11 @@
 import Image from 'next/image';
-import SingleItemCarousel from '@/components/Carousel/SingleItemCarousel';
+import CarouselContainer from '@/components/Carousel/CarouselContainer';
 
 const InstructorCarousel = async ({ imgURL }: { imgURL: string[] }) => {
   return (
     <div className="mb-5 mt-3 flex h-[18rem] w-full justify-center px-5">
       {imgURL.length >= 2 ? (
-        <SingleItemCarousel
+        <CarouselContainer
           imgURL={imgURL}
           move={true}
           priority={3}

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import ClassDates from './ClassDates';
 import ResponsiveClassPreview from './ResponsiveClassPreview';
-import SingleItemCarousel from '../Carousel/SingleItemCarousel';
+import CarouselContainer from '../Carousel/CarouselContainer';
 import Like from '../Like/Like';
 import ProfileImage from '../Profile/ProfileImage';
 import { Review } from '../Review';
@@ -44,7 +44,7 @@ const ClassPreview = (props: ClassCardType) => {
           smallView ? '' : 'xl:flex'
         }`}
       >
-        <SingleItemCarousel
+        <CarouselContainer
           imgURL={imgURL}
           move={focus}
           arrow={imgURL.length > 1 && focus}
