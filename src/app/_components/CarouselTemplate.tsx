@@ -1,13 +1,29 @@
 'use client';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
-import Carousel from '@/components/Carousel/Carousel';
+import CarouselContainer from '@/components/Carousel/CarouselContainer';
+import ClassCard from '@/components/ClassPreview/ClassPreview';
+import { searchBestInstructorData } from '@/types/instructor';
 
-interface ICarouselTemplateProps {
-  mode: 'class' | 'instructor';
-  children: React.ReactNode;
+interface classMode {
+  bestInstructorLists?: searchBestInstructorData[];
+  bestClassList: any[];
+  mode: 'class';
 }
 
-const CarouselTemplate = ({ mode, children }: ICarouselTemplateProps) => {
+interface instructorMode {
+  bestInstructorLists: searchBestInstructorData[];
+  bestClassList?: any[];
+  mode: 'instructor';
+}
+type ICarouselTemplateProps = classMode | instructorMode;
+
+const CarouselTemplate = ({
+  mode,
+  bestClassList,
+  bestInstructorLists,
+}: ICarouselTemplateProps) => {
   const [focus, setFocus] = useState(false);
   const width =
     mode === 'class'
@@ -25,21 +41,64 @@ const CarouselTemplate = ({ mode, children }: ICarouselTemplateProps) => {
   };
 
   return (
-    <div className={`relative flex ${height} w-full justify-center px-2`}>
-      <div className="h-full w-11/12 items-center overflow-hidden">
-        <div className={width} onMouseOver={onFocus} onMouseLeave={offFocus}>
-          <Carousel
-            move={true}
-            showCurrentElement={false}
-            carouselMoveIntervalTime={3000}
-            priority={priority}
-            gap={1}
-            movePause={focus}
-          >
-            {children}
-          </Carousel>
-        </div>
-      </div>
+    <div
+      className={`relative flex ${height} w-full justify-center px-2`}
+      onMouseOver={onFocus}
+      onMouseLeave={offFocus}
+    >
+      <CarouselContainer
+        move={true}
+        showCurrentElement={false}
+        carouselMoveIntervalTime={3000}
+        priority={priority}
+        gap={16}
+        movePause={focus}
+        itemStyle={width}
+        mobileShowCurrentElement={false}
+        carouselContainerStyle="h-full w-11/12 items-center overflow-hidden"
+      >
+        {mode === 'class' && bestClassList
+          ? bestClassList.map((classList, index) => {
+              const data = { ...classList, smallView: true };
+              return (
+                <div
+                  key={classList.title + index}
+                  className="w-full max-w-[13rem]"
+                >
+                  <ClassCard
+                    key={classList.title + index}
+                    {...data}
+                    touchEndEvent={offFocus}
+                    touchStartEvent={onFocus}
+                  />
+                </div>
+              );
+            })
+          : bestInstructorLists
+          ? bestInstructorLists.map((list) => (
+              <div key={list.id} className="h-full w-full">
+                <Link
+                  href={`/instructor/${list.id}`}
+                  className="flex h-full flex-col"
+                >
+                  <div className="relative flex-grow">
+                    <Image
+                      src={list.lecturerProfileImageUrl[0].url}
+                      alt="Connection 댄스 춤 이미지"
+                      fill
+                      sizes="(max-width: 720px) 60vw, (max-width: 1440px) 30vw"
+                      style={{ objectFit: 'cover' }}
+                      priority={true}
+                    />
+                  </div>
+                  <div className="flex h-6 items-center justify-center truncate bg-black text-sm text-white lg:h-8 lg:text-base lg:font-bold">
+                    {list.nickname}
+                  </div>
+                </Link>
+              </div>
+            ))
+          : null}
+      </CarouselContainer>
     </div>
   );
 };

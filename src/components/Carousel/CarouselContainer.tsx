@@ -30,6 +30,9 @@ interface CarouselContainerProps extends Props {
   carouselContainerStyle?: string;
   mobileShowCurrentElement?: boolean;
   changeCarouselIndexEvent?: (value: number) => void;
+  touchStartEvent?: () => void;
+  touchMoveEvent?: () => void;
+  touchEndEvent?: () => void;
 }
 
 const CarouselContainer = (props: CarouselContainerProps) => {
@@ -43,6 +46,9 @@ const CarouselContainer = (props: CarouselContainerProps) => {
     gap = 0,
     mobileShowCurrentElement = true,
     changeCarouselIndexEvent,
+    touchStartEvent,
+    touchMoveEvent,
+    touchEndEvent,
   } = props;
 
   const { isMobile } = useUserStore((state) => ({
@@ -64,6 +70,9 @@ const CarouselContainer = (props: CarouselContainerProps) => {
   const getItemWidth = () => itemRef.current?.clientWidth;
 
   const touchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartEvent) {
+      touchStartEvent();
+    }
     if (itemLength === 1) return;
     e.stopPropagation();
     const touch = e.touches[0];
@@ -78,6 +87,9 @@ const CarouselContainer = (props: CarouselContainerProps) => {
   };
 
   const touchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (touchMoveEvent) {
+      touchMoveEvent();
+    }
     setLoadPriority(false);
     if (itemLength === 1) return;
     e.stopPropagation();
@@ -107,6 +119,9 @@ const CarouselContainer = (props: CarouselContainerProps) => {
   };
 
   const touchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (touchEndEvent) {
+      touchEndEvent();
+    }
     if (itemLength === 1) return;
     e.stopPropagation();
     const itemWidth = getItemWidth();
