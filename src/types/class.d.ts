@@ -73,6 +73,11 @@ export interface IDateTime {
 
 type day = '일' | '월' | '화' | '수' | '목' | '금' | '토';
 
+export interface IRegularDayTimeList {
+  day: day[];
+  dateTime: string;
+}
+
 export interface IDayTimeList {
   day: day[];
   dateTime: string[];
@@ -81,6 +86,10 @@ export interface IDayTimeList {
 export interface IDateTimeList {
   date: Date;
   dateTime: string[];
+}
+
+export interface IEditScheduleList extends IDayTimeList {
+  totalClass?: number;
 }
 
 export interface IGetClassDrafts {
@@ -310,7 +319,7 @@ export interface IClassSchedule {
 
 export interface IRegularClassSchedule {
   id: number;
-  day: string[];
+  day: day[];
   dateTime: string;
   numberOfParticipants: number;
   regularLectureSchedule: IRegularSchedule[];
@@ -324,13 +333,7 @@ export interface IClassScheduleResponse {
   regularLectureStatus?: IRegularClassSchedule[];
   schedules?: IClassSchedule[];
   holidays: string[];
-  daySchedule?: IDaySchedule[];
-}
-
-export interface IClassScheduleData {
-  schedule: IClassSchedule[];
-  holidayArr: Date[];
-  daySchedule?: IDaySchedule[];
+  daySchedules?: IDaySchedule[];
 }
 
 export interface IDaySchedule {
@@ -516,7 +519,7 @@ export interface IClassEditData
     IClassDetailResponse {}
 
 export interface IClassEditPageData
-  extends IClassScheduleData,
+  extends IClassScheduleResponse,
     IClassPreviewResponse,
     IClassDetailResponse {}
 
@@ -599,6 +602,12 @@ export interface IRegularSchedule {
   day: number;
   startDateTime: string;
   endDateTime: string;
+}
+
+export interface IRegularScheduleData {
+  day: day[];
+  dateTime: string;
+  startDateTime: Date[];
 }
 
 export interface IUserApplyClass {
