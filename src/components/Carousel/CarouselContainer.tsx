@@ -5,7 +5,7 @@ import { useUserStore } from '@/store';
 import Carousel from './Carousel';
 import { Props } from '@/types/cariusel';
 /**
- * SingleItemCarousel Interface
+ * CarouselContainer Interface
  *
  *
  * @property {string} itemStyle - 아이템 요소 스타일
@@ -25,14 +25,14 @@ import { Props } from '@/types/cariusel';
  * @property {boolean} [focusAutoStop = true] - 캐러셀 초점시 캐러셀 움직임을 멈추게 하는 선택적 플래그 (boolean)
  */
 
-interface SingleItemCarouselProps extends Props {
+interface CarouselContainerProps extends Props {
   itemStyle?: string;
   carouselContainerStyle?: string;
   mobileShowCurrentElement?: boolean;
   changeCarouselIndexEvent?: (value: number) => void;
 }
 
-const SingleItemCarousel = (props: SingleItemCarouselProps) => {
+const CarouselContainer = (props: CarouselContainerProps) => {
   const {
     move,
     imgURL,
@@ -40,6 +40,7 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
     itemStyle,
     carouselContainerStyle,
     showCurrentElement,
+    gap = 0,
     mobileShowCurrentElement = true,
     changeCarouselIndexEvent,
   } = props;
@@ -63,6 +64,8 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
   const getItemWidth = () => itemRef.current?.clientWidth;
 
   const touchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (itemLength === 1) return;
+    e.stopPropagation();
     const touch = e.touches[0];
     const startPosition = touch.clientX - touchDistanceX;
 
@@ -77,6 +80,7 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
   const touchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     setLoadPriority(false);
     if (itemLength === 1) return;
+    e.stopPropagation();
     const itemWidth = getItemWidth();
     if (itemWidth) {
       const totalWidth = itemWidth * itemLength;
@@ -102,10 +106,12 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
     }
   };
 
-  const touchEnd = () => {
+  const touchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (itemLength === 1) return;
+    e.stopPropagation();
     const itemWidth = getItemWidth();
     if (itemWidth) {
-      setTouchDistanceX(carouselIndex * -itemWidth || 0);
+      setTouchDistanceX(carouselIndex * -itemWidth - gap * carouselIndex || 0);
     }
   };
 
@@ -113,7 +119,7 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
     setCarouselIndex(index);
     const itemWidth = getItemWidth();
     if (itemWidth) {
-      setTouchDistanceX(index * -itemWidth || 0);
+      setTouchDistanceX(index * -itemWidth - gap * index || 0);
     }
   };
 
@@ -155,4 +161,4 @@ const SingleItemCarousel = (props: SingleItemCarouselProps) => {
   );
 };
 
-export default SingleItemCarousel;
+export default CarouselContainer;

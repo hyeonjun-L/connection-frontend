@@ -148,7 +148,7 @@ const Carousel = ({
 
   return (
     <>
-      <ul
+      <div
         className={`flex h-full ${
           isAnimating && 'transition-transform duration-[1600ms] ease-out'
         }`}
@@ -157,10 +157,10 @@ const Carousel = ({
         }}
       >
         {carouselElements.slice(0, loadedElementCount).map((element, index) => (
-          <li
+          <div
             key={index}
             className={`relative h-full w-full flex-shrink-0 `}
-            style={{ marginRight: `${gap}rem` }}
+            style={{ marginRight: `${gap}px` }}
           >
             {children
               ? element
@@ -174,9 +174,9 @@ const Carousel = ({
                     style={{ objectFit: 'cover' }}
                   />
                 )}
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
       {showCurrentElement && (
         <div
           className={`absolute bottom-0 flex h-[10%] w-full items-center justify-center ${
@@ -199,14 +199,18 @@ const Carousel = ({
       )}
       {arrow && carouselLength > 1 && (
         <>
-          <Arrow
+          <button
             onClick={(e: React.MouseEvent) => changeImage(e, 'BACKWARD')}
-            className="absolute left-3 top-1/2 hidden -translate-y-1/2 -scale-x-100 transform cursor-pointer sm:block"
-          />
-          <Arrow
+            className="absolute left-3 top-1/2 hidden -translate-y-1/2 -scale-x-100 transform sm:block"
+          >
+            <Arrow />
+          </button>
+          <button
             onClick={(e: React.MouseEvent) => changeImage(e, 'FORWARD')}
-            className="absolute right-3 top-1/2 hidden -translate-y-1/2 transform cursor-pointer sm:block"
-          />
+            className="absolute right-3 top-1/2 hidden -translate-y-1/2 transform sm:block"
+          >
+            <Arrow />
+          </button>
         </>
       )}
     </>

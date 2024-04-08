@@ -54,6 +54,7 @@ export interface ClassCardType {
   darkMode?: boolean;
   smallView?: boolean;
   searchAfter?: [number, number];
+  changeCarouselIndexEvent?: () => void;
 }
 
 export interface Space {
