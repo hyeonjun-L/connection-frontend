@@ -8,11 +8,16 @@ import { Props } from '@/types/cariusel';
  * CarouselContainer Interface
  *
  *
- * @property {string} itemStyle - 아이템 요소 스타일
- * @property {string} carouselContainerStyle - 캐러셀 컨테이너 스타일
  * @property {string[]} imgURL - 표시할 이미지들의 URL들이 담긴 배열, children 우선 렌더
  * @property {React.ReactNode} children - 표시할 요소들, imgURL 보다 우선순위 높음
  * @property {boolean} move - 캐러셀 움직임 활성화
+ * @property {string} itemStyle - 아이템 요소 스타일 선택적 플래그
+ * @property {string} carouselContainerStyle - 캐러셀 컨테이너 스타일 선택적 플래그
+ * @property {boolean} mobileShowCurrentElement - 모바일 및 태블릿에서 상태창 표시 여부를 나타내는 선택적 플래그 (기본값 = true)
+ * @property {function} changeCarouselIndexEvent - 캐러셀 인덱스 변화시 실행 할 함수 이벤트 선택적 플래그
+ * @property {function} touchStartEvent - 캐러셀 터치 이벤트 시작시 실행 할 함수 이벤트 선택적 플래그
+ * @property {function} touchMoveEvent - 캐러셀 터치 이벤트 도중 실행 할 함수 이벤트 선택적 플래그
+ * @property {function} touchEndEvent - 캐러셀 터치 이벤트 종료시 실행 할 함수 이벤트 선택적 플래그
  * @property {boolean} [arrow=true] - 탐색을 위해 화살표를 표시해야 하는지 여부를 나타내는 선택적 플래그 (기본값 = true)
  * @property {boolean} [priority=1] - 해당 숫자 만큼 요소를 미리 렌더 (기본값 = 1)
  * @property {boolean} [showCurrentElement =true] - 현재 캐러셀 위치 표시의 상태창 표시 여부를 나타내는 선택적 플래그 (기본값 = true)
