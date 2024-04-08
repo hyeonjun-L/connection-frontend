@@ -2,12 +2,17 @@ import { eachDayOfInterval, isSameDay } from 'date-fns';
 import dynamic from 'next/dynamic';
 import { useEffect, useId, useReducer, useMemo, useState } from 'react';
 import {
+  IClassSchedule,
+  IEditSpecificDateType,
+  IEditStartDateTime,
+} from '@/types/class';
+import { useClassScheduleStore } from '@/store';
+import {
   formatDateWithDay,
   formatTimeNoSec,
   formatDateWithHyphens,
 } from '@/utils/dateTimeUtils';
 import { editSpecificDateReducer } from '@/utils/editSpecificDateReducer';
-import { IEditSpecificDateType, IEditStartDateTime } from '@/types/class';
 
 const InputClassDates = dynamic(
   () => import('@/components/Calendar/SingleCalendar'),
@@ -23,29 +28,23 @@ const TimeList = dynamic(() => import('./TimeList'), {
 /* eslint-disable no-unused-vars */
 interface AddSchedulesProps {
   onChange: (value: Date[]) => void;
-  defaultValue: {
-    range: { startDate: string; endDate: string };
-    schedules: Date[];
-  };
-  duration: number;
+  schedules: IClassSchedule[];
 }
 
 /* eslint-enable no-unused-vars */
-const AddSchedules = ({
-  defaultValue,
-  onChange,
-  duration,
-}: AddSchedulesProps) => {
+const AddSchedules = (props: AddSchedulesProps) => {
+  const { schedules, onChange } = props;
+  const { classRange, classDuration } = useClassScheduleStore();
   const [selectedDate, setSelectedDate] = useState<Date>();
 
   const initialDates = (): IEditSpecificDateType[] => {
     let dateGroupedSchedules: { [key: string]: IEditStartDateTime[] } = {};
 
-    if (!defaultValue.schedules) return [];
+    if (!schedules) return [];
 
-    defaultValue.schedules.forEach((schedule) => {
-      const date = formatDateWithHyphens(schedule);
-      const time = formatTimeNoSec(schedule);
+    schedules.forEach((schedule) => {
+      const date = formatDateWithHyphens(schedule.startDateTime);
+      const time = formatTimeNoSec(schedule.startDateTime);
 
       if (dateGroupedSchedules[date]) {
         dateGroupedSchedules[date].push({ time: time, editable: false });
@@ -65,20 +64,15 @@ const AddSchedules = ({
   };
 
   useEffect(() => {
-    if (
-      !defaultValue.range ||
-      !defaultValue.range.startDate ||
-      !defaultValue.range.endDate
-    )
-      return;
+    if (!classRange || !classRange.to || !classRange.from) return;
 
     const allDatesInRange = eachDayOfInterval({
-      start: new Date(defaultValue.range.startDate),
-      end: new Date(defaultValue.range.endDate),
+      start: classRange.from,
+      end: classRange.to,
     });
 
     dispatch({ type: 'SET_SELECTABLE_DATES', payload: allDatesInRange });
-  }, [defaultValue.range.endDate]);
+  }, [classRange]);
 
   const initialState = {
     selected: initialDates(),
@@ -232,7 +226,7 @@ const AddSchedules = ({
               {/* 시간 리스트 */}
               <TimeSlotManager
                 selectedItem={selectedItem}
-                duration={duration}
+                duration={classDuration}
                 handleStartTimeChange={handleStartTimeChange}
                 addTimeSlot={addTimeSlot}
                 removeTimeSlot={removeTimeSlot}
@@ -250,7 +244,7 @@ export default AddSchedules;
 /* eslint-disable no-unused-vars */
 interface TimeSlotManagerProps {
   selectedItem: IEditSpecificDateType | undefined;
-  duration: number;
+  duration?: number;
   handleStartTimeChange: (index: number, newStartTime: string) => void;
   addTimeSlot: () => void;
   removeTimeSlot: (indexToRemove: number) => void;
@@ -265,6 +259,7 @@ const TimeSlotManager = ({
   removeTimeSlot,
 }: TimeSlotManagerProps) => {
   const key = useId();
+  if (!duration) return null;
 
   return (
     <>

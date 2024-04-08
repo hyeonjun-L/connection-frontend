@@ -1,58 +1,61 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import { CLASS_EDIT_SECTIONS } from '@/constants/constants';
 import { Button, UniqueButton } from '@/components/Button';
+import { CLASS_EDIT_SECTIONS } from '@/constants/constants';
 
 const SideNavbar = ({ onClick }: { onClick: () => void }) => {
   const [activeSection, setActiveSection] = useState<string | null>(null);
-  const observer = useRef<IntersectionObserver | null>(null);
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
   const router = useRouter();
   const path = usePathname();
   const postId = path.split('/')[2];
 
   useEffect(() => {
-    observer.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      { threshold: 0.9 },
-    );
-
-    CLASS_EDIT_SECTIONS.forEach(({ id }) => {
-      const elem = document.getElementById(id);
-      if (elem && observer.current) observer.current.observe(elem);
-      sectionRefs.current[id] = elem;
+    CLASS_EDIT_SECTIONS.forEach((list) => {
+      const elem = document.getElementById(list.id);
+      sectionRefs.current[list.id] = elem;
     });
 
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      let minDiff = Infinity;
+      let closestSection = '';
+
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 80
+      ) {
+        setActiveSection(
+          CLASS_EDIT_SECTIONS[CLASS_EDIT_SECTIONS.length - 1].id,
+        );
+        return;
+      }
+
+      CLASS_EDIT_SECTIONS.forEach((section) => {
+        const elem = sectionRefs.current[section.id];
+
+        if (elem) {
+          const rect = elem.getBoundingClientRect();
+          const sectionTop = rect.top + window.scrollY;
+          const diff = Math.abs(sectionTop - currentScrollY - 160);
+
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestSection = section.id;
+          }
+        }
+      });
+
+      setActiveSection(closestSection);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
     return () => {
-      if (observer.current) observer.current.disconnect();
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  const handleNavLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-
-    const targetId = event.currentTarget.getAttribute('href');
-
-    if (targetId) {
-      const targetElement = sectionRefs.current[targetId.replace('#', '')];
-
-      if (targetElement) {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth',
-        });
-
-        setActiveSection(targetId.replace('#', ''));
-      }
-    }
-  };
 
   const handleEditCancel = () => {
     const confirm = window.confirm('클래스 수정을 취소하겠습니까?');
@@ -63,16 +66,12 @@ const SideNavbar = ({ onClick }: { onClick: () => void }) => {
 
   return (
     <aside className="sticky top-0 z-20 hidden h-fit w-fit justify-self-center pt-16 text-lg font-bold md:block">
-      <nav
-        onClick={handleNavLinkClick}
-        className="whitespace-nowrap text-lg font-bold"
-      >
+      <nav className="whitespace-nowrap text-lg font-bold">
         <ul className="mb-6 flex flex-col gap-y-8">
           {CLASS_EDIT_SECTIONS.map(({ id, label }) => (
             <li key={id}>
               <Link
                 href={`#${id}`}
-                ref={(ref) => (sectionRefs.current[id] = ref)}
                 className={`${
                   activeSection === id ? 'text-sub-color1' : 'text-gray-500'
                 }`}
