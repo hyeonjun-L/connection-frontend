@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { Children, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Arrow } from '@/icons/svg';
+import { Arrow } from '../../../public/icons/svg';
 import { Props } from '@/types/cariusel';
 
 interface CarouselProps extends Props {
