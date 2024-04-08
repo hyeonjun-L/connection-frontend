@@ -161,7 +161,6 @@ const CarouselContainer = (props: CarouselContainerProps) => {
         <Carousel
           {...props}
           move={move || loadPriority}
-          gotoIndex={undefined}
           currentIndex={carouselIndex}
           changeCurrentIndex={changeCarouselIndex}
           touchDistanceX={touchDistanceX}

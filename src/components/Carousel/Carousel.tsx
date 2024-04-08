@@ -138,9 +138,9 @@ const Carousel = ({
   ]);
 
   useEffect(() => {
-    if (gotoIndex === undefined) return;
+    if (gotoIndex === undefined || currentIndex === gotoIndex) return;
     changeCarouselIndexHandler(gotoIndex);
-  }, [changeCarouselIndexHandler, gotoIndex]);
+  }, [changeCarouselIndexHandler, currentIndex, gotoIndex]);
 
   useEffect(() => {
     currentIndexRef.current = currentIndex;
