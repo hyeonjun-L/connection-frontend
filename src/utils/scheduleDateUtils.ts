@@ -5,6 +5,8 @@ import {
   IDateTimeList,
   IRegularClassSchedule,
   IClassSchedule,
+  IRegularScheduleData,
+  day,
 } from '@/types/class';
 
 const dayMapping: {
@@ -23,9 +25,11 @@ export const calculateFinalDates = (
   startDate: string,
   endDate: string,
   schedules: IDayTimeList[] | IDateTimeList[],
-  holidays: {
-    holiday: string;
-  }[],
+  holidays:
+    | {
+        holiday: string;
+      }[]
+    | Date[],
 ) => {
   if (schedules.length === 0) return [];
 
@@ -34,7 +38,10 @@ export const calculateFinalDates = (
     end: new Date(endDate),
   });
 
-  const holidayDates = holidays.map((holiday) => new Date(holiday.holiday));
+  const holidayDates = holidays.map((holiday) => {
+    if (holiday instanceof Date) return holiday;
+    else return new Date(holiday.holiday);
+  });
 
   if ('day' in schedules[0]) {
     // 요일별 선택 시
@@ -81,7 +88,7 @@ export const calculateRegularFinalClass = (
   holidays: {
     holiday: string;
   }[],
-) => {
+): IRegularScheduleData[] => {
   if (schedules.length === 0) return [];
   const holidayDates = holidays.map((holiday) => new Date(holiday.holiday));
   const allDatesInRange = eachDayOfInterval({
@@ -92,7 +99,7 @@ export const calculateRegularFinalClass = (
   const allDates = calculateUnSelectedDate(allDatesInRange, holidayDates);
 
   const results: {
-    day: string[];
+    day: day[];
     dateTime: string;
     startDateTime: Date[];
   }[] = [];

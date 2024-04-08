@@ -246,18 +246,11 @@ export const getOriginalClassInfo = async (
           method: 'GET',
         }).then((data) => data.json()),
       ]);
-    const { schedule, holidayArr } = scheduleResponse.data;
-
-    const formatHoliday = holidayArr.map(
-      (holiday: string) => new Date(holiday),
-    );
 
     return {
       ...classDetailResponse.data.lectureDetail,
       ...classInfoResponse.data.lecturePreview,
       ...scheduleResponse.data,
-      schedule,
-      holidayArr: formatHoliday,
     };
   } catch (error) {
     throw new Error('클래스 수정 기본 정보 요청 에러!');
