@@ -564,7 +564,7 @@ export interface searchClass {
   reviewCount: number;
   isActive: boolean;
   lecturer: {
-    id: number;
+    lecturerId: number;
     nickname: string;
     profileCardImageUrl: string;
   };

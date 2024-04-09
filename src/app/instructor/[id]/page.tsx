@@ -32,16 +32,10 @@ const InstructorDetailPage = async ({
 }: {
   params: { id: string };
 }) => {
-  const profileData = await getInstructor(id);
-
-  if (profileData === undefined) {
-    throw new Error('강사 프로필 조회 오류');
-  }
-
   return (
     <main className="mx-auto w-full">
       <Suspense fallback={<div>로딩</div>}>
-        <ProfileSection profileData={profileData} id={id} />
+        <ProfileSection id={id} />
       </Suspense>
       <div className="mx-auto flex w-full max-w-[51.1rem] flex-col items-center overflow-hidden">
         <Suspense fallback={<div>로딩</div>}>
@@ -52,7 +46,7 @@ const InstructorDetailPage = async ({
           <PassSection id={id} />
         </Suspense>
 
-        <ReviewSection stars={profileData.stars} type="instructor" />
+        <ReviewSection stars={0} type="instructor" />
       </div>
     </main>
   );

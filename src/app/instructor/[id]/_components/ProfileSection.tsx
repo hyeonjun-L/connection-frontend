@@ -4,6 +4,7 @@ import {
   INSTRUCTOR_SECTIONS,
 } from '@/constants/constants';
 import { InstagramSVG, YoutubeSVG, LinkSVG, ChatSVG } from '@/icons/svg';
+import { getInstructor } from '@/lib/apis/serverApis/instructorPostApis';
 import {
   formatLocationToString,
   formatGenreToString,
@@ -15,14 +16,14 @@ import ChatButton from '@/components/Chat/ChatButton';
 import Like from '@/components/Like/Like';
 import Nav from '@/components/Nav/Nav';
 import { Review } from '@/components/Review';
-import { instructorPostResponse } from '@/types/instructor';
 
-interface ProfileSectionProps {
-  id: string;
-  profileData: instructorPostResponse;
-}
+const ProfileSection = async ({ id }: { id: string }) => {
+  const profileData = await getInstructor(id);
 
-const ProfileSection = async ({ id, profileData }: ProfileSectionProps) => {
+  if (profileData === undefined) {
+    throw new Error('강사 프로필 조회 오류');
+  }
+
   const {
     lecturerProfileImageUrl,
     lecturerInstagramPostUrl,
