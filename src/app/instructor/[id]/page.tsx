@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { getInstructor } from '@/lib/apis/serverApis/instructorPostApis';
 import ClassSection from './_components/ClassSection';
+import ClassSectionLoading from './_components/loading/ClassSectionLoading';
 import ProfileSectionLoading from './_components/loading/ProfileSectionLoading';
 import PassSection from './_components/PassSection';
 import ProfileSection from './_components/ProfileSection';
@@ -40,7 +41,7 @@ const InstructorDetailPage = async ({
       </Suspense>
 
       <div className="mx-auto flex w-full max-w-[51.1rem] flex-col items-center overflow-hidden">
-        <Suspense fallback={<div>로딩</div>}>
+        <Suspense fallback={<ClassSectionLoading />}>
           <ClassSection id={id} />
         </Suspense>
 
