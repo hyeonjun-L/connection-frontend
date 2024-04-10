@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ReadMore from '@/app/class/[id]/_components/ReadMore';
 import {
   INSTRUCTOR_H2_STYLE,
   INSTRUCTOR_SECTIONS,
@@ -182,24 +183,28 @@ const ProfileSection = async ({ id }: { id: string }) => {
         {/* 강사소개 섹션 */}
         <section
           id="introduction-section"
-          className="w-full px-5 pt-10 sm:px-0"
+          className="relative w-full px-5 pt-10 sm:px-0"
         >
-          <h2 className={INSTRUCTOR_H2_STYLE}>강사소개</h2>
+          <h2 className={`${INSTRUCTOR_H2_STYLE} mb-5`}>강사소개</h2>
           <div
             dangerouslySetInnerHTML={{
               __html: sanitizeHtmlString(introduction),
             }}
+            className="curriculum line-clamp-[18] peer-checked:line-clamp-none"
           />
+          <ReadMore labelName="강사소개 더보기" />
         </section>
         {/* 강사 경력 섹션 */}
         <section
           id="work-experience-section"
-          className=" w-full px-5 pt-20 sm:px-0"
+          className="relative w-full px-5 pt-20 sm:px-0"
         >
-          <h2 className={INSTRUCTOR_H2_STYLE}>강사 경력</h2>
+          <h2 className={`${INSTRUCTOR_H2_STYLE} mb-5`}>강사 경력</h2>
           <div
             dangerouslySetInnerHTML={{ __html: sanitizeHtmlString(experience) }}
+            className="curriculum line-clamp-[18] peer-checked:line-clamp-none"
           />
+          <ReadMore labelName="강사경력 더보기" />
         </section>
       </div>
     </>

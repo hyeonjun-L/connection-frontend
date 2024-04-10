@@ -117,7 +117,7 @@ const ClassDetail = async ({ id }: { id: string }) => {
             }}
             className="curriculum line-clamp-[18] peer-checked:line-clamp-none"
           />
-          <ReadMore />
+          <ReadMore labelName="커리큘럼 더보기" />
         </section>
 
         <section
