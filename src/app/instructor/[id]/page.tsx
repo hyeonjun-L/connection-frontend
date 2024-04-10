@@ -2,32 +2,33 @@ import { Suspense } from 'react';
 import { getInstructor } from '@/lib/apis/serverApis/instructorPostApis';
 import ClassSection from './_components/ClassSection';
 import ClassSectionLoading from './_components/loading/ClassSectionLoading';
+import PassSectionLoading from './_components/loading/PassSectionLoading';
 import ProfileSectionLoading from './_components/loading/ProfileSectionLoading';
 import PassSection from './_components/PassSection';
 import ProfileSection from './_components/ProfileSection';
 import ReviewSection from '@/components/uis/ReviewSection';
 import type { Metadata } from 'next';
 
-// export const generateMetadata = async ({
-//   params,
-// }: {
-//   params: { id: string };
-// }): Promise<Metadata> => {
-//   const { id } = params;
-//   const profile = await getInstructor(id);
+export const generateMetadata = async ({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> => {
+  const { id } = params;
+  const profile = await getInstructor(id);
 
-//   if (profile instanceof Error || !profile) {
-//     return {
-//       title: 'Connection | 강의 상세페이지',
-//       description: 'Connection 강의 상세페이지',
-//     };
-//   }
+  if (profile instanceof Error || !profile) {
+    return {
+      title: 'Connection | 강의 상세페이지',
+      description: 'Connection 강의 상세페이지',
+    };
+  }
 
-//   return {
-//     title: profile.nickname,
-//     description: profile.introduction,
-//   };
-// };
+  return {
+    title: profile.nickname,
+    description: profile.introduction,
+  };
+};
 
 const InstructorDetailPage = async ({
   params: { id },
@@ -45,7 +46,7 @@ const InstructorDetailPage = async ({
           <ClassSection id={id} />
         </Suspense>
 
-        <Suspense fallback={<div>로딩</div>}>
+        <Suspense fallback={<PassSectionLoading />}>
           <PassSection id={id} />
         </Suspense>
 

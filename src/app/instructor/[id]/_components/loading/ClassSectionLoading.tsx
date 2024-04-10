@@ -1,4 +1,3 @@
-import React from 'react';
 import CarouselContainer from '@/components/Carousel/CarouselContainer';
 import ClassPreviewLoading from '@/components/Loading/ClassPreviewLoading';
 

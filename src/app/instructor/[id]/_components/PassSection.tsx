@@ -16,28 +16,32 @@ const PassSection = async ({ id }: { id: string }) => {
         <h2 className={INSTRUCTOR_H2_STYLE}>패스권 {passLists.length}개</h2>
       </div>
       <div className="relative flex h-60 w-full justify-center ">
-        <CarouselContainer
-          move={true}
-          showCurrentElement={false}
-          carouselMoveIntervalTime={3000}
-          priority={3}
-          gap={32}
-          mobileShowCurrentElement={false}
-          itemStyle="w-72 sm:w-80"
-          carouselContainerStyle="flex h-full w-11/12 items-center overflow-hidden"
-        >
-          {passLists.map((passInfo) => (
-            <UserPass
-              key={passInfo.id}
-              passInfo={{
-                ...passInfo,
-                appliedList: passInfo.lecturePassTarget.map(({ lecture }) => ({
-                  ...lecture,
-                })),
-              }}
-            />
-          ))}
-        </CarouselContainer>
+        {passLists.length > 0 && (
+          <CarouselContainer
+            move={true}
+            showCurrentElement={false}
+            carouselMoveIntervalTime={3000}
+            priority={3}
+            gap={32}
+            mobileShowCurrentElement={false}
+            itemStyle="w-72 sm:w-80"
+            carouselContainerStyle="flex h-full w-11/12 items-center overflow-hidden"
+          >
+            {passLists.map((passInfo) => (
+              <UserPass
+                key={passInfo.id}
+                passInfo={{
+                  ...passInfo,
+                  appliedList: passInfo.lecturePassTarget.map(
+                    ({ lecture }) => ({
+                      ...lecture,
+                    }),
+                  ),
+                }}
+              />
+            ))}
+          </CarouselContainer>
+        )}
       </div>
     </section>
   );

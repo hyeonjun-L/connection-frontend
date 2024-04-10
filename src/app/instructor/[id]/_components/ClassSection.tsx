@@ -29,7 +29,7 @@ const ClassSection = async ({ id }: { id: string }) => {
       {classList.length > 0 ? (
         <ClassList classList={classList} />
       ) : (
-        <div className="h-40 w-full" />
+        <div className="h-60 w-full" />
       )}
     </section>
   );
