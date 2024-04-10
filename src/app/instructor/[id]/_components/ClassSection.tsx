@@ -12,8 +12,8 @@ const ClassSection = async ({ id }: { id: string }) => {
 
   const classList = transformToCardData(classListsResponse, {
     id: Number(id),
-    nickname: classListsResponse[0].lecturer.nickname,
-    img: classListsResponse[0].lecturer.profileCardImageUrl,
+    nickname: classListsResponse[0]?.lecturer.nickname,
+    img: classListsResponse[0]?.lecturer.profileCardImageUrl,
   });
 
   return (
@@ -26,7 +26,11 @@ const ClassSection = async ({ id }: { id: string }) => {
           진행중인 강의 {classList.length}개
         </h2>
       </div>
-      {classList.length > 0 && <ClassList classList={classList} />}
+      {classList.length > 0 ? (
+        <ClassList classList={classList} />
+      ) : (
+        <div className="h-40 w-full" />
+      )}
     </section>
   );
 };

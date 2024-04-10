@@ -90,7 +90,7 @@ export interface searchPass {
 }
 
 export interface userPass {
-  searchAfter: [number, number];
+  searchAfter?: [number, number];
   id: number;
   price: number;
   title: string;
@@ -100,9 +100,9 @@ export interface userPass {
     id: number;
     title: string;
   }[];
-  lecturerId: number;
-  nickname: string;
-  profileCardImageUrl: string;
+  lecturerId?: number;
+  nickname?: string;
+  profileCardImageUrl?: string;
 }
 
 export interface searchPassesParameters {

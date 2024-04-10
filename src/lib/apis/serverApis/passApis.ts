@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import {
   IPassInfoForIdData,
   IgetPassFunction,
+  IpassData,
   IresponsePassData,
   passSituation,
   userPassList,
@@ -10,7 +11,9 @@ import { FetchError } from '@/types/types';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
-export const getLecturerPassList = async (lecturerId: string) => {
+export const getLecturerPassList = async (
+  lecturerId: string,
+): Promise<undefined | IpassData[]> => {
   try {
     const response = await fetch(
       `${END_POINT}/passes/lecturers/${lecturerId}`,
@@ -22,7 +25,10 @@ export const getLecturerPassList = async (lecturerId: string) => {
     );
 
     if (!response.ok) {
-      throw new Error(`강사 패스권 목록 불러오기: ${response.status}`);
+      const errorData = await response.json();
+      const error: FetchError = new Error(errorData.message || '');
+      error.status = response.status;
+      throw new Error(`강사 패스권 목록 불러오기: ${error.status} ${error}`);
     }
 
     const resData = await response.json();
