@@ -60,7 +60,7 @@ const ProfileSection = async ({ id }: { id: string }) => {
         imgURL={lecturerProfileImageUrl.map((img) => img.url)}
       />
 
-      <div className="mx-auto flex w-full max-w-[51.1rem] flex-col items-center overflow-hidden">
+      <div className="mx-auto flex w-full max-w-[51.1rem] flex-col items-center">
         <section className="flex w-full flex-col items-center">
           <div className="flex flex-col px-5 sm:items-center sm:px-0">
             {/* 강사 이름 및 이벤트 */}
@@ -214,7 +214,7 @@ const InstagramIframe = ({ link }: { link: string }) => {
   urlObj.hash = '';
 
   return (
-    <div className="h-[535px] w-[16.6875rem] overflow-hidden">
+    <div className="h-[35.625rem] w-[16.6875rem] overflow-hidden sm:h-[33.438rem]">
       <iframe
         height="535"
         width="363"
