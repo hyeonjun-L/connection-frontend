@@ -10,7 +10,9 @@ import {
   formatGenreToString,
 } from '@/utils/parseUtils';
 import { sanitizeHtmlString } from '@/utils/sanitizeHtmlString';
+import ErrorContainer from './ErrorContainer';
 import InstructorCarousel from './InstructorCarousel';
+import ProfileSectionLoading from './loading/ProfileSectionLoading';
 import { OptionButtons } from '@/components/Button';
 import ChatButton from '@/components/Chat/ChatButton';
 import Like from '@/components/Like/Like';
@@ -18,10 +20,21 @@ import Nav from '@/components/Nav/Nav';
 import { Review } from '@/components/Review';
 
 const ProfileSection = async ({ id }: { id: string }) => {
-  const profileData = await getInstructor(id);
+  let profileData;
+  try {
+    const resProfileData = await getInstructor(id);
 
-  if (profileData === undefined) {
-    throw new Error('강사 프로필 조회 오류');
+    if (resProfileData === undefined) {
+      throw new Error('강사 프로필 조회 오류');
+    }
+    profileData = resProfileData;
+  } catch (error) {
+    console.error(error);
+    return (
+      <ErrorContainer toastMessage="잠시 후 다시 시도해 주세요.">
+        <ProfileSectionLoading />
+      </ErrorContainer>
+    );
   }
 
   const {

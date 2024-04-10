@@ -4,17 +4,23 @@ import { transformToCardData } from '@/utils/apiDataProcessor';
 import ClassList from './ClassList';
 
 const ClassSection = async ({ id }: { id: string }) => {
-  const classListsResponse = await getInstructorClassLists(id);
+  let classList;
+  try {
+    const classListsResponse = await getInstructorClassLists(id);
 
-  if (classListsResponse instanceof Error) {
-    return '에러표시';
+    if (classListsResponse instanceof Error) {
+      throw new Error(classListsResponse.message);
+    }
+
+    classList = transformToCardData(classListsResponse, {
+      id: Number(id),
+      nickname: classListsResponse[0]?.lecturer.nickname,
+      img: classListsResponse[0]?.lecturer.profileCardImageUrl,
+    });
+  } catch (error) {
+    console.error(error);
+    return null;
   }
-
-  const classList = transformToCardData(classListsResponse, {
-    id: Number(id),
-    nickname: classListsResponse[0]?.lecturer.nickname,
-    img: classListsResponse[0]?.lecturer.profileCardImageUrl,
-  });
 
   return (
     <section

@@ -4,14 +4,23 @@ import CarouselContainer from '@/components/Carousel/CarouselContainer';
 import UserPass from '@/components/Pass/UserPass';
 
 const PassSection = async ({ id }: { id: string }) => {
-  const passLists = await getLecturerPassList(id);
+  let passLists;
+  try {
+    passLists = await getLecturerPassList(id);
 
-  if (passLists === undefined) {
-    return null;
+    if (passLists === undefined) {
+      throw new Error('강사 배포된 패스권 조회 오류');
+    }
+  } catch (error) {
+    console.error(error);
+    return <div className="h-20 w-full" />;
   }
 
   return (
-    <section className="mb-14 flex w-full flex-col items-center px-5 pt-20 sm:px-0">
+    <section
+      id="class-section"
+      className="mb-14 flex w-full flex-col items-center px-5 pt-20 sm:px-0"
+    >
       <div className="w-full ">
         <h2 className={INSTRUCTOR_H2_STYLE}>패스권 {passLists.length}개</h2>
       </div>
