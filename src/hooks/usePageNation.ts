@@ -22,14 +22,14 @@ const usePageNation = <T extends ItemWithId>({
   defaultFilterState,
   queryFn,
   staleTime = Infinity,
+  initialData,
 }: usePageNationProps<T>) => {
   const queryClient = useQueryClient();
-
   const [totalItemCount, setTotalItemCount] = useState(0);
   const [filterState, setFilterState] = useState(defaultFilterState);
 
-  const queryKey = useMemo(() => {
-    return Object.entries(filterState)
+  const makeQueryKey = (filter: { [key: string]: any | undefined }) => {
+    return Object.entries(filter)
       .filter(
         ([key, _]) =>
           key !== 'firstItemId' &&
@@ -37,12 +37,27 @@ const usePageNation = <T extends ItemWithId>({
           key !== 'currentPage',
       )
       .map(([_, value]) => value);
+  };
+
+  const initialDataQueryKey = makeQueryKey(defaultFilterState);
+
+  const queryKey = useMemo(() => {
+    return makeQueryKey(filterState);
   }, [filterState]);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<{ count: number; item: T[] }>({
     queryKey: [queryType, ...queryKey],
     queryFn: ({ signal }) => queryFn(filterState, signal),
     staleTime,
+    initialData: () => {
+      if (
+        initialData &&
+        filterState.targetPage === 1 &&
+        JSON.stringify(initialDataQueryKey) === JSON.stringify(queryKey)
+      ) {
+        return initialData;
+      }
+    },
   });
 
   useEffect(() => {
@@ -64,7 +79,7 @@ const usePageNation = <T extends ItemWithId>({
         firstItemId: 0,
         lastItemId: 0,
         currentPage: 0,
-        targetPage: 0,
+        targetPage: 1,
         [key]: value,
       };
 
