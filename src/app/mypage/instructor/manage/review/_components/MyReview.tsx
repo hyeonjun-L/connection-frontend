@@ -11,11 +11,11 @@ import { OptionType } from '@/types/coupon';
 import { GetMyLecturersReviews, MyLecturersReviewsData } from '@/types/review';
 
 interface MyReview {
-  reviewList: MyLecturersReviewsData[];
+  initialData: { count: number; item: MyLecturersReviewsData[] };
   myClassListsOption: OptionType[];
 }
 
-const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
+const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
   const {
     items: reviews,
     totalItemCount,
@@ -23,7 +23,8 @@ const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
     isLoading,
     changeFilterState,
     changePage,
-  } = usePageNation({
+  } = usePageNation<MyLecturersReviewsData>({
+    initialData,
     defaultFilterState: {
       take: 2,
       targetPage: 1,
@@ -111,7 +112,7 @@ const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
               </select>
               {totalItemCount}개의 리뷰
             </div>
-            {totalItemCount > 0 ? (
+            {reviews.length > 0 ? (
               <>
                 <ul className="flex flex-col">
                   {reviews.map(
@@ -156,7 +157,7 @@ const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
           </div>
         </section>
         <section className="w-full self-start sm:w-56 md:w-72 lg:w-80">
-          <ReviewStatistics reviewList={reviewList} />
+          <ReviewStatistics reviewList={initialData.item} />
         </section>
       </div>
     </main>

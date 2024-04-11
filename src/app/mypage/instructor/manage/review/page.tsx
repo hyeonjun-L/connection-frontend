@@ -7,7 +7,7 @@ import { GetMyLecturersReviewsData } from '@/types/review';
 const page = async () => {
   let myClassListsOption;
   const firstRender = {
-    take: 10000,
+    take: 2,
     lecturerMyReviewType: '전체',
     orderBy: '최신순',
   };
@@ -41,7 +41,7 @@ const page = async () => {
 
   return (
     <MyReview
-      reviewList={resReview.item}
+      initialData={resReview}
       myClassListsOption={myClassListsOption ?? []}
     />
   );
