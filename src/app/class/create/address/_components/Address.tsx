@@ -1,5 +1,6 @@
 'use client';
-import { FormEvent, useRef, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FormEvent, useState } from 'react';
 import { searchAddress } from '@/lib/apis/searchAddress';
 import AddressDescription from './AddressDescription';
 import SearchForm from './SearchForm';
@@ -8,9 +9,16 @@ import Pagination from '@/components/Pagination/Pagination';
 import { AddressData } from '@/types/address';
 
 const Address = () => {
-  const [addressData, setAddressData] = useState<AddressData | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const inputAddressRef = useRef('');
+  const [inputAddress, setInputAddress] = useState('');
+
+  const queryClient = useQueryClient();
+
+  const { data: addressData, isLoading } = useQuery<AddressData>({
+    queryKey: ['searchAddress', inputAddress, currentPage],
+    queryFn: ({ signal }) => searchAddress(inputAddress, currentPage, signal),
+    enabled: !!inputAddress,
+  });
 
   const addressSearch = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,15 +27,13 @@ const Address = () => {
     const value = formData.get('inputAddress') as string;
 
     if (value) {
-      inputAddressRef.current = value;
-      setAddressData(await searchAddress(value, 0));
-      setCurrentPage(0);
+      setInputAddress(value);
     }
   };
 
   const handlePageChange = async ({ selected }: { selected: number }) => {
     setCurrentPage(selected);
-    setAddressData(await searchAddress(inputAddressRef.current, selected + 1));
+    queryClient.cancelQueries({ queryKey: ['searchAddress'] });
   };
 
   return (

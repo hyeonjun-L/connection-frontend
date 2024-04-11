@@ -518,6 +518,7 @@ export const HIDE_NAV_PATH = [
   '^/class/[\\w-]+$',
   '^/order',
   '^/instructor/[\\w-]+/edit$',
+  '^/class/create/address',
 ];
 
 export const CHATS_TAKE = 12 as const;
