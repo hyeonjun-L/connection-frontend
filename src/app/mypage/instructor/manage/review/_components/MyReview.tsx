@@ -1,9 +1,9 @@
 'use client';
 import { Fragment, useState } from 'react';
+import usePageNation from '@/hooks/usePageNation';
 import { NotFoundSVG } from '@/icons/svg';
 import { getMyLecturersReviews } from '@/lib/apis/reviewApis';
 import formatDate from '@/utils/formatDate';
-import usePageNation from '@/utils/usePagenation';
 import ClassFilterSelect from './ClassFilterSelect';
 import Pagination from '@/components/Pagination/Pagination';
 import { UserReview, ReviewStatistics } from '@/components/Review';
@@ -16,35 +16,23 @@ interface MyReview {
 }
 
 const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
-  const [reviews, setReviews] = useState(
-    reviewList.length > 2 ? reviewList.slice(0, 2) : reviewList,
-  );
-
-  const changeReviews = (reviews: MyLecturersReviewsData[]) => {
-    setReviews(reviews);
-  };
-
   const {
-    filterState,
-    handleChangePage,
-    resetFilter,
-    updateFilter,
+    items: reviews,
     totalItemCount,
+    filterState,
+    isLoading,
+    changeFilterState,
+    changePage,
   } = usePageNation({
     defaultFilterState: {
       take: 2,
-      currentPage: 1,
       targetPage: 1,
       lecturerMyReviewType: '전체',
       orderBy: '최신순',
       lectureId: myClassListsOption[0]?.value ?? undefined,
     },
-    firstPageIndex: 1,
-    itemList: reviews,
-    totalItemCount: reviewList.length,
-    changeItemListFn: changeReviews,
-    getItemListFn: (data: GetMyLecturersReviews, signal: AbortSignal) =>
-      getMyLecturersReviews(data, signal),
+    queryType: 'instructorReview',
+    queryFn: getMyLecturersReviews,
   });
 
   const options: {
@@ -82,7 +70,7 @@ const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
                   className="peer h-[18px] w-[18px]  accent-black"
                   checked={filterState.lecturerMyReviewType === option.id}
                   onChange={() =>
-                    resetFilter('lecturerMyReviewType', option.id)
+                    changeFilterState('lecturerMyReviewType', option.id, true)
                   }
                 />
                 <label
@@ -102,7 +90,7 @@ const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
                   ) ?? myClassListsOption[0]
                 }
                 onChange={(change: any) => {
-                  resetFilter('lectureId', change.value);
+                  changeFilterState('lectureId', change.value, true);
                 }}
                 isDisabled={filterState.lecturerMyReviewType !== '전체'}
               />
@@ -114,7 +102,7 @@ const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
                 name="sorting"
                 className="h-7 border border-solid border-gray-500"
                 value={filterState.orderBy}
-                onChange={(e) => updateFilter('orderBy', e.target.value)}
+                onChange={(e) => changeFilterState('orderBy', e.target.value)}
               >
                 <option value="최신순">최신순</option>
                 <option value="좋아요순">좋아요순</option>
@@ -153,12 +141,9 @@ const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
                   <Pagination
                     pageCount={Math.ceil(totalItemCount / 2)}
                     currentPage={
-                      filterState.targetPage !== undefined &&
-                      filterState.targetPage > 0
-                        ? filterState.targetPage - 1
-                        : 0
+                      filterState.currentPage ? filterState.currentPage - 1 : 0
                     }
-                    onPageChange={handleChangePage}
+                    onPageChange={changePage}
                   />
                 </nav>
               </>

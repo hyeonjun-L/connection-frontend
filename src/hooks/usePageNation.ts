@@ -6,7 +6,7 @@ interface usePageNationProps {
   defaultFilterState: PagenationFilterState;
   queryType: string;
   queryFn: (
-    data: PagenationFilterState,
+    data: any,
     signal?: AbortSignal,
   ) => Promise<{ count: number; item: any[] }>;
   initialData?: any;

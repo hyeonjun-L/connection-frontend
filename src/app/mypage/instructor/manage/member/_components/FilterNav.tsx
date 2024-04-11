@@ -6,7 +6,7 @@ import { PagenationFilterState } from '@/types/types';
 
 interface FilterNavProps {
   filterState: PagenationFilterState;
-  resetFilter: (key: string, value: any) => void;
+  resetFilter: (key: string, value: any, reset?: boolean) => void;
   myClassListsOption: OptionType[];
 }
 
@@ -50,7 +50,7 @@ const FilterNav = ({
                 id={option.id}
                 type="checkbox"
                 checked={filterState.filterOption === option.id}
-                onChange={() => resetFilter('filterOption', option.id)}
+                onChange={() => resetFilter('filterOption', option.id, true)}
                 className="peer h-[18px] w-[18px]  accent-black"
               />
               <label
