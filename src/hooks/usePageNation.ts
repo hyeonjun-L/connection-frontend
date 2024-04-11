@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import useChangeSearchParams from './useChangeSearchParams';
 import { PagenationFilterState } from '@/types/types';
 
 interface ItemWithId {
@@ -28,7 +29,10 @@ const usePageNation = <T extends ItemWithId>({
   const [totalItemCount, setTotalItemCount] = useState(0);
   const [filterState, setFilterState] = useState(defaultFilterState);
 
-  const makeQueryKey = (filter: { [key: string]: any | undefined }) => {
+  const { changeMultipleParams, getCurrentParamsToObject } =
+    useChangeSearchParams();
+
+  const filterQueryParams = (filter: { [key: string]: any | undefined }) => {
     return Object.entries(filter)
       .filter(
         ([key, _]) =>
@@ -36,14 +40,19 @@ const usePageNation = <T extends ItemWithId>({
           key !== 'lastItemId' &&
           key !== 'currentPage',
       )
-      .map(([_, value]) => value);
+      .map(([key, value]) => ({ name: key, value }));
   };
 
+  const makeQueryKey = useCallback(
+    (filter: { [key: string]: any | undefined }) =>
+      filterQueryParams(filter).map(({ value }) => value),
+    [],
+  );
   const initialDataQueryKey = makeQueryKey(defaultFilterState);
 
   const queryKey = useMemo(() => {
     return makeQueryKey(filterState);
-  }, [filterState]);
+  }, [filterState, makeQueryKey]);
 
   const { data, isLoading } = useQuery<{ count: number; item: T[] }>({
     queryKey: [queryType, ...queryKey],
@@ -63,6 +72,8 @@ const usePageNation = <T extends ItemWithId>({
   useEffect(() => {
     if (!data) return;
 
+    changeMultipleParams(filterQueryParams(filterState), false);
+
     setFilterState((prev) => ({
       ...prev,
       currentPage: prev.currentPage ? filterState.targetPage : 1,
@@ -72,6 +83,21 @@ const usePageNation = <T extends ItemWithId>({
 
     setTotalItemCount(data.count);
   }, [data]);
+
+  useEffect(() => {
+    const prevParams = getCurrentParamsToObject();
+
+    const params = Object.keys(prevParams).reduce<{ [key: string]: any }>(
+      (acc, key) => {
+        const value = prevParams[key];
+        acc[key] = !isNaN(value) && value !== '' ? +value : value;
+        return acc;
+      },
+      {},
+    );
+
+    setFilterState((prev) => ({ ...prev, ...params }));
+  }, []);
 
   const changeFilterState = (key: string, value: any, reset?: boolean) => {
     setFilterState((prevState) => {

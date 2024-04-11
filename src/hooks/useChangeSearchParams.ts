@@ -66,6 +66,7 @@ const useChangeSearchParams = () => {
 
   const changeMultipleParams = (
     paramsArray: { name: string; value: string | string[] }[],
+    push?: boolean,
   ) => {
     const params = new URLSearchParams(searchParams);
 
@@ -88,11 +89,12 @@ const useChangeSearchParams = () => {
     });
 
     const newQueryString = params.toString();
+    const url = newQueryString ? `${pathname}?${newQueryString}` : pathname;
 
-    if (newQueryString) {
-      router.push(pathname + '?' + newQueryString);
+    if (push) {
+      router.push(url);
     } else {
-      router.push(pathname);
+      router.replace(url);
     }
   };
 
