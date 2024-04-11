@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FormEvent, useState } from 'react';
 import { searchAddress } from '@/lib/apis/searchAddress';
 import AddressDescription from './AddressDescription';
+import AddressLoading from './loading/AddressLoading';
 import SearchForm from './SearchForm';
 import SearchResults from './SearchResults';
 import Pagination from '@/components/Pagination/Pagination';
@@ -46,7 +47,9 @@ const Address = () => {
       <section className="m-auto mb-5 flex w-full max-w-2xl flex-col px-3 sm:mb-0 sm:px-11">
         <SearchForm addressSearch={addressSearch} />
 
-        {addressData ? (
+        {isLoading ? (
+          <AddressLoading />
+        ) : addressData ? (
           <SearchResults addressData={addressData} />
         ) : (
           <AddressDescription />
