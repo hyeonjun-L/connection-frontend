@@ -2,23 +2,27 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { PagenationFilterState } from '@/types/types';
 
-interface usePageNationProps {
+interface ItemWithId {
+  id: number;
+}
+
+interface usePageNationProps<T extends ItemWithId> {
   defaultFilterState: PagenationFilterState;
   queryType: string;
   queryFn: (
     data: any,
     signal?: AbortSignal,
-  ) => Promise<{ count: number; item: any[] }>;
+  ) => Promise<{ count: number; item: T[] }>;
   initialData?: any;
   staleTime?: number;
 }
 
-const usePageNation = ({
+const usePageNation = <T extends ItemWithId>({
   queryType,
   defaultFilterState,
   queryFn,
   staleTime = Infinity,
-}: usePageNationProps) => {
+}: usePageNationProps<T>) => {
   const queryClient = useQueryClient();
 
   const [totalItemCount, setTotalItemCount] = useState(0);
