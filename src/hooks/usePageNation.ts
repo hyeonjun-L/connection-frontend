@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { PagenationFilterState } from '@/types/types';
 
@@ -7,15 +7,20 @@ interface usePageNationProps {
   queryType: string;
   queryFn: (
     data: PagenationFilterState,
+    signal?: AbortSignal,
   ) => Promise<{ count: number; item: any[] }>;
   initialData?: any;
+  staleTime?: number;
 }
 
 const usePageNation = ({
   queryType,
   defaultFilterState,
   queryFn,
+  staleTime = Infinity,
 }: usePageNationProps) => {
+  const queryClient = useQueryClient();
+
   const [totalItemCount, setTotalItemCount] = useState(0);
   const [filterState, setFilterState] = useState(defaultFilterState);
 
@@ -32,18 +37,21 @@ const usePageNation = ({
 
   const { data, isLoading } = useQuery({
     queryKey: [queryType, ...queryKey],
-    queryFn: () => queryFn(filterState),
-    staleTime: Infinity,
+    queryFn: ({ signal }) => queryFn(filterState, signal),
+    staleTime,
   });
 
   useEffect(() => {
+    if (!data) return;
+
     setFilterState((prev) => ({
       ...prev,
-      firstItemId: data?.item[0]?.id ?? 0,
-      lastItemId: data?.item.at(-1).id ?? 0,
+      currentPage: prev.currentPage ? filterState.targetPage : 1,
+      firstItemId: data.item[0]?.id ?? 0,
+      lastItemId: data.item.at(-1)?.id ?? 0,
     }));
 
-    setTotalItemCount((prev) => data?.count ?? prev);
+    setTotalItemCount(data.count);
   }, [data]);
 
   const changeFilterState = (key: string, value: any, reset?: boolean) => {
@@ -65,9 +73,10 @@ const usePageNation = ({
   const changePage = ({ selected }: { selected: number }) => {
     setFilterState((prevState) => ({
       ...prevState,
-      currentPage: filterState.targetPage,
-      targetPage: selected,
+      targetPage: selected + 1,
     }));
+
+    queryClient.cancelQueries({ queryKey: [queryType] });
   };
 
   return {
