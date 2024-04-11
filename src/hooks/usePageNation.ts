@@ -13,7 +13,7 @@ interface usePageNationProps<T extends ItemWithId> {
     data: any,
     signal?: AbortSignal,
   ) => Promise<{ count: number; item: T[] }>;
-  initialData?: any;
+  initialData?: { count: number; item: T[] };
   staleTime?: number;
 }
 

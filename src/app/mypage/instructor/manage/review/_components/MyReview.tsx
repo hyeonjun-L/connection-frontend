@@ -138,7 +138,7 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
                     ),
                   )}
                 </ul>
-                <nav className="z-10">
+                <nav className="z-0">
                   <Pagination
                     pageCount={Math.ceil(totalItemCount / 2)}
                     currentPage={
