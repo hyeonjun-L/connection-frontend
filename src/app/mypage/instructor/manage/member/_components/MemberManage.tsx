@@ -1,12 +1,13 @@
 'use client';
 import { MEMBER_MANAGE_TAKE } from '@/constants/constants';
 import usePageNation from '@/hooks/usePageNation';
-import { NotFoundSVG } from '@/icons/svg';
+import { ArrowRightSVG, NotFoundSVG } from '@/icons/svg';
 import { getMyMembers } from '@/lib/apis/instructorApi';
 import FilterNav from './FilterNav';
 import MemberListLoading from './loading/MemberListLoading';
 import MemberListView from './MemberListView';
 import Pagination from '@/components/Pagination/Pagination';
+import PaginationLoading from '@/components/Pagination/PaginationLoading';
 import { OptionType } from '@/types/coupon';
 import { GetMyMembersData } from '@/types/instructor';
 
@@ -36,7 +37,9 @@ const MemberManage = ({ myMembers, myClassListsOption }: MemberManageProps) => {
     queryFn: getMyMembers,
   });
 
-  const pageCount = Math.ceil(totalItemCount / MEMBER_MANAGE_TAKE);
+  const pageCount = Math.ceil(
+    totalItemCount / (filterState.take ?? MEMBER_MANAGE_TAKE),
+  );
 
   return (
     <main className="col-span-1 flex w-full flex-col px-2 sm:px-6">
@@ -64,17 +67,20 @@ const MemberManage = ({ myMembers, myClassListsOption }: MemberManageProps) => {
               <p>존재하는 회원이 없습니다</p>
             </div>
           )}
-
-          {pageCount > 0 && (
-            <nav className="z-0">
-              <Pagination
-                pageCount={pageCount}
-                currentPage={
-                  filterState.currentPage ? filterState.currentPage - 1 : 0
-                }
-                onPageChange={changePage}
-              />
-            </nav>
+          {memberList.length > 0 && pageCount === 0 ? (
+            <PaginationLoading />
+          ) : (
+            pageCount > 0 && (
+              <nav className="z-0">
+                <Pagination
+                  pageCount={pageCount}
+                  currentPage={
+                    filterState.currentPage ? filterState.currentPage - 1 : 0
+                  }
+                  onPageChange={changePage}
+                />
+              </nav>
+            )
           )}
         </div>
       </section>

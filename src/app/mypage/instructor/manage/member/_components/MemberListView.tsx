@@ -8,7 +8,7 @@ import {
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { Suspense, useMemo } from 'react';
 import { ChatSVG, MemoSVG } from '@/icons/svg';
 import { useMemberStore } from '@/store/memberStore';
 import formatDate from '@/utils/formatDate';
@@ -25,6 +25,9 @@ interface MemberListViewProps {
 
 const ExcelDownload = dynamic(() => import('./ExcelDownload'), {
   ssr: false,
+  loading: () => (
+    <div className="h-7 w-16 animate-pulse rounded-lg bg-gray-700 sm:w-[7.5rem]" />
+  ),
 });
 
 const MemberListView = ({
