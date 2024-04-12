@@ -1,5 +1,6 @@
 import { PAYMENT_STATUS } from '@/constants/constants';
 import { IClassSchedule, IRegularClassSchedule } from './class';
+import { PagenationFilterState } from '@/types/types';
 
 export interface IReservationInfo {
   lectureScheduleId: number;
@@ -215,6 +216,10 @@ export interface IMyPayment {
 }
 
 export interface IMyPaymentResponse {
-  totalItemCount: number;
-  userPaymentsHistory: IMyPayment[];
+  count: number;
+  item: IMyPayment[];
+}
+
+export interface IMyPaymentParams extends PagenationFilterState {
+  paymentHistoryType: '전체' | '클래스' | '패스권';
 }
