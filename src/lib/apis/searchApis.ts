@@ -1,3 +1,4 @@
+import createParams from '@/utils/createParams';
 import { searchClass, searchClassParameters } from '@/types/class';
 import {
   searchInstructor,
@@ -39,17 +40,7 @@ export const searchInstructors = async (
   userState: boolean,
 ): Promise<searchInstructor[]> => {
   try {
-    const params = new URLSearchParams();
-
-    Object.entries(data)
-      .filter(([_, v]) => v !== undefined)
-      .forEach(([k, v]) => {
-        if (Array.isArray(v)) {
-          v.forEach((value) => params.append(`${k}[]`, value));
-        } else {
-          params.append(k, String(v));
-        }
-      });
+    const params = createParams(data);
 
     const response = await fetch(`/api/instructors/search?${params}`, {
       method: 'GET',
@@ -80,17 +71,7 @@ export const searchClasses = async (
   userState: boolean,
 ): Promise<searchClass[]> => {
   try {
-    const params = new URLSearchParams();
-
-    Object.entries(data)
-      .filter(([_, v]) => v !== undefined)
-      .forEach(([k, v]) => {
-        if (Array.isArray(v)) {
-          v.forEach((value) => params.append(`${k}[]`, value));
-        } else {
-          params.append(k, String(v));
-        }
-      });
+    const params = createParams(data);
 
     const response = await fetch(`/api/class/search?${params}`, {
       method: 'GET',
@@ -121,17 +102,7 @@ export const searchPasses = async (
   userState: boolean,
 ): Promise<searchPass[]> => {
   try {
-    const params = new URLSearchParams();
-
-    Object.entries(data)
-      .filter(([_, v]) => v !== undefined)
-      .forEach(([k, v]) => {
-        if (Array.isArray(v)) {
-          v.forEach((value) => params.append(`${k}[]`, value));
-        } else {
-          params.append(k, String(v));
-        }
-      });
+    const params = createParams(data);
 
     const response = await fetch(`/api/pass/search?${params}`, {
       method: 'GET',

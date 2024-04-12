@@ -54,6 +54,8 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
     },
   ];
 
+  const pageCount = Math.ceil(totalItemCount / 2);
+
   return (
     <main className="col-span-1 flex w-full flex-col px-2 sm:px-6">
       <div className="flex flex-col-reverse gap-5 sm:flex-row">
@@ -113,46 +115,46 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
               {totalItemCount}개의 리뷰
             </div>
             {reviews.length > 0 ? (
-              <>
-                <ul className="flex flex-col">
-                  {reviews.map(
-                    ({ id, stars, users, description, reservation }) => (
-                      <Fragment key={id}>
-                        <UserReview
-                          src={users.userProfileImage.imageUrl}
-                          nickname={users.nickname}
-                          average={stars}
-                          date={formatDate(
-                            reservation.lectureSchedule.startDateTime,
-                          )}
-                          title={reservation.lectureSchedule.lecture.title}
-                          count={3}
-                          isLike={false}
-                          reviewId={id}
-                          content={description}
-                          disabled={true}
-                          link={`/report?lectureReviewId=${id}`}
-                        />
-                        <div className="h-1 bg-sub-color1-transparent" />
-                      </Fragment>
-                    ),
-                  )}
-                </ul>
-                <nav className="z-0">
-                  <Pagination
-                    pageCount={Math.ceil(totalItemCount / 2)}
-                    currentPage={
-                      filterState.currentPage ? filterState.currentPage - 1 : 0
-                    }
-                    onPageChange={changePage}
-                  />
-                </nav>
-              </>
+              <ul className="flex flex-col">
+                {reviews.map(
+                  ({ id, stars, users, description, reservation }) => (
+                    <Fragment key={id}>
+                      <UserReview
+                        src={users.userProfileImage.imageUrl}
+                        nickname={users.nickname}
+                        average={stars}
+                        date={formatDate(
+                          reservation.lectureSchedule.startDateTime,
+                        )}
+                        title={reservation.lectureSchedule.lecture.title}
+                        count={3}
+                        isLike={false}
+                        reviewId={id}
+                        content={description}
+                        disabled={true}
+                        link={`/report?lectureReviewId=${id}`}
+                      />
+                      <div className="h-1 bg-sub-color1-transparent" />
+                    </Fragment>
+                  ),
+                )}
+              </ul>
             ) : (
               <div className="my-7 flex w-full flex-col items-center justify-center gap-8 text-lg font-semibold text-gray-100">
                 <NotFoundSVG />
                 <p>작성 된 리뷰가 없습니다!</p>
               </div>
+            )}
+            {pageCount > 0 && (
+              <nav className="z-0">
+                <Pagination
+                  pageCount={pageCount}
+                  currentPage={
+                    filterState.currentPage ? filterState.currentPage - 1 : 0
+                  }
+                  onPageChange={changePage}
+                />
+              </nav>
             )}
           </div>
         </section>

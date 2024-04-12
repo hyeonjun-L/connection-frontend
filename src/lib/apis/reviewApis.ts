@@ -1,3 +1,4 @@
+import createParams from '@/utils/createParams';
 import {
   GetMyLecturersReviews,
   GetMyLecturersReviewsData,
@@ -87,13 +88,7 @@ export const getMyLecturersReviews = async (
   signal?: AbortSignal,
 ): Promise<GetMyLecturersReviewsData> => {
   try {
-    const params = new URLSearchParams();
-
-    Object.entries(data)
-      .filter(([_, v]) => v !== undefined)
-      .forEach(([k, v]) => {
-        params.append(k, String(v));
-      });
+    const params = createParams(data);
 
     const response = await fetch(`/api/review/lecturer?${params}`, {
       method: 'GET',

@@ -1,3 +1,4 @@
+import createParams from '@/utils/createParams';
 import { instructorProfile } from '@/types/auth';
 import { IMonthlyClassSchedules } from '@/types/class';
 import {
@@ -221,13 +222,7 @@ export const getMyMembers = async (
   signal?: AbortSignal,
 ): Promise<GetMyMembersData> => {
   try {
-    const params = new URLSearchParams();
-
-    Object.entries(data)
-      .filter(([_, v]) => v !== undefined)
-      .forEach(([k, v]) => {
-        params.append(k, String(v));
-      });
+    const params = createParams(data);
 
     const response = await fetch(`/api/instructors/my-member?${params}`, {
       method: 'GET',
