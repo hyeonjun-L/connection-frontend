@@ -125,7 +125,7 @@ const IncomeDataViewer = () => {
   };
 
   return (
-    <section className="w-full rounded-lg bg-white shadow-float lg:col-span-2">
+    <section className="z-0 w-full rounded-lg bg-white shadow-float lg:col-span-2">
       <div className="flex flex-col gap-2.5 whitespace-nowrap border-b border-solid border-gray-700 px-4 py-5">
         {/* 조회 기간 선택 */}
         <IncomeRange handleSetRange={handleSetRange} />
@@ -186,14 +186,14 @@ const IncomeDataViewer = () => {
         </IncomeTable>
       </div>
 
-      {pageCount > 1 && (
-        <div className="mb-5 w-full">
+      {pageCount > 0 && (
+        <nav className="z-0 mb-5 w-full">
           <Pagination
             pageCount={pageCount}
             currentPage={currentPage}
             onPageChange={handlePageChange}
           />
-        </div>
+        </nav>
       )}
     </section>
   );
