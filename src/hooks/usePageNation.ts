@@ -22,7 +22,7 @@ const usePageNation = <T extends ItemWithId>({
   queryType,
   defaultFilterState,
   queryFn,
-  staleTime = Infinity,
+  staleTime,
   initialData,
 }: usePageNationProps<T>) => {
   const queryClient = useQueryClient();
@@ -35,10 +35,11 @@ const usePageNation = <T extends ItemWithId>({
   const filterQueryParams = (filter: { [key: string]: any | undefined }) => {
     return Object.entries(filter)
       .filter(
-        ([key, _]) =>
+        ([key, value]) =>
           key !== 'firstItemId' &&
           key !== 'lastItemId' &&
-          key !== 'currentPage',
+          key !== 'currentPage' &&
+          value,
       )
       .map(([key, value]) => ({ name: key, value }));
   };
@@ -48,7 +49,20 @@ const usePageNation = <T extends ItemWithId>({
       filterQueryParams(filter).map(({ value }) => value),
     [],
   );
+
+  const prevParams = getCurrentParamsToObject();
+
+  const searchParams = Object.keys(prevParams).reduce<{
+    [key: string]: any;
+  }>((acc, key) => {
+    const value = prevParams[key];
+    acc[key] = !isNaN(value) && value !== '' ? +value : value;
+    return acc;
+  }, {});
+
   const initialDataQueryKey = makeQueryKey(defaultFilterState);
+
+  const searchParamsKey = makeQueryKey(searchParams);
 
   const queryKey = useMemo(() => {
     return makeQueryKey(filterState);
@@ -62,7 +76,8 @@ const usePageNation = <T extends ItemWithId>({
       if (
         initialData &&
         filterState.targetPage === 1 &&
-        JSON.stringify(initialDataQueryKey) === JSON.stringify(queryKey)
+        JSON.stringify(initialDataQueryKey) === JSON.stringify(queryKey) &&
+        JSON.stringify(initialDataQueryKey) === JSON.stringify(searchParamsKey)
       ) {
         return initialData;
       }
@@ -85,18 +100,7 @@ const usePageNation = <T extends ItemWithId>({
   }, [data]);
 
   useEffect(() => {
-    const prevParams = getCurrentParamsToObject();
-
-    const params = Object.keys(prevParams).reduce<{ [key: string]: any }>(
-      (acc, key) => {
-        const value = prevParams[key];
-        acc[key] = !isNaN(value) && value !== '' ? +value : value;
-        return acc;
-      },
-      {},
-    );
-
-    setFilterState((prev) => ({ ...prev, ...params }));
+    setFilterState((prev) => ({ ...prev, ...searchParams }));
   }, []);
 
   const changeFilterState = (key: string, value: any, reset?: boolean) => {
