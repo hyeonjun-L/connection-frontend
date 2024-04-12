@@ -1,10 +1,12 @@
 'use client';
-import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import { useSearchParams, usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState, useRef, ChangeEvent } from 'react';
+import { ChangeEvent } from 'react';
 import { toast } from 'react-toastify';
-import { MYPAGE_FILTER_OPTIONS } from '@/constants/constants';
+import {
+  MYPAGE_FILTER_OPTIONS,
+  PAYMENT_HISTORY_TAKE,
+} from '@/constants/constants';
+import usePageNation from '@/hooks/usePageNation';
 import { getPaymentHistory } from '@/lib/apis/paymentApis';
 import EmptyData from './_components/EmptyData';
 import Pagination from '@/components/Pagination/Pagination';
@@ -16,47 +18,24 @@ const PaymentList = dynamic(() => import('./_components/PaymentList'), {
 });
 
 const PaymentHistory = () => {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
-
-  const option = searchParams.get('option') || '전체';
-  const count = Number(searchParams.get('count')) || 5;
-  const page = Number(searchParams.get('page') || 0);
-  const selectedOption = decodeURIComponent(option) as MYPAGE_FILTER_OPTIONS;
-  const [itemId, setItemId] = useState({
-    firstItemId: 0,
-    lastItemId: 0,
-  });
-  const prevPage = useRef<number>(0);
-
-  const { data, isLoading } = useQuery({
-    queryKey: ['user-payment', selectedOption, count, page],
-    queryFn: () =>
-      getPaymentHistory(
-        count,
-        prevPage.current,
-        page,
-        itemId.firstItemId,
-        itemId.lastItemId,
-        selectedOption,
-      ),
+  const {
+    items: paymentHistoryList,
+    totalItemCount,
+    filterState,
+    isLoading,
+    changeFilterState,
+    changePage,
+  } = usePageNation({
+    queryType: 'user-payment',
+    defaultFilterState: {
+      take: PAYMENT_HISTORY_TAKE,
+      paymentHistoryType: '전체',
+      targetPage: 1,
+    },
+    queryFn: getPaymentHistory,
   });
 
-  useEffect(() => {
-    if (data) {
-      const itemIds = {
-        firstItemId: data.userPaymentsHistory[0]?.id,
-        lastItemId:
-          data.userPaymentsHistory[data.userPaymentsHistory.length - 1]?.id,
-      };
-
-      setItemId(itemIds);
-      prevPage.current = page;
-    }
-  }, [data?.totalItemCount, selectedOption, count, page]);
-
-  if (isLoading || !data)
+  if (isLoading || !paymentHistoryList)
     return (
       <div className="mx-auto mt-3 w-full max-w-[40rem] px-4 xl:mx-0">
         <h1 className="mb-2.5 border-b border-solid border-gray-700 pb-2.5 text-2xl font-bold text-gray-100">
@@ -68,53 +47,20 @@ const PaymentHistory = () => {
       </div>
     );
 
-  const pageCount = Math.ceil(data.totalItemCount / count);
-
-  const handleSearchParams = (params: { [key: string]: string | number }) => {
-    const currentParams = new URLSearchParams(window.location.search);
-    for (const key in params) {
-      currentParams.set(key, String(params[key]));
-    }
-    router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
-  };
+  const pageCount = Math.ceil(
+    totalItemCount / (filterState.take ?? PAYMENT_HISTORY_TAKE),
+  );
 
   const handleDisplayCount = (event: ChangeEvent<HTMLSelectElement>) => {
     const newCount = Number(event.target.value);
-    const queryObj = {
-      option,
-      count: newCount,
-      page,
-    };
 
-    handleSearchParams(queryObj);
+    changeFilterState('take', newCount);
   };
 
   const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newOption = event.target.id as MYPAGE_FILTER_OPTIONS;
 
-    if (Object.values(MYPAGE_FILTER_OPTIONS).includes(newOption)) {
-      const queryObj = {
-        option: newOption,
-        count,
-        page: 0,
-      };
-      handleSearchParams(queryObj);
-
-      setItemId({
-        firstItemId: 0,
-        lastItemId: 0,
-      });
-    }
-  };
-
-  const handlePageChange = async ({ selected }: { selected: number }) => {
-    const queryObj = {
-      option,
-      count,
-      page: selected,
-    };
-
-    handleSearchParams(queryObj);
+    changeFilterState('paymentHistoryType', newOption, true);
   };
 
   const handlePaymentDelete = () => {
@@ -140,7 +86,7 @@ const PaymentHistory = () => {
               <input
                 type="checkbox"
                 id={option}
-                checked={selectedOption === option}
+                checked={filterState.paymentHistoryType === option}
                 onChange={handleCheckboxChange}
                 className="h-[18px] w-[18px] cursor-pointer accent-sub-color1"
               />
@@ -151,12 +97,15 @@ const PaymentHistory = () => {
           ))}
         </ul>
 
-        <PageSizeSelector value={count} onChange={handleDisplayCount} />
+        <PageSizeSelector
+          value={filterState.take ?? PAYMENT_HISTORY_TAKE}
+          onChange={handleDisplayCount}
+        />
       </div>
 
-      {data.totalItemCount > 0 ? (
+      {totalItemCount > 0 ? (
         <div className="mb-4 flex flex-col gap-4">
-          {data.userPaymentsHistory.map((data) => (
+          {paymentHistoryList.map((data) => (
             <PaymentList
               key={data.id}
               {...data}
@@ -165,15 +114,19 @@ const PaymentHistory = () => {
           ))}
         </div>
       ) : (
-        <EmptyData selectedOption={selectedOption} />
+        <EmptyData selectedOption={filterState.paymentHistoryType} />
       )}
 
-      {pageCount > 1 && (
-        <Pagination
-          pageCount={pageCount}
-          currentPage={page}
-          onPageChange={handlePageChange}
-        />
+      {pageCount > 0 && (
+        <nav className="z-0">
+          <Pagination
+            pageCount={pageCount}
+            currentPage={
+              filterState.currentPage ? filterState.currentPage - 1 : 0
+            }
+            onPageChange={changePage}
+          />
+        </nav>
       )}
     </section>
   );
