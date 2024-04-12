@@ -502,7 +502,7 @@ export interface Lecture {
   };
 }
 
-interface ResponseData {
+export interface ResponseData {
   lecture: Lecture[];
 }
 

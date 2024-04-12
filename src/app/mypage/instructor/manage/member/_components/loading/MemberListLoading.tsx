@@ -1,6 +1,6 @@
 import { MEMBER_MANAGE_TAKE } from '@/constants/constants';
 
-const MemberListLoading = () => {
+const MemberListLoading = ({ take }: { take?: number }) => {
   return (
     <>
       <div className="mb-5 flex justify-between">
@@ -14,7 +14,7 @@ const MemberListLoading = () => {
       <div className="mt-3 h-10 w-full animate-pulse bg-gray-700" />
       <hr className="my-3 animate-pulse border-2 bg-gray-500" />
       <div className="flex flex-col gap-2">
-        {Array.from({ length: MEMBER_MANAGE_TAKE }, (_, index) => (
+        {Array.from({ length: take ?? MEMBER_MANAGE_TAKE }, (_, index) => (
           <div key={index} className="h-10 w-full animate-pulse bg-gray-700" />
         ))}
       </div>

@@ -54,7 +54,7 @@ const MemberManage = ({ myMembers, myClassListsOption }: MemberManageProps) => {
         </header>
         <div className="flex flex-col px-5 pt-3">
           {isLoading ? (
-            <MemberListLoading />
+            <MemberListLoading take={filterState.take} />
           ) : memberList.length > 0 ? (
             <MemberListView
               memberList={memberList}

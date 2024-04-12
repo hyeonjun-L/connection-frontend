@@ -94,7 +94,7 @@ const useChangeSearchParams = () => {
     if (push) {
       router.push(url);
     } else {
-      router.replace(url);
+      router.replace(url, { scroll: false });
     }
   };
 

@@ -1,9 +1,9 @@
 import {
-  ApiResponse,
   IGetClassDraft,
   IGetClassDrafts,
   IUpdateClassDraft,
   LastClassInfo,
+  Lecture,
   LikedLecture,
 } from '@/types/class';
 import { FetchError } from '@/types/types';
@@ -165,7 +165,7 @@ export const createClass = async (data: any) => {
   }
 };
 
-export const getMyLecture = async (): Promise<ApiResponse> => {
+export const getMyLecture = async (): Promise<Lecture[]> => {
   try {
     const response = await fetch(`/api/class/myLecture`, {
       method: 'GET',
@@ -174,11 +174,14 @@ export const getMyLecture = async (): Promise<ApiResponse> => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || '');
+      const error: FetchError = new Error(errorData.message || '');
+      error.status = response.status;
+      throw error;
     }
 
-    const data = await response.json();
-    return data;
+    const res = await response.json();
+
+    return res.data.lecture ?? [];
   } catch (error) {
     console.error('내 보유 강의 조회 오류', error);
     throw error;

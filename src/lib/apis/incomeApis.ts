@@ -68,12 +68,14 @@ export const getTotalIncome = async (
 
 export const getIncomeHistory = async (
   data: IIncomeHistoryParams,
+  signal?: AbortSignal,
 ): Promise<IIncomeHistoryResponse> => {
   const params = createParams(data);
 
   const response = await fetch(`/api/income/history?${params}`, {
     method: 'GET',
     credentials: 'include',
+    signal,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -90,6 +92,6 @@ export const getIncomeHistory = async (
 
   return {
     count: resData.data.totalItemCount,
-    item: resData.data.lecturerPaymentList,
+    item: resData.data?.lecturerPaymentList ?? [],
   };
 };
