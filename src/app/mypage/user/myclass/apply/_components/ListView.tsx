@@ -19,10 +19,10 @@ const ListView = () => {
     '진행중/예정',
   );
   const [displayCount, setDisplayCount] = useState(5);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const { data: classListData, isLoading } = useQuery({
     queryKey: ['user', 'apply', 'list', activeTab, displayCount, currentPage],
-    queryFn: () => getUserClass(activeTab, displayCount, currentPage - 1),
+    queryFn: () => getUserClass(activeTab, displayCount, currentPage),
   });
 
   if (!classListData) return null;
@@ -78,14 +78,14 @@ const ListView = () => {
             ))}
           </ul>
 
-          {pageCount > displayCount && (
-            <div className="w-full">
+          {pageCount > 0 && (
+            <nav className="z-0 w-full">
               <Pagination
                 pageCount={pageCount}
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
               />
-            </div>
+            </nav>
           )}
         </>
       ) : (
