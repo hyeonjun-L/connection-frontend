@@ -48,9 +48,10 @@ const ListView = () => {
     changeMultipleParams(filter, false);
   }, [classListData]);
 
-  if (!classListData) return null;
-
-  const { totalItemCount, enrollLectureList } = classListData;
+  const { totalItemCount, enrollLectureList } = classListData ?? {
+    totalItemCount: 0,
+    enrollLectureList: [],
+  };
   const pageCount =
     totalItemCount > 0 ? Math.ceil(totalItemCount / displayCount) : 0;
 
@@ -89,8 +90,7 @@ const ListView = () => {
 
         <PageSizeSelector value={displayCount} onChange={handleDisplayCount} />
       </div>
-      {/* 로딩 왜 안 보일까요... */}
-      {isLoading || !classListData ? (
+      {isLoading ? (
         <div className="mt-20 flex h-full items-center justify-center">
           <Spinner />
         </div>
