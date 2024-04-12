@@ -9,7 +9,7 @@ import MemberListView from './MemberListView';
 import Pagination from '@/components/Pagination/Pagination';
 import PaginationLoading from '@/components/Pagination/PaginationLoading';
 import { OptionType } from '@/types/coupon';
-import { GetMyMembersData } from '@/types/instructor';
+import { GetMyMembersData, MemberData } from '@/types/instructor';
 
 interface MemberManageProps {
   myMembers: GetMyMembersData;
@@ -24,7 +24,7 @@ const MemberManage = ({ myMembers, myClassListsOption }: MemberManageProps) => {
     isLoading,
     changeFilterState,
     changePage,
-  } = usePageNation({
+  } = usePageNation<MemberData>({
     defaultFilterState: {
       take: MEMBER_MANAGE_TAKE,
       targetPage: 1,

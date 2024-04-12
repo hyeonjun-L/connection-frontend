@@ -536,8 +536,10 @@ export const CHAT_BOX_SIZE_LIMITS = {
   MAX_WIDTH: 608,
 } as const;
 
-export const SEARCH_LOCAL_STORAGE_KEY = 'searchKeys';
+export const SEARCH_LOCAL_STORAGE_KEY = 'searchKeys' as const;
 
 export const FRONT_DOMAIN = 'https://connection-frontend.vercel.app' as const;
 
-export const PAYMENT_HISTORY_TAKE = 5;
+export const PAYMENT_HISTORY_TAKE = 5 as const;
+
+export const INCOME_HISTORY_TAKE = 5 as const;

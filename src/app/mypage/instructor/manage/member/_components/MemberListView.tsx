@@ -20,7 +20,12 @@ import { PagenationFilterState } from '@/types/types';
 interface MemberListViewProps {
   memberList: MemberData[];
   filterState: PagenationFilterState;
-  updateFilter: (key: string, value: any) => void;
+  updateFilter: (
+    filter: {
+      [key: string]: any;
+    },
+    reset?: boolean | undefined,
+  ) => void;
 }
 
 const ExcelDownload = dynamic(() => import('./ExcelDownload'), {
@@ -224,7 +229,7 @@ const MemberListView = ({
         <Select
           name="sorting"
           value={filterState.orderBy}
-          onChange={(e) => updateFilter('sortOption', e.target.value)}
+          onChange={(e) => updateFilter({ sortOption: e.target.value })}
           options={sortingOptions}
         />
 
@@ -232,7 +237,7 @@ const MemberListView = ({
           <Select
             name="take"
             value={filterState.take}
-            onChange={(e) => updateFilter('take', e.target.value)}
+            onChange={(e) => updateFilter({ take: e.target.value })}
             options={takeOptions}
           />
 

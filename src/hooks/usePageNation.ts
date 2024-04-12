@@ -103,14 +103,17 @@ const usePageNation = <T extends ItemWithId>({
     setFilterState((prev) => ({ ...prev, ...searchParams }));
   }, []);
 
-  const changeFilterState = (key: string, value: any, reset?: boolean) => {
+  const changeFilterState = (
+    filter: { [key: string]: any },
+    reset?: boolean,
+  ) => {
     setFilterState((prevState) => {
       const commonState = {
         firstItemId: 0,
         lastItemId: 0,
         currentPage: 0,
         targetPage: 1,
-        [key]: value,
+        ...filter,
       };
 
       return reset

@@ -12,6 +12,7 @@ import EmptyData from './_components/EmptyData';
 import Pagination from '@/components/Pagination/Pagination';
 import PageSizeSelector from '@/components/Selector/PageSizeSelector';
 import Spinner from '@/components/Spinner/Spinner';
+import { IMyPayment } from '@/types/payment';
 
 const PaymentList = dynamic(() => import('./_components/PaymentList'), {
   ssr: false,
@@ -25,7 +26,7 @@ const PaymentHistory = () => {
     isLoading,
     changeFilterState,
     changePage,
-  } = usePageNation({
+  } = usePageNation<IMyPayment>({
     queryType: 'user-payment',
     defaultFilterState: {
       take: PAYMENT_HISTORY_TAKE,
@@ -54,13 +55,13 @@ const PaymentHistory = () => {
   const handleDisplayCount = (event: ChangeEvent<HTMLSelectElement>) => {
     const newCount = Number(event.target.value);
 
-    changeFilterState('take', newCount);
+    changeFilterState({ take: newCount });
   };
 
   const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newOption = event.target.id as MYPAGE_FILTER_OPTIONS;
 
-    changeFilterState('paymentHistoryType', newOption, true);
+    changeFilterState({ paymentHistoryType: newOption }, true);
   };
 
   const handlePaymentDelete = () => {

@@ -6,7 +6,12 @@ import { PagenationFilterState } from '@/types/types';
 
 interface FilterNavProps {
   filterState: PagenationFilterState;
-  resetFilter: (key: string, value: any, reset?: boolean) => void;
+  resetFilter: (
+    filter: {
+      [key: string]: any;
+    },
+    reset?: boolean | undefined,
+  ) => void;
   myClassListsOption: OptionType[];
 }
 
@@ -50,7 +55,7 @@ const FilterNav = ({
                 id={option.id}
                 type="checkbox"
                 checked={filterState.filterOption === option.id}
-                onChange={() => resetFilter('filterOption', option.id, true)}
+                onChange={() => resetFilter({ filterOption: option.id }, true)}
                 className="peer h-[18px] w-[18px]  accent-black"
               />
               <label
@@ -71,7 +76,7 @@ const FilterNav = ({
               ) ?? myClassListsOption[0]
             }
             onChange={(change: any) => {
-              resetFilter('lectureId', change.value);
+              resetFilter({ lectureId: change.value });
             }}
             isDisabled={false}
           />

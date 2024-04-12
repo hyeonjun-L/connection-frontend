@@ -1,5 +1,5 @@
 'use client';
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import usePageNation from '@/hooks/usePageNation';
 import { NotFoundSVG } from '@/icons/svg';
 import { getMyLecturersReviews } from '@/lib/apis/reviewApis';
@@ -8,7 +8,7 @@ import ClassFilterSelect from './ClassFilterSelect';
 import Pagination from '@/components/Pagination/Pagination';
 import { UserReview, ReviewStatistics } from '@/components/Review';
 import { OptionType } from '@/types/coupon';
-import { GetMyLecturersReviews, MyLecturersReviewsData } from '@/types/review';
+import { MyLecturersReviewsData } from '@/types/review';
 
 interface MyReview {
   initialData: { count: number; item: MyLecturersReviewsData[] };
@@ -73,7 +73,7 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
                   className="peer h-[18px] w-[18px]  accent-black"
                   checked={filterState.lecturerMyReviewType === option.id}
                   onChange={() =>
-                    changeFilterState('lecturerMyReviewType', option.id, true)
+                    changeFilterState({ lecturerMyReviewType: option.id }, true)
                   }
                 />
                 <label
@@ -93,7 +93,7 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
                   ) ?? myClassListsOption[0]
                 }
                 onChange={(change: any) => {
-                  changeFilterState('lectureId', change.value, true);
+                  changeFilterState({ lectureId: change.value }, true);
                 }}
                 isDisabled={filterState.lecturerMyReviewType !== '전체'}
               />
@@ -105,7 +105,7 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
                 name="sorting"
                 className="h-7 border border-solid border-gray-500"
                 value={filterState.orderBy}
-                onChange={(e) => changeFilterState('orderBy', e.target.value)}
+                onChange={(e) => changeFilterState({ orderBy: e.target.value })}
               >
                 <option value="최신순">최신순</option>
                 <option value="좋아요순">좋아요순</option>
