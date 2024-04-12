@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useChangeSearchParams from './useChangeSearchParams';
 import { PagenationFilterState } from '@/types/types';
 
@@ -28,6 +28,8 @@ const usePageNation = <T extends ItemWithId>({
   const queryClient = useQueryClient();
   const [totalItemCount, setTotalItemCount] = useState(0);
   const [filterState, setFilterState] = useState(defaultFilterState);
+
+  const searchParamsRef = useRef(false);
 
   const { changeMultipleParams, getCurrentParamsToObject } =
     useChangeSearchParams();
@@ -89,19 +91,26 @@ const usePageNation = <T extends ItemWithId>({
 
     changeMultipleParams(filterQueryParams(filterState), false);
 
-    setFilterState((prev) => ({
-      ...prev,
-      currentPage: prev.currentPage ? filterState.targetPage : 1,
+    const updateStateWithCommonData = (prevState: PagenationFilterState) => ({
+      ...prevState,
+      currentPage: prevState.currentPage ? filterState.targetPage : 1,
       firstItemId: data.item[0]?.id ?? 0,
       lastItemId: data.item.at(-1)?.id ?? 0,
-    }));
+    });
+
+    if (!searchParamsRef.current) {
+      searchParamsRef.current = true;
+
+      setFilterState((prev) => ({
+        ...updateStateWithCommonData(prev),
+        ...searchParams,
+      }));
+    } else {
+      setFilterState(updateStateWithCommonData);
+    }
 
     setTotalItemCount(data.count);
   }, [data]);
-
-  useEffect(() => {
-    setFilterState((prev) => ({ ...prev, ...searchParams }));
-  }, []);
 
   const changeFilterState = (
     filter: { [key: string]: any },
