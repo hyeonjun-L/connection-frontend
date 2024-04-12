@@ -3,11 +3,14 @@ import type { NextRequest } from 'next/server';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
-if (!END_POINT) {
-  throw new Error('환경 변수 누락');
-}
-
 export const GET = async (request: NextRequest) => {
+  if (!END_POINT) {
+    return NextResponse.json({
+      status: 500,
+      message: '환경 변수가 설정되지 않았습니다.',
+    });
+  }
+
   const token = request.cookies.get('lecturerAccessToken')?.value;
 
   if (!token) {
@@ -31,11 +34,19 @@ export const GET = async (request: NextRequest) => {
         'Content-Type': 'application/json',
       },
     },
-  ).then((data) => data.json());
+  );
 
-  if (serverResponse.statusCode !== 200) {
-    throw new Error('강사 수입 내역 조회 요청 에러!');
+  if (!serverResponse.ok) {
+    const errorData = await serverResponse.json();
+    return NextResponse.json(
+      {
+        status: serverResponse.status,
+        message: errorData.message || '서버 요청 오류',
+      },
+      { status: serverResponse.status },
+    );
   }
+  const result = await serverResponse.json();
 
-  return NextResponse.json(serverResponse);
+  return NextResponse.json(result);
 };

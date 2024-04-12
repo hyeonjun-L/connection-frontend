@@ -154,8 +154,15 @@ export interface ILecturerPayment {
 }
 
 export interface IIncomeHistoryResponse {
-  totalItemCount: number;
-  lecturerPaymentList: ILecturerPayment[];
+  count: number;
+  item: ILecturerPayment[];
+}
+
+export interface IIncomeHistoryParams extends PagenationFilterState {
+  startDate: Date;
+  endDate: Date;
+  productType: string;
+  lectureId?: string | number;
 }
 
 export interface IRefundRequest {

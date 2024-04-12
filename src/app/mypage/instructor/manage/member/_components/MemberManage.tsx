@@ -1,7 +1,7 @@
 'use client';
 import { MEMBER_MANAGE_TAKE } from '@/constants/constants';
 import usePageNation from '@/hooks/usePageNation';
-import { ArrowRightSVG, NotFoundSVG } from '@/icons/svg';
+import { NotFoundSVG } from '@/icons/svg';
 import { getMyMembers } from '@/lib/apis/instructorApi';
 import FilterNav from './FilterNav';
 import MemberListLoading from './loading/MemberListLoading';
@@ -33,7 +33,7 @@ const MemberManage = ({ myMembers, myClassListsOption }: MemberManageProps) => {
       lectureId: myClassListsOption[0]?.value ?? undefined,
     },
     initialData: myMembers,
-    queryType: 'instructorReview',
+    queryType: 'instructorMember',
     queryFn: getMyMembers,
   });
 

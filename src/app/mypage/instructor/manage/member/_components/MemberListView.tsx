@@ -8,7 +8,7 @@ import {
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Suspense, useMemo } from 'react';
+import { useMemo } from 'react';
 import { ChatSVG, MemoSVG } from '@/icons/svg';
 import { useMemberStore } from '@/store/memberStore';
 import formatDate from '@/utils/formatDate';
