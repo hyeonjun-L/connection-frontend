@@ -11,11 +11,13 @@ import { profileInfo, userType } from '@/types/auth';
 interface UserStoreInitializerProps {
   authUser: profileInfo | null;
   userType: userType | null;
+  isMobile: boolean;
 }
 
 const UserStoreInitializer = ({
   authUser,
   userType,
+  isMobile,
 }: UserStoreInitializerProps) => {
   const initialized = useRef(false);
   const { setLikeClassList, likeClassList } = useUserStore((state) => ({
@@ -51,6 +53,7 @@ const UserStoreInitializer = ({
   if (!initialized.current) {
     store.setAuthUser(authUser);
     store.setUserType(userType);
+    store.setIsMobile(isMobile);
     initialized.current = true;
   }
 

@@ -1,7 +1,8 @@
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import { Inter } from 'next/font/google';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { ToastContainer } from 'react-toastify';
+import UAParser from 'ua-parser-js';
 import { getChatSocketRoomsId } from '@/lib/apis/serverApis/chatApi';
 import {
   getInstructorProfile,
@@ -43,6 +44,11 @@ export default async function RootLayout({
   let userType: userType | null = null;
   let socketRooms: string[] | null = null;
 
+  const { get } = headers();
+  const ua = get('user-agent');
+
+  const device = new UAParser(ua || '').getDevice();
+
   try {
     if (user) {
       const userProfile = await getMyProfile();
@@ -71,7 +77,11 @@ export default async function RootLayout({
         className={`${inter.className} mx-auto flex min-h-screen max-w-desktop flex-col`}
       >
         <Providers>
-          <UserStoreInitializer authUser={authUser} userType={userType} />
+          <UserStoreInitializer
+            authUser={authUser}
+            userType={userType}
+            isMobile={device.type === 'mobile' || device.type === 'tablet'}
+          />
           <SocketInitializer
             userType={userType}
             userId={authUser?.id}

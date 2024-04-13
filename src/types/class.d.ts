@@ -54,6 +54,8 @@ export interface ClassCardType {
   darkMode?: boolean;
   smallView?: boolean;
   searchAfter?: [number, number];
+  touchStartEvent?: () => void;
+  touchEndEvent?: () => void;
 }
 
 export interface Space {
