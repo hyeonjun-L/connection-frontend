@@ -26,12 +26,7 @@ const BestInstructor = async () => {
     return null;
   }
 
-  return (
-    <CarouselTemplate
-      mode="instructor"
-      bestInstructorLists={bestInstructorLists}
-    />
-  );
+  return <CarouselTemplate bestInstructorLists={bestInstructorLists} />;
 };
 
 export default BestInstructor;

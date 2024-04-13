@@ -44,8 +44,7 @@ const Carousel = ({
 
   const carouselElements = useMemo(() => {
     if (originalElements.length > 1) {
-      const newElementArr = [...originalElements, originalElements[0]];
-      newElementArr.shift();
+      const newElementArr = [...originalElements.slice(1), originalElements[0]];
       return [
         newElementArr.at(-1),
         ...newElementArr,
@@ -104,14 +103,9 @@ const Carousel = ({
     event.stopPropagation();
     event.nativeEvent.preventDefault();
 
+    const step = direction === 'FORWARD' ? 1 : -1;
     const index =
-      direction === 'FORWARD'
-        ? currentIndex === originalElements.length - 1
-          ? 0
-          : currentIndex + 1
-        : currentIndex === 0
-        ? originalElements.length - 1
-        : currentIndex - 1;
+      (currentIndex + step + originalElements.length) % originalElements.length;
 
     changeCarouselIndexHandler(index, true);
   };
