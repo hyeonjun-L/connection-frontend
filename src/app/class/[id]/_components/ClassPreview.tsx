@@ -16,7 +16,7 @@ import {
 } from '@/utils/parseUtils';
 import DiscountCouponBanner from './DiscountCouponBanner';
 import OptionButton from './OptionButton';
-import Carousel from '@/components/Carousel/Carousel';
+import CarouselContainer from '@/components/Carousel/CarouselContainer';
 import { Review } from '@/components/Review';
 
 const ClassPreview = async ({ id }: { id: string }) => {
@@ -49,20 +49,24 @@ const ClassPreview = async ({ id }: { id: string }) => {
     <section className="mb-4 flex w-full flex-col items-center border-b border-solid border-gray-500 md:col-span-2 xl:col-span-3">
       {/* 클래스 이미지 */}
       <div className="mb-5 flex h-[18rem] w-full justify-center px-10">
-        {lectureImage.length > 2 ? (
-          <div className="relative h-full w-full overflow-hidden">
-            <div className="h-full w-1/3">
-              <Carousel
-                imgURL={lectureImage.map((image) => image.imageUrl)}
-                move={true}
-                priority={3}
-                showCurrentElementBackGround={false}
-              />
-            </div>
-          </div>
+        {lectureImage.length >= 2 ? (
+          <CarouselContainer
+            imgURL={lectureImage.map((image) => image.imageUrl)}
+            move={true}
+            priority={3}
+            showCurrentElementBackGround={false}
+            itemStyle={`size-full md:w-1/2 ${
+              lectureImage.length === 2 ? '' : 'lg:w-1/3'
+            }`}
+            carouselContainerStyle="relative size-full overflow-hidden"
+            showCurrentElement={true}
+          />
         ) : (
           lectureImage.map((img, index) => (
-            <div key={img.imageUrl + index} className="relative h-full w-1/3">
+            <div
+              key={img.imageUrl + index}
+              className="relative h-full w-full sm:w-1/2 lg:w-1/3"
+            >
               <Image
                 src={img.imageUrl}
                 alt="Connection 댄스 춤 이미지"

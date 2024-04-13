@@ -4,11 +4,13 @@ import { userType, profileInfo } from '@/types/auth';
 export interface IUserStore {
   authUser: profileInfo | null;
   userType: userType | null;
+  isMobile: boolean | null;
   requestLoading: boolean;
   likeClassList: number[];
   likeInstructorList: number[];
   setUserType: (type: userType | null) => void;
   setAuthUser: (user: profileInfo | null) => void;
+  setIsMobile: (isMobile: boolean) => void;
   setRequestLoading: (isLoading: boolean) => void;
   reset: () => void;
   setLikeClassList: (list: number[]) => void;
@@ -22,11 +24,13 @@ export interface IUserStore {
 export const useUserStore = create<IUserStore>((set) => ({
   authUser: null,
   userType: null,
+  isMobile: null,
   requestLoading: false,
   likeClassList: [],
   likeInstructorList: [],
   setUserType: (type) => set((state) => ({ ...state, userType: type })),
   setAuthUser: (user) => set((state) => ({ ...state, authUser: user })),
+  setIsMobile: (isMobile) => set({ isMobile }),
   setRequestLoading: (isLoading) =>
     set((state) => ({ ...state, requestLoading: isLoading })),
   reset: () => set({ authUser: null, requestLoading: false }),

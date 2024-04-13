@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { StarSVG } from '@/icons/svg';
-import Carousel from '../Carousel/Carousel';
+import CarouselContainer from '../Carousel/CarouselContainer';
 import ProfileImage from '../Profile/ProfileImage';
 import { ClassCardType } from '@/types/class';
 
@@ -18,6 +18,8 @@ const ResponsiveClassPreview = (props: ClassCardType) => {
     profile,
     imgURL,
     darkMode = false,
+    touchStartEvent,
+    touchEndEvent,
   } = props;
 
   const [focus, setFocus] = useState(false);
@@ -37,11 +39,15 @@ const ResponsiveClassPreview = (props: ClassCardType) => {
           darkMode && 'border border-solid border-white'
         }`}
       >
-        <Carousel
+        <CarouselContainer
           imgURL={imgURL}
           move={focus}
+          carouselContainerStyle="flex h-full w-full"
+          itemStyle="relative w-full overflow-hidden"
           arrow={imgURL.length > 1 && focus}
           showCurrentElement={focus}
+          touchStartEvent={touchStartEvent}
+          touchEndEvent={touchEndEvent}
         />
 
         <div className="z-5 absolute top-0 flex h-[3.5rem] w-full items-baseline gap-2 whitespace-nowrap rounded-lg bg-gradient-to-b from-[rgba(32,32,35,0.5)] to-[rgba(32,32,35,0)] pl-2.5 pt-2.5 text-sm font-semibold text-white">
