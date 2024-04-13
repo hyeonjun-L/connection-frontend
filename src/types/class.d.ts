@@ -425,11 +425,15 @@ export interface IClassPostResponse {
     name: string;
   };
   lectureNotification: IClassNotification;
-
   lectureImage: IImage[];
   lectureToRegion: IRegion[];
   lectureToDanceGenre: IGenre[];
   isLike: boolean;
+  lecturer: {
+    id: number;
+    nickname: string;
+    profileCardImageUrl: string | null;
+  };
 }
 
 interface IImage {
@@ -560,7 +564,7 @@ export interface searchClass {
   reviewCount: number;
   isActive: boolean;
   lecturer: {
-    id: number;
+    lecturerId: number;
     nickname: string;
     profileCardImageUrl: string;
   };

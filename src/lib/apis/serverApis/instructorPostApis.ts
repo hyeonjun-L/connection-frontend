@@ -65,7 +65,10 @@ export const getInstructor = async (
     });
 
     if (!response.ok) {
-      throw new Error(`강사 프로필 불러오기: ${response.status}`);
+      const errorData = await response.json();
+      const error: FetchError = new Error(errorData.message || '');
+      error.status = response.status;
+      throw new Error(`강사 프로필 불러오기: ${error.status} ${error}`);
     }
 
     const resData = await response.json();
