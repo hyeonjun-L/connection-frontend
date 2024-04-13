@@ -108,8 +108,8 @@ const CarouselContainer = (props: CarouselContainerProps) => {
 
       const currentIndex =
         distanceX > 0
-          ? itemLength - Math.round(Math.abs(distanceX) / itemWidth)
-          : Math.round(Math.abs(distanceX) / itemWidth);
+          ? itemLength - Math.round(Math.abs(distanceX) / (itemWidth + gap))
+          : Math.round(Math.abs(distanceX) / (itemWidth + gap));
 
       setCarouselIndex(currentIndex > itemLength - 1 ? 0 : currentIndex);
 
@@ -131,7 +131,7 @@ const CarouselContainer = (props: CarouselContainerProps) => {
     e.stopPropagation();
     const itemWidth = getItemWidth();
     if (itemWidth) {
-      setTouchDistanceX(carouselIndex * -itemWidth - gap * carouselIndex || 0);
+      setTouchDistanceX((-itemWidth - gap) * carouselIndex || 0);
     }
   };
 
@@ -139,7 +139,7 @@ const CarouselContainer = (props: CarouselContainerProps) => {
     setCarouselIndex(index);
     const itemWidth = getItemWidth();
     if (itemWidth) {
-      setTouchDistanceX(index * -itemWidth - gap * index || 0);
+      setTouchDistanceX((-itemWidth - gap) * index || 0);
     }
   };
 

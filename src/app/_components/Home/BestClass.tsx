@@ -28,7 +28,7 @@ const BestClass = async () => {
     return null;
   }
 
-  return <CarouselTemplate mode="class" bestClassList={bestClassList} />;
+  return <CarouselTemplate bestClassList={bestClassList} />;
 };
 
 export default BestClass;
