@@ -121,16 +121,20 @@ const AreaLocationMap = ({ regions, id }: AreaLocationMapProps) => {
         zoom={Object.keys(addresses).length === 1 ? 8 : 3}
         center={getDefaultCenter(addresses)}
       >
-        {data.markerPoint.map(([x, y], index) => (
-          <Marker
-            key={x}
-            position={new naver.maps.LatLng(y, x)}
-            onClick={() => selectMarker(new naver.maps.LatLng(y, x))}
-            icon={{
-              content: `<div class="markerBox">${markerName[index]}</div>`,
-            }}
-          />
-        ))}
+        {data.markerPoint.map(([x, y], index) => {
+          if (!markerName[index]) return;
+
+          return (
+            <Marker
+              key={x}
+              position={new naver.maps.LatLng(y, x)}
+              onClick={() => selectMarker(new naver.maps.LatLng(y, x))}
+              icon={{
+                content: `<div class="markerBox">${markerName[index]}</div>`,
+              }}
+            />
+          );
+        })}
         {data.polylineList.map((paths, index) => (
           <Fragment key={index}>
             <Polyline
