@@ -58,7 +58,9 @@ export const POST = async (request: NextRequest) => {
 
   const polylineData = responseData
     .filter(({ properties }) =>
-      data.district.includes((properties as District).sig_kor_nm),
+      data.district.some((district: string) =>
+        (properties as District).sig_kor_nm.startsWith(district),
+      ),
     )
     .map(({ geometry }) => geometry.coordinates.flatMap((a) => a));
 

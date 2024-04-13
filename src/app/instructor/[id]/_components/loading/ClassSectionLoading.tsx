@@ -1,17 +1,17 @@
 import CarouselContainer from '@/components/Carousel/CarouselContainer';
 import ClassPreviewLoading from '@/components/Loading/ClassPreviewLoading';
 
-const BestClassLoading = () => (
-  <div className="relative flex h-[14rem] w-full justify-center px-2">
+const ClassSectionLoading = () => (
+  <div className="relative flex h-60 w-full justify-center ">
     <CarouselContainer
       move={true}
       showCurrentElement={false}
       carouselMoveIntervalTime={3000}
-      priority={6}
-      gap={16}
+      priority={3}
+      gap={32}
       mobileShowCurrentElement={false}
       itemStyle="w-[13rem]"
-      carouselContainerStyle="h-full w-11/12 items-center overflow-hidden"
+      carouselContainerStyle="flex h-full w-11/12 items-center overflow-hidden"
     >
       {Array.from({ length: 6 }, (_, index) => (
         <div key={index} className="w-full max-w-[13rem] xl:max-w-[33.7rem]">
@@ -22,4 +22,4 @@ const BestClassLoading = () => (
   </div>
 );
 
-export default BestClassLoading;
+export default ClassSectionLoading;
