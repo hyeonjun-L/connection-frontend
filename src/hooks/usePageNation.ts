@@ -25,14 +25,10 @@ const usePageNation = <T extends ItemWithId>({
   staleTime,
   initialData,
 }: usePageNationProps<T>) => {
-  const queryClient = useQueryClient();
-  const [totalItemCount, setTotalItemCount] = useState(0);
-  const [filterState, setFilterState] = useState(defaultFilterState);
-
-  const searchParamsRef = useRef(false);
-
   const { changeMultipleParams, getCurrentParamsToObject } =
     useChangeSearchParams();
+
+  const prevParams = getCurrentParamsToObject();
 
   const filterQueryParams = (filter: { [key: string]: any | undefined }) => {
     return Object.entries(filter)
@@ -52,19 +48,30 @@ const usePageNation = <T extends ItemWithId>({
     [],
   );
 
-  const prevParams = getCurrentParamsToObject();
+  // const defaultQueryKey = makeQueryKey(defaultFilterState);
 
-  const searchParams = Object.keys(prevParams).reduce<{
-    [key: string]: any;
-  }>((acc, key) => {
-    const value = prevParams[key];
-    acc[key] = !isNaN(value) && value !== '' ? +value : value;
-    return acc;
-  }, {});
+  const searchParams = Object.keys(prevParams).reduce<PagenationFilterState>(
+    (acc, key) => {
+      const value = prevParams[key];
+      if (Object.keys(defaultFilterState).includes(key)) {
+        acc[key] = !isNaN(value) && value !== '' ? +value : value;
+      }
+      return acc;
+    },
+    {} as PagenationFilterState,
+  );
 
-  const initialDataQueryKey = makeQueryKey(defaultFilterState);
+  // const searchParamsKey = makeQueryKey(searchParams);
 
-  const searchParamsKey = makeQueryKey(searchParams);
+  const queryClient = useQueryClient();
+  const [totalItemCount, setTotalItemCount] = useState(0);
+  const [filterState, setFilterState] = useState(
+    Object.keys(searchParams).length === 0
+      ? defaultFilterState
+      : { ...searchParams, targetPage: 1 },
+  );
+
+  const searchParamsRef = useRef(false);
 
   const queryKey = useMemo(() => {
     return makeQueryKey(filterState);
@@ -72,14 +79,18 @@ const usePageNation = <T extends ItemWithId>({
 
   const { data, isLoading } = useQuery<{ count: number; item: T[] }>({
     queryKey: [queryType, ...queryKey],
-    queryFn: ({ signal }) => queryFn(filterState, signal),
+    queryFn: ({ signal }) => {
+      console.log('filterState::::', filterState);
+      return queryFn(filterState, signal);
+    },
     staleTime,
     initialData: () => {
       if (
         initialData &&
-        filterState.targetPage === 1 &&
-        JSON.stringify(initialDataQueryKey) === JSON.stringify(queryKey) &&
-        JSON.stringify(initialDataQueryKey) === JSON.stringify(searchParamsKey)
+        filterState.targetPage === 1
+        // &&
+        // JSON.stringify(defaultQueryKey) === JSON.stringify(queryKey) &&
+        // JSON.stringify(defaultQueryKey) === JSON.stringify(searchParamsKey)
       ) {
         return initialData;
       }
