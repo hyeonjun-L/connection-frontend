@@ -26,25 +26,30 @@ const getCouponPassInfo = async () => {
       filterOption: 'LATEST' as 'LATEST',
     };
 
-    const resultCoupon = await getCouponList(reqCouponData, 'lecturer');
-    const { itemList, totalItemCount } = await getIssuedPassList(
-      reqPassData,
-      'lecturer',
-    );
+    const resultLectureLists = getMyLecture();
+    const resultCoupon = getCouponList(reqCouponData, 'lecturer');
+    const resultPass = getIssuedPassList(reqPassData, 'lecturer');
+
+    const [coupon, pass, lectureList] = await Promise.all([
+      resultCoupon,
+      resultPass,
+      resultLectureLists,
+    ]);
+
+    const { itemList, totalItemCount } = pass;
+
     passList = itemList;
     passCount = totalItemCount;
 
-    if (resultCoupon) {
+    if (coupon) {
       const { totalItemCount: resTotalItemCount, itemList: resCouponList } =
-        resultCoupon;
+        coupon;
       CouponCount = resTotalItemCount;
 
       couponList = resCouponList?.map(mapItemToCoupon) ?? [];
     }
 
-    const resLectureLists = await getMyLecture();
-
-    myClassListsOption = resLectureLists.map(
+    myClassListsOption = lectureList.map(
       ({ id, title }): OptionType => ({
         value: id,
         label: title,

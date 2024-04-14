@@ -2,7 +2,7 @@ import React from 'react';
 import getCouponPassInfo from '@/utils/getInstructorCouponPassInfo';
 import CouponNav from './_components/CouponNav';
 import CouponView from './_components/CouponView';
-import { couponGET } from '@/types/coupon';
+import { couponGET, couponStatusOptionType } from '@/types/coupon';
 
 const CouponPage = async () => {
   const couponInfo = await getCouponPassInfo();
@@ -18,9 +18,8 @@ const CouponPage = async () => {
         <CouponNav couponCount={couponCount} passCount={passCount} />
 
         <CouponView
+          initialData={{ count: couponCount, item: couponList }}
           myLectureList={myClassListsOption ?? []}
-          couponList={couponList ?? []}
-          totalItemCount={couponCount}
         />
       </div>
     </section>

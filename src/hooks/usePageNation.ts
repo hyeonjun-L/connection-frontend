@@ -124,7 +124,6 @@ const usePageNation = <T extends ItemWithId>({
         targetPage: 1,
         ...filter,
       };
-
       return reset
         ? { ...defaultFilterState, ...commonState }
         : { ...prevState, ...commonState };

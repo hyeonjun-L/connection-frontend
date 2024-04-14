@@ -17,8 +17,6 @@ const CouponComponent = ({
   type,
   expiration,
 }: CouponComponentProps) => {
-  const { width } = useWindowSize();
-
   return (
     <>
       {couponList.map((coupon, index) => {
@@ -27,7 +25,8 @@ const CouponComponent = ({
           <Coupon
             key={coupon.id}
             coupon={coupon}
-            lastItemElementRef={width < 640 ? lastItemElementRef : undefined}
+            // lastItemElementRef={width < 640 ? lastItemElementRef : undefined}
+            lastItemElementRef={undefined}
             type={type}
             expiration={expiration === 'DISABLED' || expiration === 'EXPIRED'}
           />
