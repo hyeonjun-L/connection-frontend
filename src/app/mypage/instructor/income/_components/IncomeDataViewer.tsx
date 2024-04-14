@@ -31,6 +31,7 @@ const IncomeDataViewer = () => {
       startDate: from.toISOString().split('T')[0],
       endDate: to.toISOString().split('T')[0],
       productType: MYPAGE_FILTER_OPTIONS.All,
+      lectureId: undefined,
     },
     queryType: 'incomeHistory',
     queryFn: getIncomeHistory,
@@ -49,6 +50,7 @@ const IncomeDataViewer = () => {
         new Date(filterState.startDate),
         new Date(filterState.endDate),
         filterState.productType,
+        filterState.lectureId,
       ),
   });
 
@@ -57,7 +59,7 @@ const IncomeDataViewer = () => {
   );
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    changeFilterState({ lectureId: event.target.value }, true);
+    changeFilterState({ lectureId: event.target.value });
   };
 
   const handleDisplayCount = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -80,7 +82,7 @@ const IncomeDataViewer = () => {
     const option = event.target.id as MYPAGE_FILTER_OPTIONS;
 
     if (Object.values(MYPAGE_FILTER_OPTIONS).includes(option)) {
-      changeFilterState({ productType: option }, true);
+      changeFilterState({ productType: option });
     }
   };
 
@@ -88,7 +90,11 @@ const IncomeDataViewer = () => {
     <section className="z-0 w-full rounded-lg bg-white shadow-float lg:col-span-2">
       <div className="flex flex-col gap-2.5 whitespace-nowrap border-b border-solid border-gray-700 px-4 py-5">
         {/* 조회 기간 선택 */}
-        <IncomeRange handleSetRange={handleSetRange} />
+        <IncomeRange
+          handleSetRange={handleSetRange}
+          startDate={filterState.startDate}
+          endDate={filterState.endDate}
+        />
 
         {/* 전체, 클래스, 패스권 필터링 */}
         <div className="flex gap-4 text-sm">
