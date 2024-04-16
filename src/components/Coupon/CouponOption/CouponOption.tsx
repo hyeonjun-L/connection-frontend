@@ -1,5 +1,6 @@
 'use client';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import {
   Control,
   Controller,
@@ -26,7 +27,7 @@ import {
   MaxDiscountTooltip,
   PrivateTooltip,
 } from '@/components/Tooltip/TooltipMessages/TooltipMessages';
-import { CouponData, SelectClassType, couponGET } from '@/types/coupon';
+import { CouponData, couponGET } from '@/types/coupon';
 
 const CouponOptionInputStyles =
   'h-7 px-3 rounded-md border border-solid border-gray-500 focus:outline-none';
@@ -56,25 +57,24 @@ const CouponOption = ({
   defaultValue,
   type = 'CREATE',
 }: CouponOptionProps) => {
-  const [options, setOptions] = useState<SelectClassType[]>([]);
-  const [render, setRender] = useState(false);
   const [isAllSelected, setIsAllSelected] = useState(false);
 
   const selectClass = watch('lectureIds');
   const couponQuantity = watch('couponQuantity');
 
-  useEffect(() => {
-    getMyLecture()
-      .then((resData) => {
-        const options = resData.data.lecture.map(({ id, title }) => ({
-          label: title,
-          value: id,
-        }));
-        setOptions(options);
-        setRender(true);
-      })
-      .catch((error) => console.error(error));
-  }, []);
+  const { data: classList, isLoading } = useQuery({
+    queryKey: ['myClass'],
+    queryFn: getMyLecture,
+  });
+
+  const options = useMemo(
+    () =>
+      classList?.map(({ id, title }) => ({
+        label: title,
+        value: id,
+      })) ?? [],
+    [classList],
+  );
 
   useEffect(() => {
     setIsAllSelected(selectClass?.length === options.length);
@@ -293,7 +293,7 @@ const CouponOption = ({
       <section className="grid grid-cols-[1fr,5fr] items-stretch">
         <h2 className="mr-10 whitespace-nowrap font-semibold">적용할 클래스</h2>
 
-        {(options.length > 0 || render) && (
+        {(options.length > 0 || !isLoading) && (
           <Controller
             name="lectureIds"
             control={control}

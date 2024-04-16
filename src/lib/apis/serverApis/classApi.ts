@@ -113,7 +113,7 @@ export const getMyLecture = async (): Promise<Lecture[]> => {
 
   const data = await response.json();
 
-  return data.data.lecture;
+  return data.data.lecture ?? [];
 };
 
 export const getLikesClassList = async (): Promise<
@@ -146,7 +146,6 @@ export const getLikesClassList = async (): Promise<
   }
 };
 
-
 export const getApplyClassDetail = async (
   scheduleId: string | number,
   type: string,
@@ -170,8 +169,7 @@ export const getApplyClassDetail = async (
   }
 
   return response.data;
-}
-
+};
 
 export const getRecentApply = async (): Promise<IRecentApply[]> => {
   const cookieStore = cookies();
@@ -202,5 +200,4 @@ export const getRecentApply = async (): Promise<IRecentApply[]> => {
   const resData = await response.json();
 
   return resData.data.myReservationList;
-
 };
