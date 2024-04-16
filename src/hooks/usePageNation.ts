@@ -48,8 +48,6 @@ const usePageNation = <T extends ItemWithId>({
     [],
   );
 
-  // const defaultQueryKey = makeQueryKey(defaultFilterState);
-
   const searchParams = Object.keys(prevParams).reduce<PagenationFilterState>(
     (acc, key) => {
       const value = prevParams[key];
@@ -61,8 +59,6 @@ const usePageNation = <T extends ItemWithId>({
     {} as PagenationFilterState,
   );
 
-  // const searchParamsKey = makeQueryKey(searchParams);
-
   const queryClient = useQueryClient();
   const [totalItemCount, setTotalItemCount] = useState(0);
   const [filterState, setFilterState] = useState(
@@ -71,7 +67,12 @@ const usePageNation = <T extends ItemWithId>({
       : { ...searchParams, targetPage: 1 },
   );
 
+  const initialDataFilterState = useRef<string[] | null>(null);
   const searchParamsRef = useRef(false);
+
+  if (!searchParamsRef.current) {
+    initialDataFilterState.current = makeQueryKey(searchParams);
+  }
 
   const queryKey = useMemo(() => {
     return makeQueryKey(filterState);
@@ -79,18 +80,14 @@ const usePageNation = <T extends ItemWithId>({
 
   const { data, isLoading } = useQuery<{ count: number; item: T[] }>({
     queryKey: [queryType, ...queryKey],
-    queryFn: ({ signal }) => {
-      console.log('filterState::::', filterState);
-      return queryFn(filterState, signal);
-    },
+    queryFn: ({ signal }) => queryFn(filterState, signal),
     staleTime,
     initialData: () => {
       if (
         initialData &&
-        filterState.targetPage === 1
-        // &&
-        // JSON.stringify(defaultQueryKey) === JSON.stringify(queryKey) &&
-        // JSON.stringify(defaultQueryKey) === JSON.stringify(searchParamsKey)
+        filterState.targetPage === 1 &&
+        JSON.stringify(queryKey) ===
+          JSON.stringify(initialDataFilterState.current)
       ) {
         return initialData;
       }
