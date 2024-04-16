@@ -1,21 +1,14 @@
 'use client';
-import { useRef } from 'react';
 import { LECTURE_COUPON_TAKE } from '@/constants/constants';
 import usePageNation from '@/hooks/usePageNation';
 import { NotFoundSVG } from '@/icons/svg';
 import { getCouponLists } from '@/lib/apis/couponApis';
-import CouponComponent from '@/components/Coupon/CouponContainer';
+import CouponLoading from './loading/CouponLoading';
+import Coupon from '@/components/Coupon/Coupon';
 import ClassFilterSelect from '@/components/Filter/ClassSelectFilter';
 import Pagination from '@/components/Pagination/Pagination';
-import Spinner from '@/components/Spinner/Spinner';
-import {
-  IgetFunction,
-  IgetListFunctionHandler,
-  IonChangeItemList,
-  SelectClassType,
-  StatusOptionType,
-  couponGET,
-} from '@/types/coupon';
+import PaginationLoading from '@/components/Pagination/PaginationLoading';
+import { IgetFunction, SelectClassType, couponGET } from '@/types/coupon';
 
 interface CouponViewProps {
   initialData: { count: number; item: couponGET[] };
@@ -23,10 +16,6 @@ interface CouponViewProps {
 }
 
 const CouponView = ({ initialData, myLectureList }: CouponViewProps) => {
-  const selectClassHandler = (selectedOptions: any) => {
-    console.log(selectedOptions);
-  };
-
   const getListFunctionHandler = async (
     data: IgetFunction,
     signal?: AbortSignal,
@@ -48,10 +37,23 @@ const CouponView = ({ initialData, myLectureList }: CouponViewProps) => {
       targetPage: 1,
       couponStatusOption: 'AVAILABLE',
       filterOption: 'LATEST',
+      lectureId: undefined,
     },
     queryType: 'instructorCoupon',
     queryFn: getListFunctionHandler,
   });
+
+  const selectClassHandler = (selectedOptions: any) => {
+    changeFilterState(
+      {
+        lectureId:
+          selectedOptions.value === 'select-all'
+            ? undefined
+            : selectedOptions.value,
+      },
+      true,
+    );
+  };
 
   const options: {
     id: 'AVAILABLE' | 'DISABLED' | 'USED' | 'EXPIRED';
@@ -75,7 +77,6 @@ const CouponView = ({ initialData, myLectureList }: CouponViewProps) => {
     { id: 'UPCOMING', label: '기간 임박순' },
   ];
 
-  const test = useRef(null);
   const pageCount = Math.ceil(totalItemCount / LECTURE_COUPON_TAKE);
 
   return (
@@ -103,7 +104,11 @@ const CouponView = ({ initialData, myLectureList }: CouponViewProps) => {
         <div className="w-80">
           <ClassFilterSelect
             options={myLectureList}
-            value={filterState.lectureId}
+            value={
+              myLectureList.find(
+                ({ value }) => value === filterState.lectureId,
+              ) ?? myLectureList[0]
+            }
             onChange={selectClassHandler}
           />
         </div>
@@ -124,36 +129,43 @@ const CouponView = ({ initialData, myLectureList }: CouponViewProps) => {
           ))}
       </nav>
 
-      <div className="flex flex-wrap justify-center gap-4 pb-4 sm:justify-normal">
-        <CouponComponent
-          couponList={couponLists}
-          lastItemElementRef={test}
-          totalItemCount={totalItemCount}
-          type="lecturer"
-          expiration={filterState.couponStatusOption}
-        />
-      </div>
-      {isLoading && (
-        <div className="mb-5 flex justify-center">
-          <Spinner />
+      {isLoading ? (
+        <CouponLoading />
+      ) : couponLists.length > 0 ? (
+        <div className="flex flex-wrap justify-center gap-4 pb-4 sm:justify-normal">
+          {couponLists.map((coupon) => (
+            <Coupon
+              key={coupon.id}
+              coupon={coupon}
+              type="lecturer"
+              expiration={
+                filterState.couponStatusOption === 'DISABLED' ||
+                filterState.couponStatusOption === 'EXPIRED'
+              }
+            />
+          ))}
         </div>
-      )}
-
-      {pageCount > 0 ? (
-        <nav className="my-8 hidden sm:block">
-          <Pagination
-            pageCount={pageCount}
-            currentPage={
-              filterState.currentPage ? filterState.currentPage - 1 : 0
-            }
-            onPageChange={changePage}
-          />
-        </nav>
       ) : (
         <div className="my-7 flex w-full flex-col items-center justify-center gap-8 text-lg font-semibold text-gray-100">
           <NotFoundSVG />
           <p>해당 쿠폰이 없습니다!</p>
         </div>
+      )}
+
+      {couponLists.length > 0 && pageCount === 0 ? (
+        <PaginationLoading />
+      ) : (
+        pageCount > 0 && (
+          <nav className="my-8">
+            <Pagination
+              pageCount={pageCount}
+              currentPage={
+                filterState.currentPage ? filterState.currentPage - 1 : 0
+              }
+              onPageChange={changePage}
+            />
+          </nav>
+        )
       )}
     </>
   );
