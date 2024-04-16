@@ -60,7 +60,7 @@ const FilterNav = ({
               />
               <label
                 htmlFor={option.id}
-                className="cursor-pointer text-gray-500 peer-checked:text-black"
+                className="cursor-pointer whitespace-nowrap text-gray-500 peer-checked:text-black"
               >
                 {option.label}
               </label>

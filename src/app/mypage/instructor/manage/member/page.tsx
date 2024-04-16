@@ -5,17 +5,28 @@ import MemberManage from './_components/MemberManage';
 import { OptionType } from '@/types/coupon';
 import { GetMyMembersData } from '@/types/instructor';
 
-const page = async () => {
+const page = async ({
+  searchParams,
+}: {
+  searchParams: {
+    take: number;
+    sortOption: 'LATEST' | 'ASC' | 'HIGHEST_APPLICANTS';
+    filterOption: 'ALL' | 'IN_PROGRESS' | 'COMPLETED';
+    lectureId: number;
+  };
+}) => {
   let myClassListsOption: OptionType[] = [];
   let myMembers: GetMyMembersData = {
     count: 0,
     item: [],
   };
+  const { take, sortOption, filterOption, lectureId } = searchParams;
 
   const firstRender = {
-    take: MEMBER_MANAGE_TAKE,
-    sortOption: 'LATEST' as 'LATEST',
-    filterOption: 'ALL' as 'ALL',
+    take: take ?? MEMBER_MANAGE_TAKE,
+    sortOption: sortOption ?? 'LATEST',
+    filterOption: filterOption ?? 'ALL',
+    lectureId,
   };
 
   try {

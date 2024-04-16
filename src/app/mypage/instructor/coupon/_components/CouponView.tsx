@@ -4,8 +4,6 @@ import { LECTURE_COUPON_TAKE } from '@/constants/constants';
 import usePageNation from '@/hooks/usePageNation';
 import { NotFoundSVG } from '@/icons/svg';
 import { getCouponLists } from '@/lib/apis/couponApis';
-import { mapItemToCoupon } from '@/utils/apiDataProcessor';
-import useCouponPassHook from '@/utils/useCouponPassHook';
 import CouponComponent from '@/components/Coupon/CouponContainer';
 import ClassFilterSelect from '@/components/Filter/ClassSelectFilter';
 import Pagination from '@/components/Pagination/Pagination';
@@ -15,6 +13,7 @@ import {
   IgetListFunctionHandler,
   IonChangeItemList,
   SelectClassType,
+  StatusOptionType,
   couponGET,
 } from '@/types/coupon';
 
@@ -32,7 +31,6 @@ const CouponView = ({ initialData, myLectureList }: CouponViewProps) => {
     data: IgetFunction,
     signal?: AbortSignal,
   ) => {
-    console.log(data);
     return await getCouponLists(data, 'lecturer', signal);
   };
 
@@ -105,7 +103,7 @@ const CouponView = ({ initialData, myLectureList }: CouponViewProps) => {
         <div className="w-80">
           <ClassFilterSelect
             options={myLectureList}
-            value={filterState.filterOption}
+            value={filterState.lectureId}
             onChange={selectClassHandler}
           />
         </div>

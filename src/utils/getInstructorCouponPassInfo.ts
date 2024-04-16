@@ -3,10 +3,13 @@ import { getMyLecture } from '@/lib/apis/serverApis/classApi';
 import { getCouponList } from '@/lib/apis/serverApis/couponApis';
 import { getIssuedPassList } from '@/lib/apis/serverApis/passApis';
 import { mapItemToCoupon } from '@/utils/apiDataProcessor';
-import { OptionType, couponGET } from '@/types/coupon';
+import { ISearchParams, OptionType, couponGET } from '@/types/coupon';
 import { IpassData } from '@/types/pass';
 
-const getCouponPassInfo = async () => {
+const getCouponPassInfo = async (
+  type: 'COUPON' | 'PASS',
+  filterOption?: ISearchParams,
+) => {
   let myClassListsOption;
   let CouponCount = 0;
   let passCount = 0;
@@ -15,15 +18,25 @@ const getCouponPassInfo = async () => {
 
   try {
     const reqCouponData = {
-      take: LECTURE_COUPON_TAKE,
-      couponStatusOption: 'AVAILABLE' as 'AVAILABLE',
-      filterOption: 'LATEST' as 'LATEST',
+      take: filterOption?.take ?? LECTURE_COUPON_TAKE,
+      couponStatusOption:
+        type === 'COUPON'
+          ? filterOption?.couponStatusOption ?? 'AVAILABLE'
+          : 'AVAILABLE',
+      filterOption:
+        type === 'COUPON' ? filterOption?.filterOption ?? 'LATEST' : 'LATEST',
+      lectureId: type === 'COUPON' ? filterOption?.lectureId : undefined,
     };
 
     const reqPassData = {
       take: LECTURE_PASS_TAKE,
-      passStatusOptions: 'AVAILABLE' as 'AVAILABLE',
-      filterOption: 'LATEST' as 'LATEST',
+      passStatusOptions:
+        type === 'PASS'
+          ? filterOption?.passStatusOptions ?? 'AVAILABLE'
+          : 'AVAILABLE',
+      filterOption:
+        type === 'PASS' ? filterOption?.filterOption ?? 'LATEST' : 'LATEST',
+      lectureId: type === 'PASS' ? filterOption?.lectureId : undefined,
     };
 
     const resultLectureLists = getMyLecture();

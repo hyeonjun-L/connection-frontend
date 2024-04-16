@@ -5,7 +5,7 @@ export interface IgetPassFunction {
   firstItemId?: number;
   lastItemId?: number;
   passStatusOptions: 'AVAILABLE' | 'DISABLED';
-  filterOption: 'LATEST' | 'HIGHEST_PRICE' | 'BEST_SELLING';
+  filterOption: 'LATEST' | 'HIGHEST_PRICE' | 'BEST_SELLING' | 'UPCOMING';
   lectureId?: string | number;
 }
 

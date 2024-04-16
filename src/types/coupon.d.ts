@@ -157,21 +157,35 @@ export interface createCouponData extends baseCouponData {
 
 export interface updateCouponData extends baseCouponData {}
 
-export type couponStatusOptionType = 'AVAILABLE' | 'DISABLED';
+export type StatusOptionType = 'AVAILABLE' | 'DISABLED';
 
 export type passStatusOptionType = 'USED' | 'EXPIRED';
 
+export type FilterOption =
+  | 'LATEST'
+  | 'UPCOMING'
+  | 'HIGHEST_PRICE'
+  | 'BEST_SELLING';
+
+export interface ISearchParams {
+  take?: number;
+  couponStatusOption?: StatusOptionType;
+  passStatusOptions?: StatusOptionType;
+  filterOption?: FilterOption;
+  lectureId?: number;
+}
+
 export interface IgetFunction extends PagenationFilterState {
-  passStatusOptions?: couponStatusOptionType | passStatusOptionType;
-  couponStatusOption?: couponStatusOptionType | passStatusOptionType;
-  filterOption: 'LATEST' | 'UPCOMING' | 'HIGHEST_PRICE' | 'BEST_SELLING';
+  passStatusOptions?: StatusOptionType | passStatusOptionType;
+  couponStatusOption?: StatusOptionType | passStatusOptionType;
+  filterOption: FilterOption;
   lectureId?: string | number;
 }
 
 export interface IFilterState {
   isInterested: 'COUPON' | 'PASS';
-  passStatusOptions: couponStatusOptionType | passStatusOptionType;
-  filterOption: 'LATEST' | 'UPCOMING' | 'HIGHEST_PRICE' | 'BEST_SELLING';
+  passStatusOptions: StatusOptionType | passStatusOptionType;
+  filterOption: FilterOption;
   selectedClass: { value: string; label: string } | null;
   currentPage: number;
   targetPage: number;
