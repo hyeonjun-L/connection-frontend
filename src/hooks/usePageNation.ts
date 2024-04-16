@@ -30,14 +30,17 @@ const usePageNation = <T extends ItemWithId>({
 
   const prevParams = getCurrentParamsToObject();
 
-  const filterQueryParams = (filter: { [key: string]: any | undefined }) => {
+  const filterQueryParams = (
+    filter: { [key: string]: any | undefined },
+    searchParams?: boolean,
+  ) => {
     return Object.entries(filter)
       .filter(
         ([key, value]) =>
           key !== 'firstItemId' &&
           key !== 'lastItemId' &&
           key !== 'currentPage' &&
-          value,
+          (searchParams || value),
       )
       .map(([key, value]) => ({ name: key, value }));
   };
@@ -97,7 +100,7 @@ const usePageNation = <T extends ItemWithId>({
   useEffect(() => {
     if (!data) return;
 
-    changeMultipleParams(filterQueryParams(filterState), false);
+    changeMultipleParams(filterQueryParams(filterState, true), false);
 
     const updateStateWithCommonData = (prevState: PagenationFilterState) => ({
       ...prevState,
