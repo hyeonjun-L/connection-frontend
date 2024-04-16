@@ -2,10 +2,11 @@ import React from 'react';
 import getCouponPassInfo from '@/utils/getInstructorCouponPassInfo';
 import PassListView from './_components/PassListView';
 import PassNav from './_components/PassNav';
+import { ISearchParams } from '@/types/coupon';
 import { IpassData } from '@/types/pass';
 
-const PassPage = async () => {
-  const passInfo = await getCouponPassInfo();
+const PassPage = async ({ searchParams }: { searchParams: ISearchParams }) => {
+  const passInfo = await getCouponPassInfo('PASS', searchParams);
 
   const myClassListsOption = passInfo?.myClassListsOption ?? [];
   const couponCount = passInfo?.CouponCount ?? 0;
@@ -17,9 +18,8 @@ const PassPage = async () => {
       <div className="z-0 flex w-full flex-col rounded-lg bg-white p-5 shadow-float">
         <PassNav couponCount={couponCount} passCount={passCount} />
         <PassListView
+          initialData={{ count: passCount, item: passList }}
           myLectureList={myClassListsOption}
-          totalItemCount={passCount}
-          passList={passList}
         />
       </div>
     </section>

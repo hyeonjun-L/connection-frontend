@@ -10,8 +10,8 @@ export interface IgetPassFunction {
 }
 
 export interface IresponsePassData {
-  itemList: IpassData[];
-  totalItemCount: number;
+  item: IpassData[];
+  count: number;
 }
 
 export interface IpassData {
