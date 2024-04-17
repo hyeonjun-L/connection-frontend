@@ -41,6 +41,10 @@ const useChangeSearchParams = () => {
     router.push(pathname + '?' + params.toString());
   };
 
+  const removeAllParams = () => {
+    router.push(pathname);
+  };
+
   const changeParams = ({
     name,
     value,
@@ -121,6 +125,7 @@ const useChangeSearchParams = () => {
     getCurrentParamsToObject,
     changeMultipleParams,
     removeMultipleParams,
+    removeAllParams,
   };
 };
 

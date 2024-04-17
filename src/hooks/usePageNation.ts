@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useChangeSearchParams from './useChangeSearchParams';
-import { PagenationFilterState } from '@/types/types';
+import { FetchError, PagenationFilterState } from '@/types/types';
 
 interface ItemWithId {
   id: number;
@@ -25,7 +25,7 @@ const usePageNation = <T extends ItemWithId>({
   staleTime,
   initialData,
 }: usePageNationProps<T>) => {
-  const { changeMultipleParams, getCurrentParamsToObject } =
+  const { changeMultipleParams, getCurrentParamsToObject, removeAllParams } =
     useChangeSearchParams();
 
   const prevParams = getCurrentParamsToObject();
@@ -81,7 +81,7 @@ const usePageNation = <T extends ItemWithId>({
     return makeQueryKey(filterState);
   }, [filterState, makeQueryKey]);
 
-  const { data, isLoading } = useQuery<{ count: number; item: T[] }>({
+  const { data, isLoading, error } = useQuery<{ count: number; item: T[] }>({
     queryKey: [queryType, ...queryKey],
     queryFn: ({ signal }) => queryFn(filterState, signal),
     staleTime,
@@ -96,6 +96,16 @@ const usePageNation = <T extends ItemWithId>({
       }
     },
   });
+
+  useEffect(() => {
+    if (error instanceof Error) {
+      const fetchError = error as FetchError;
+      if (fetchError.status === 400) {
+        removeAllParams();
+        setFilterState(defaultFilterState);
+      }
+    }
+  }, [defaultFilterState, error, removeAllParams]);
 
   useEffect(() => {
     if (!data) return;
