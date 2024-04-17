@@ -6,19 +6,21 @@ import { getUserPassList } from '@/lib/apis/serverApis/passApis';
 import { mapItemToCoupon } from '@/utils/apiDataProcessor';
 import CouponView from './_components/CouponView';
 import PassView from './_components/PassView';
-import { OptionType, couponGET } from '@/types/coupon';
+import { ISearchParams, OptionType, couponGET } from '@/types/coupon';
 import { userPassList } from '@/types/pass';
 
 const CouponPassPage = async ({
   params,
+  searchParams,
 }: {
   params: { ['coupon-pass']: 'pass' | 'coupon' };
+  searchParams: ISearchParams;
 }) => {
   if (params['coupon-pass'] !== 'pass' && params['coupon-pass'] !== 'coupon') {
     redirect('/404');
   }
 
-  const couponPassInfo = await getCouponPassInfo();
+  const couponPassInfo = await getCouponPassInfo(searchParams);
 
   const myClassListsOption = couponPassInfo?.myClassListsOption ?? [];
   const totalItemCount = couponPassInfo?.totalItemCount ?? 0;
@@ -51,8 +53,7 @@ const CouponPassPage = async ({
       {params['coupon-pass'] === 'coupon' ? (
         <CouponView
           myLectureList={myClassListsOption ?? []}
-          couponList={couponList ?? []}
-          totalItemCount={totalItemCount}
+          initialData={{ count: totalItemCount, item: couponList }}
         />
       ) : (
         <PassView passList={passList} />
@@ -63,7 +64,7 @@ const CouponPassPage = async ({
 
 export default CouponPassPage;
 
-const getCouponPassInfo = async () => {
+const getCouponPassInfo = async (filterOption?: ISearchParams) => {
   let myClassListsOption;
   let totalItemCount = 0;
   let passItemCount = 0;
@@ -72,9 +73,10 @@ const getCouponPassInfo = async () => {
 
   try {
     const reqData = {
-      take: LECTURE_COUPON_TAKE,
-      couponStatusOption: 'AVAILABLE' as 'AVAILABLE',
-      filterOption: 'LATEST' as 'LATEST',
+      take: filterOption?.take ?? LECTURE_COUPON_TAKE,
+      couponStatusOption: filterOption?.couponStatusOption ?? 'AVAILABLE',
+      filterOption: filterOption?.filterOption ?? 'LATEST',
+      lectureId: filterOption?.lectureId,
     };
 
     const result = await getCouponList(reqData, 'user');

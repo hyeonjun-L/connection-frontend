@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import createParams from '@/utils/createParams';
 import {
   IPassInfoForIdData,
   IgetPassFunction,
@@ -47,17 +48,7 @@ export const getIssuedPassList = async (
   const authorization = cookieStore.get(
     type === 'lecturer' ? 'lecturerAccessToken' : 'userAccessToken',
   )?.value;
-  const params = new URLSearchParams();
-
-  Object.entries(data)
-    .filter(([_, v]) => v !== undefined)
-    .forEach(([k, v]) => {
-      if (Array.isArray(v)) {
-        v.forEach((value) => params.append(`${k}[]`, value));
-      } else {
-        params.append(k, String(v));
-      }
-    });
+  const params = createParams(data);
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${authorization}`,
@@ -80,12 +71,12 @@ export const getIssuedPassList = async (
 
   const resData = await response.json();
 
-  const { passList: itemList, totalItemCount } = resData?.data ?? {
+  const { passList: item, totalItemCount } = resData?.data ?? {
     totalItemCount: 0,
     passList: [],
   };
 
-  return { itemList: itemList, totalItemCount };
+  return { item, count: totalItemCount };
 };
 
 export const getPassInfoForId = async (

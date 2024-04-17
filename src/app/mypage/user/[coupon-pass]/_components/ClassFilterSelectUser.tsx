@@ -5,7 +5,7 @@ interface ClassFilterSelectUserProps {
   changeUserClassFilterView: () => void;
   filterState: string;
   refreshBtnView: boolean;
-  triggerClassListRefresh: () => void;
+  refreshClassFilter: () => void;
 }
 
 const ClassFilterSelectUser = ({
@@ -13,7 +13,7 @@ const ClassFilterSelectUser = ({
   changeUserClassFilterView,
   filterState,
   refreshBtnView,
-  triggerClassListRefresh,
+  refreshClassFilter,
 }: ClassFilterSelectUserProps) => {
   return (
     <div className="flex gap-2 md:ml-7">
@@ -40,7 +40,7 @@ const ClassFilterSelectUser = ({
       {refreshBtnView && (
         <button
           className="flex items-center gap-1 font-bold text-gray-500"
-          onClick={triggerClassListRefresh}
+          onClick={refreshClassFilter}
         >
           초기화 <ResetSVG className="mb-0.5 h-[14px] w-[14px] fill-gray-500" />
         </button>

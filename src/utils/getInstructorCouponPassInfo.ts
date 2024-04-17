@@ -49,10 +49,10 @@ const getCouponPassInfo = async (
       resultLectureLists,
     ]);
 
-    const { itemList, totalItemCount } = pass;
+    const { item, count } = pass;
 
-    passList = itemList;
-    passCount = totalItemCount;
+    passList = item;
+    passCount = count;
 
     if (coupon) {
       const { totalItemCount: resTotalItemCount, itemList: resCouponList } =

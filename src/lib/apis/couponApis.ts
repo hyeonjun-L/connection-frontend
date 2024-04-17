@@ -5,6 +5,7 @@ import {
   IgetFunction,
   createCouponData,
   updateCouponData,
+  userCouponGET,
 } from '@/types/coupon';
 import { FetchError } from '@/types/types';
 
@@ -62,7 +63,13 @@ export const getCouponLists = async (
     const resData = await response.json();
 
     return {
-      item: resData.data.couponList,
+      item:
+        type === 'user'
+          ? (resData.data.couponList as userCouponGET[]).map((coupon) => ({
+              ...coupon,
+              ...coupon.lectureCoupon,
+            }))
+          : resData.data.couponList,
       count: resData.data.totalItemCount,
     };
   } catch (error) {
