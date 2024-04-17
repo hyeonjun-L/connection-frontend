@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import CouponLoading from '@/app/mypage/instructor/coupon/_components/loading/CouponLoading';
 import {
   LECTURE_COUPON_TAKE,
   USER_COUPON_CLASS_LIST_TAKE,
@@ -143,13 +144,6 @@ const CouponView = ({ myLectureList, initialData }: CouponViewProps) => {
           />
         )}
       </nav>
-      {/* 
-      <div className="my-7 flex w-full flex-col items-center justify-center gap-8 text-lg font-semibold text-gray-100">
-          <NotFoundSVG />
-          <p>{`해당 ${
-            filterState.isInterested ? '쿠폰' : '패스권'
-          }이 없습니다!`}</p>
-        </div> */}
 
       <nav className="flex gap-2.5 py-4">
         {filterState.couponStatusOption === 'AVAILABLE' &&
@@ -166,16 +160,25 @@ const CouponView = ({ myLectureList, initialData }: CouponViewProps) => {
           ))}
       </nav>
 
-      <div className="flex flex-wrap justify-center gap-4 pb-4 sm:justify-normal">
-        {couponLists.map((coupon) => (
-          <Coupon
-            key={coupon.id}
-            coupon={coupon}
-            type="user"
-            expiration={filterState.couponStatusOption}
-          />
-        ))}
-      </div>
+      {isLoading ? (
+        <CouponLoading />
+      ) : couponLists.length > 0 ? (
+        <div className="flex flex-wrap justify-center gap-4 pb-4 sm:justify-normal">
+          {couponLists.map((coupon) => (
+            <Coupon
+              key={coupon.id}
+              coupon={coupon}
+              type="user"
+              expiration={filterState.couponStatusOption}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="my-7 flex w-full flex-col items-center justify-center gap-8 text-lg font-semibold text-gray-100">
+          <NotFoundSVG />
+          <p>해당 쿠폰이 없습니다!</p>
+        </div>
+      )}
 
       {couponLists.length > 0 && pageCount === 0 ? (
         <PaginationLoading />
