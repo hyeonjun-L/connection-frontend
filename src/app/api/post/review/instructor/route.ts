@@ -33,7 +33,8 @@ export const GET = async (request: NextRequest) => {
       };
 
   const serverResponse = await fetch(
-    END_POINT + `/lecture-reviews/lecturers/${lecturerId}?${query}`,
+    END_POINT +
+      `/lecture-reviews/lectureReviewId/lecturers/${lecturerId}?${query}`,
     {
       headers,
     },

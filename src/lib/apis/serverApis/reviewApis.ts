@@ -5,6 +5,7 @@ import {
   ReservationDetails,
   WriteReview,
 } from '@/types/review';
+import { FetchError } from '@/types/types';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
@@ -19,7 +20,8 @@ export const getWriteReviews = async (
   };
 
   const response = await fetch(
-    END_POINT + `/lecture-reviews/my-reviews/users?orderBy=${orderBy}`,
+    END_POINT +
+      `/lecture-reviews/lectureReviewId/my-reviews/users?orderBy=${orderBy}`,
     {
       method: 'GET',
       credentials: 'include',
@@ -28,7 +30,10 @@ export const getWriteReviews = async (
   );
 
   if (!response.ok) {
-    throw new Error(`작성한 리뷰 목록 불러오기: ${response.status}`);
+    const errorData = await response.json();
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
   }
 
   const resData = await response.json();
@@ -45,11 +50,14 @@ export const getReservationDetails = async (): Promise<
     Authorization: `Bearer ${authorization}`,
   };
 
-  const response = await fetch(END_POINT + '/lecture-reviews/reservations', {
-    method: 'GET',
-    credentials: 'include',
-    headers,
-  });
+  const response = await fetch(
+    END_POINT + '/lecture-reviews/lectureReviewId/reservations',
+    {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    },
+  );
 
   if (!response.ok) {
     throw new Error(`작성가능한 예약 내역 불러오기: ${response.status}`);
@@ -79,7 +87,8 @@ export const getMyLecturersReviews = async (
   };
 
   const response = await fetch(
-    END_POINT + `/lecture-reviews/my-reviews/lecturers?${params}`,
+    END_POINT +
+      `/lecture-reviews/lectureReviewId/my-reviews/lecturers?${params}`,
     {
       cache: 'no-store',
       method: 'GET',

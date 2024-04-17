@@ -30,7 +30,7 @@ export const GET = async (request: NextRequest) => {
   };
 
   const response = await fetch(
-    `${END_POINT}/lecture-reviews/my-reviews/users?orderBy=${orderBy}`,
+    `${END_POINT}/lecture-reviews/lectureReviewId/my-reviews/users?orderBy=${orderBy}`,
     {
       method: 'GET',
       credentials: 'include',
