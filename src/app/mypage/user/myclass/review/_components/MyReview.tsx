@@ -67,7 +67,7 @@ const MyReview = ({ writeReviews, classLists }: ReviewProps) => {
               </select>
               {writeReviews.length}개의 리뷰
             </div>
-            <Link href="/mypage/user/review/writeReviewModal">
+            <Link href="/mypage/user/myclass/review/writeReviewModal">
               <Button>
                 <div className="flex items-center gap-1 whitespace-nowrap px-2 text-sm sm:px-4 sm:text-base">
                   <EditSVG
