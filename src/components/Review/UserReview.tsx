@@ -7,7 +7,7 @@ import { LikeSVG } from '../../../public/icons/svg';
 import Profile from '../Profile/ProfileImage';
 
 interface UserReviewProps {
-  src: string | null;
+  src?: string | null;
   nickname: string;
   average: number;
   content: string;

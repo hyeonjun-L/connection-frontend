@@ -33,44 +33,15 @@ export interface WriteReview {
   lectureId: number;
   userId: number;
   reservationId: number;
-  stars: number;
+  lectureTitle: string;
   description: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  lecture: {
-    id: number;
-    lecturerId: number;
-    lectureTypeId: number;
-    lectureMethodId: number;
-    isGroup: boolean;
-    startDate: string;
-    endDate: string;
-    title: string;
-    introduction: string;
-    curriculum: string;
-    duration: number;
-    difficultyLevel: string;
-    minCapacity: number;
-    maxCapacity: number;
-    reservationDeadline: number;
-    reservationComment: string;
-    price: number;
-    noShowDeposit: number;
-    reviewCount: number;
-    stars: number;
-    isActive: boolean;
-    locationDescription: string;
-    createdAt: string;
-    updatedAt: string;
-    deletedAt: string | null;
-  };
-  likedLectureReview: [];
-  reservation: {
-    lectureSchedule: string;
-  };
-  _count: {
-    likedLectureReview: number;
+  stars: number;
+  isLike: boolean;
+  likeCount: number;
+  startDateTime: string;
+  user: {
+    nickname: string;
+    profileImage?: string;
   };
 }
 
@@ -107,6 +78,15 @@ export interface WriteReviewData {
 export interface GetMyLecturersReviews extends PagenationFilterState {
   lecturerMyReviewType: string;
   orderBy: string;
+}
+
+export interface GetWriteReviews extends PagenationFilterState {
+  orderBy: string;
+}
+
+export interface GetWriteReviewsData {
+  count: number;
+  item: WriteReview[];
 }
 
 export interface GetMyLecturersReviewsData {

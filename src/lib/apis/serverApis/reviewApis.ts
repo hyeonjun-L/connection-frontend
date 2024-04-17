@@ -1,7 +1,10 @@
 import { cookies } from 'next/headers';
+import createParams from '@/utils/createParams';
 import {
   GetMyLecturersReviews,
   GetMyLecturersReviewsData,
+  GetWriteReviews,
+  GetWriteReviewsData,
   ReservationDetails,
   WriteReview,
 } from '@/types/review';
@@ -10,18 +13,18 @@ import { FetchError } from '@/types/types';
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
 export const getWriteReviews = async (
-  orderBy: string,
-): Promise<WriteReview[]> => {
+  data: GetWriteReviews,
+): Promise<GetWriteReviewsData> => {
   const cookieStore = cookies();
   const authorization = cookieStore.get('userAccessToken')?.value;
+  const params = createParams(data);
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${authorization}`,
   };
 
   const response = await fetch(
-    END_POINT +
-      `/lecture-reviews/lectureReviewId/my-reviews/users?orderBy=${orderBy}`,
+    END_POINT + `/lecture-reviews/lectureReviewId/my-reviews/users?${params}`,
     {
       method: 'GET',
       credentials: 'include',
@@ -37,7 +40,7 @@ export const getWriteReviews = async (
   }
 
   const resData = await response.json();
-  return resData.data.review;
+  return { item: resData.data.reviews, count: resData.data.totalItemCount };
 };
 
 export const getReservationDetails = async (): Promise<

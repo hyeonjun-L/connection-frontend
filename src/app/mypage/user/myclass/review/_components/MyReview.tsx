@@ -9,21 +9,27 @@ import { useUserStore } from '@/store';
 import formatDate from '@/utils/formatDate';
 import { Button } from '@/components/Button';
 import { ReviewStatistics, UserReview } from '@/components/Review';
-import { ReservationDetails, WriteReview } from '@/types/review';
+import {
+  GetWriteReviewsData,
+  ReservationDetails,
+  WriteReview,
+} from '@/types/review';
 import { FetchError } from '@/types/types';
 
 interface ReviewProps {
-  writeReviews: WriteReview[];
+  initialData: GetWriteReviewsData;
   classLists: ReservationDetails[];
 }
 
-const MyReview = ({ writeReviews, classLists }: ReviewProps) => {
-  const [reviewList, setReviewList] = useState(writeReviews);
-  const { authUser } = useUserStore((state) => ({
-    authUser: state.authUser,
-  }));
+const MyReview = ({ initialData, classLists }: ReviewProps) => {
+  const [reviewList, setReviewList] = useState(initialData.item);
+  // const { authUser } = useUserStore((state) => ({
+  //   authUser: state.authUser,
+  // }));
 
-  if (!authUser) return null;
+  // console.log(reviewList);
+
+  // if (!authUser) return null;
 
   const filterChange = async (e: ChangeEvent<HTMLSelectElement>) => {
     try {
@@ -65,7 +71,7 @@ const MyReview = ({ writeReviews, classLists }: ReviewProps) => {
                 <option value="평점 높은순">평점 높은순</option>
                 <option value="평점 낮은순">평점 낮은순</option>
               </select>
-              {writeReviews.length}개의 리뷰
+              {/* {writeReviews.length}개의 리뷰 */}
             </div>
             <Link href="/mypage/user/myclass/review/writeReviewModal">
               <Button>
@@ -88,20 +94,22 @@ const MyReview = ({ writeReviews, classLists }: ReviewProps) => {
                 ({
                   id,
                   stars,
-                  lecture,
-                  _count,
                   description,
-                  likedLectureReview,
+                  lectureTitle,
+                  startDateTime,
+                  likeCount,
+                  isLike,
+                  user,
                 }) => (
                   <UserReview
                     key={id}
-                    src={authUser.profileImage}
-                    nickname={authUser.nickname}
+                    src={user?.profileImage}
+                    nickname={user.nickname}
                     average={stars}
-                    date={formatDate(lecture.startDate)}
-                    title={lecture.title}
-                    count={_count.likedLectureReview}
-                    isLike={likedLectureReview.length > 0}
+                    date={formatDate(startDateTime)}
+                    title={lectureTitle}
+                    count={likeCount}
+                    isLike={isLike}
                     reviewId={id}
                     content={description}
                     link={`/report?lectureReviewId=${id}`}
@@ -117,7 +125,7 @@ const MyReview = ({ writeReviews, classLists }: ReviewProps) => {
           )}
         </div>
         <div className="w-full self-start sm:w-56 md:w-72 lg:w-80">
-          <ReviewStatistics reviewList={writeReviews} />
+          {/* <ReviewStatistics reviewList={writeReviews} /> */}
         </div>
       </div>
     </section>

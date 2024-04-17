@@ -1,27 +1,33 @@
+import { redirect } from 'next/navigation';
 import {
   getReservationDetails,
   getWriteReviews,
 } from '@/lib/apis/serverApis/reviewApis';
 import MyReview from './_components/MyReview';
-import { ReservationDetails, WriteReview } from '@/types/review';
+import { GetWriteReviewsData, ReservationDetails } from '@/types/review';
 
 const page = async () => {
-  let writeReviews: WriteReview[] = [];
+  let writeReviews: GetWriteReviewsData = { count: 0, item: [] };
   let reservationLists: ReservationDetails[] = [];
+  const firstRender = {
+    take: 2,
+    orderBy: '최신순',
+  };
 
   try {
     const [geyWriteReviews, getReservationLists] = await Promise.all([
-      getWriteReviews('최신순'),
+      getWriteReviews(firstRender),
       getReservationDetails(),
     ]);
 
     writeReviews = geyWriteReviews;
     reservationLists = getReservationLists;
   } catch (error) {
+    // redirect('/');
     console.error(error);
   }
 
-  return <MyReview writeReviews={writeReviews} classLists={reservationLists} />;
+  return <MyReview initialData={writeReviews} classLists={reservationLists} />;
 };
 
 export default page;
