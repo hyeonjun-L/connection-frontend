@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import createParams from '@/utils/createParams';
 import { IcouponsData, IgetFunction } from '@/types/coupon';
+import { FetchError } from '@/types/types';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
@@ -27,7 +28,10 @@ export const getCouponList = async (
   });
 
   if (!response.ok) {
-    throw new Error(`쿠폰 목록 불러오기: ${response.status}`);
+    const errorData = await response.json();
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
   }
 
   const resData = await response.json();

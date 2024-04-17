@@ -66,7 +66,7 @@ export const getIssuedPassList = async (
     const errorData = await response.json();
     const error: FetchError = new Error(errorData.message || '');
     error.status = response.status;
-    throw new Error(`발급한 패스권 목록 불러오기: ${error.status} ${error}`);
+    throw error;
   }
 
   const resData = await response.json();

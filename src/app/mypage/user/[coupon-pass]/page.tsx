@@ -8,6 +8,7 @@ import CouponView from './_components/CouponView';
 import PassView from './_components/PassView';
 import { ISearchParams, OptionType, couponGET } from '@/types/coupon';
 import { userPassList } from '@/types/pass';
+import { FetchError } from '@/types/types';
 
 const CouponPassPage = async ({
   params,
@@ -118,8 +119,13 @@ const getCouponPassInfo = async (filterOption?: ISearchParams) => {
       passList,
     };
   } catch (error) {
-    console.error(error);
-    throw error;
+    if (error instanceof Error) {
+      const fetchError = error as FetchError;
+      if (fetchError.status === 400) {
+        redirect('/mypage/user/coupon');
+      }
+      console.error(error);
+    }
   }
 };
 

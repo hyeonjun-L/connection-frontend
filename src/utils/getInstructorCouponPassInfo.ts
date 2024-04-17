@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { LECTURE_COUPON_TAKE, LECTURE_PASS_TAKE } from '@/constants/constants';
 import { getMyLecture } from '@/lib/apis/serverApis/classApi';
 import { getCouponList } from '@/lib/apis/serverApis/couponApis';
@@ -5,6 +6,7 @@ import { getIssuedPassList } from '@/lib/apis/serverApis/passApis';
 import { mapItemToCoupon } from '@/utils/apiDataProcessor';
 import { ISearchParams, OptionType, couponGET } from '@/types/coupon';
 import { IpassData } from '@/types/pass';
+import { FetchError } from '@/types/types';
 
 const getCouponPassInfo = async (
   type: 'COUPON' | 'PASS',
@@ -77,7 +79,17 @@ const getCouponPassInfo = async (
 
     return { CouponCount, couponList, passCount, myClassListsOption, passList };
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      const fetchError = error as FetchError;
+      if (fetchError.status === 400) {
+        redirect(
+          type === 'COUPON'
+            ? '/mypage/instructor/coupon'
+            : '/mypage/instructor/pass',
+        );
+      }
+      console.error(error);
+    }
   }
 };
 

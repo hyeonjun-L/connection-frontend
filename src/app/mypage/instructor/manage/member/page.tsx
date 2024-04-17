@@ -1,9 +1,11 @@
+import { redirect } from 'next/navigation';
 import { MEMBER_MANAGE_TAKE } from '@/constants/constants';
 import { getMyLecture } from '@/lib/apis/serverApis/classApi';
 import { getMyMembers } from '@/lib/apis/serverApis/instructorPostApis';
 import MemberManage from './_components/MemberManage';
 import { OptionType } from '@/types/coupon';
 import { GetMyMembersData } from '@/types/instructor';
+import { FetchError } from '@/types/types';
 
 const page = async ({
   searchParams,
@@ -54,7 +56,13 @@ const page = async ({
         label: `전체 클래스(${myClassListsOption.length})`,
       });
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      const fetchError = error as FetchError;
+      if (fetchError.status === 400) {
+        redirect('/mypage/instructor/manage/member');
+      }
+      console.error(error);
+    }
   }
 
   return (
