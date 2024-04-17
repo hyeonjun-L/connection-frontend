@@ -30,8 +30,8 @@ export interface IReviewResponse {
 
 export interface WriteReview {
   id: number;
-  lectureId: number;
-  userId: number;
+  lectureId: string;
+  userId: string;
   reservationId: number;
   lectureTitle: string;
   description: string;

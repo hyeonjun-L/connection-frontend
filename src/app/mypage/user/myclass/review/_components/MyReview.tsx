@@ -9,7 +9,6 @@ import { Button } from '@/components/Button';
 import Pagination from '@/components/Pagination/Pagination';
 import PaginationLoading from '@/components/Pagination/PaginationLoading';
 import { UserReview } from '@/components/Review';
-import ReviewLoading from '@/components/Review/ReviewLoading';
 import ReviewLoadingContainer from '@/components/Review/ReviewLoading';
 import {
   GetWriteReviewsData,
@@ -40,6 +39,8 @@ const MyReview = ({ initialData, classLists }: ReviewProps) => {
     queryType: 'userReview',
     queryFn: getWriteReviews,
   });
+
+  console.log(reviewList);
 
   const pageCount = Math.ceil(totalItemCount / REVIEW_TAKE);
 
@@ -93,9 +94,11 @@ const MyReview = ({ initialData, classLists }: ReviewProps) => {
                   likeCount,
                   isLike,
                   user,
+                  userId,
                 }) => (
                   <UserReview
                     key={id}
+                    userId={userId}
                     src={user?.profileImage}
                     nickname={user.nickname}
                     average={stars}

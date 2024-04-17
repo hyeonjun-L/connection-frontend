@@ -1,9 +1,12 @@
 'use client';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { ButtonStyles } from '@/constants/constants';
 import { postReviewLikes, deleteReviewLikes } from '@/lib/apis/classApis';
+import { useUserStore } from '@/store';
 import Review from './Review';
-import { LikeSVG } from '../../../public/icons/svg';
+import { CloseSVG, LikeSVG } from '../../../public/icons/svg';
 import Profile from '../Profile/ProfileImage';
 
 interface UserReviewProps {
@@ -18,6 +21,7 @@ interface UserReviewProps {
   reviewId: number;
   disabled?: boolean;
   link: string;
+  userId: string;
 }
 
 const UserReview = ({
@@ -32,7 +36,12 @@ const UserReview = ({
   reviewId,
   disabled = false,
   link,
+  userId,
 }: UserReviewProps) => {
+  const { authUser, userType } = useUserStore((state) => ({
+    authUser: state.authUser,
+    userType: state.userType,
+  }));
   const [liked, setLiked] = useState(isLike);
   const [likeCount, setLikeCount] = useState(count);
   const router = useRouter();
@@ -58,6 +67,8 @@ const UserReview = ({
     router.push(link);
   };
 
+  const mine = userType === 'user' && authUser?.id === userId;
+
   return (
     <div className="w-full rounded-md border-b border-solid border-gray-700 bg-white text-sm shadow-vertical">
       <div className="flex w-full justify-between p-[0.8rem]">
@@ -71,13 +82,19 @@ const UserReview = ({
 
         <div className="flex h-fit w-full flex-nowrap items-baseline justify-end whitespace-nowrap text-gray-500">
           <span className="gray-300">수강일 {date}</span>
-          <button
-            onClick={handleReport}
-            className="ml-3 box-border h-6 cursor-pointer rounded-md border border-solid border-gray-700 px-1.5 text-sm font-normal hover:text-gray-100"
-            aria-label="리뷰 신고"
-          >
-            신고
-          </button>
+          {mine ? (
+            <button className="my-auto ml-2">
+              <CloseSVG className="size-[17px] stroke-gray-500 stroke-[3px]" />
+            </button>
+          ) : (
+            <button
+              onClick={handleReport}
+              className="ml-3 box-border h-6 cursor-pointer rounded-md border border-solid border-gray-700 px-1.5 text-sm font-normal hover:text-gray-100"
+              aria-label="리뷰 신고"
+            >
+              신고
+            </button>
+          )}
         </div>
       </div>
 
@@ -89,6 +106,14 @@ const UserReview = ({
             liked ? 'text-main-color' : 'text-gray-500'
           }`}
         >
+          {mine && (
+            <Link
+              href="/mypage/user/myclass/review/writeReviewModal"
+              className={`${ButtonStyles.secondary} mr-2 px-2`}
+            >
+              수정
+            </Link>
+          )}
           <button
             onClick={disabled ? undefined : handleLike}
             className={`${disabled && 'cursor-default'}`}
