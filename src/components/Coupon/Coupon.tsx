@@ -8,6 +8,7 @@ import { deleteCoupon, getPrivateCode } from '@/lib/apis/couponApis';
 import { accessTokenReissuance } from '@/lib/apis/userApi';
 import { useUserStore } from '@/store';
 import formatDate from '@/utils/formatDate';
+import { reloadToast } from '@/utils/reloadMessage';
 import UniqueButton from '../Button/UniqueButton';
 import { couponGET } from '@/types/coupon';
 import { FetchError } from '@/types/types';
@@ -110,14 +111,18 @@ const Coupon = ({
   const deleteCouponHandler = async (couponID?: number) => {
     if (!couponID) return toast.error('잘못된 요청입니다!');
 
+    const deleteAction = async () => {
+      await deleteCoupon(couponID, type);
+      reloadToast(`${title} 쿠폰 제거 완료`, 'success');
+      location.reload();
+    };
+
     try {
       if (
         confirm(`쿠폰명: '${title}'
 해당 쿠폰을 삭제 하시겠습니까?`)
       ) {
-        await deleteCoupon(couponID, type);
-        toast.success(`${title} 쿠폰 제거 완료`);
-        router.refresh();
+        await deleteAction();
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -125,9 +130,7 @@ const Coupon = ({
         if (fetchError.status === 401) {
           try {
             await accessTokenReissuance();
-            await deleteCoupon(couponID, type);
-            toast.success(`${title} 쿠폰 제거 완료`);
-            router.refresh();
+            await deleteAction();
           } catch (error) {
             console.error(error);
           }

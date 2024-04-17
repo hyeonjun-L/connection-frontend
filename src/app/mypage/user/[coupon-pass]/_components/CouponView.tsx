@@ -169,7 +169,7 @@ const CouponView = ({ myLectureList, initialData }: CouponViewProps) => {
               key={coupon.id}
               coupon={coupon}
               type="user"
-              expiration={filterState.couponStatusOption}
+              expiration={filterState.couponStatusOption !== 'AVAILABLE'}
             />
           ))}
         </div>
