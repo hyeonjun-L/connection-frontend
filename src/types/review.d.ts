@@ -119,3 +119,8 @@ export interface NewReviews extends ReviewMainContent {
   lectureId: number;
   reservationId: number;
 }
+
+export interface RatingsData {
+  stars: number;
+  count: number;
+}

@@ -1,11 +1,16 @@
 import { redirect } from 'next/navigation';
 import { REVIEW_TAKE } from '@/constants/constants';
 import {
+  getRatings,
   getReservationDetails,
   getWriteReviews,
 } from '@/lib/apis/serverApis/reviewApis';
 import MyReview from './_components/MyReview';
-import { GetWriteReviewsData, ReservationDetails } from '@/types/review';
+import {
+  GetWriteReviewsData,
+  RatingsData,
+  ReservationDetails,
+} from '@/types/review';
 
 const page = async ({
   searchParams,
@@ -15,17 +20,21 @@ const page = async ({
   const { orderBy } = searchParams;
   let writeReviews: GetWriteReviewsData = { count: 0, item: [] };
   let reservationLists: ReservationDetails[] = [];
+  let ratingLists: RatingsData[] = [];
   const firstRender = {
     take: REVIEW_TAKE,
     orderBy: orderBy ?? '최신순',
   };
 
   try {
-    const [geyWriteReviews, getReservationLists] = await Promise.all([
-      getWriteReviews(firstRender),
-      getReservationDetails(),
-    ]);
+    const [geyWriteReviews, getReservationLists, getRatingLists] =
+      await Promise.all([
+        getWriteReviews(firstRender),
+        getReservationDetails(),
+        getRatings('user'),
+      ]);
 
+    ratingLists = getRatingLists;
     writeReviews = geyWriteReviews;
     reservationLists = getReservationLists;
   } catch (error) {
@@ -33,7 +42,13 @@ const page = async ({
     console.error(error);
   }
 
-  return <MyReview initialData={writeReviews} classLists={reservationLists} />;
+  return (
+    <MyReview
+      initialData={writeReviews}
+      classLists={reservationLists}
+      ratingLists={ratingLists}
+    />
+  );
 };
 
 export default page;

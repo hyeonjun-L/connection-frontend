@@ -8,10 +8,11 @@ import formatDate from '@/utils/formatDate';
 import { Button } from '@/components/Button';
 import Pagination from '@/components/Pagination/Pagination';
 import PaginationLoading from '@/components/Pagination/PaginationLoading';
-import { UserReview } from '@/components/Review';
+import { ReviewStatistics, UserReview } from '@/components/Review';
 import ReviewLoadingContainer from '@/components/Review/ReviewLoading';
 import {
   GetWriteReviewsData,
+  RatingsData,
   ReservationDetails,
   WriteReview,
 } from '@/types/review';
@@ -19,9 +20,10 @@ import {
 interface ReviewProps {
   initialData: GetWriteReviewsData;
   classLists: ReservationDetails[];
+  ratingLists: RatingsData[];
 }
 
-const MyReview = ({ initialData, classLists }: ReviewProps) => {
+const MyReview = ({ initialData, classLists, ratingLists }: ReviewProps) => {
   const {
     items: reviewList,
     totalItemCount,
@@ -134,7 +136,7 @@ const MyReview = ({ initialData, classLists }: ReviewProps) => {
           )}
         </div>
         <div className="w-full self-start sm:w-56 md:w-72 lg:w-80">
-          {/* <ReviewStatistics reviewList={writeReviews} /> */}
+          <ReviewStatistics ratingLists={ratingLists} />
         </div>
       </div>
     </section>
