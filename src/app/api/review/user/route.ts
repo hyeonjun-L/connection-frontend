@@ -10,9 +10,6 @@ export const GET = async (request: NextRequest) => {
     });
   }
 
-  const searchParams = request.nextUrl.searchParams;
-  const orderBy = searchParams.get('orderBy');
-
   const tokenValue = request.cookies.get('userAccessToken')?.value;
   if (!tokenValue) {
     return NextResponse.json(
@@ -30,7 +27,7 @@ export const GET = async (request: NextRequest) => {
   };
 
   const response = await fetch(
-    `${END_POINT}/lecture-reviews/lectureReviewId/my-reviews/users?orderBy=${orderBy}`,
+    `${END_POINT}/lecture-reviews/lectureReviewId/my-reviews/users?${request.nextUrl.searchParams.toString()}`,
     {
       method: 'GET',
       credentials: 'include',

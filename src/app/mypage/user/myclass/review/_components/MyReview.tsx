@@ -1,20 +1,21 @@
 'use client';
 import Link from 'next/link';
-import { ChangeEvent, useState } from 'react';
-import { toast } from 'react-toastify';
+import { REVIEW_TAKE } from '@/constants/constants';
+import usePageNation from '@/hooks/usePageNation';
 import { EditSVG, NotFoundSVG } from '@/icons/svg';
 import { getWriteReviews } from '@/lib/apis/reviewApis';
-import { accessTokenReissuance } from '@/lib/apis/userApi';
-import { useUserStore } from '@/store';
 import formatDate from '@/utils/formatDate';
 import { Button } from '@/components/Button';
-import { ReviewStatistics, UserReview } from '@/components/Review';
+import Pagination from '@/components/Pagination/Pagination';
+import PaginationLoading from '@/components/Pagination/PaginationLoading';
+import { UserReview } from '@/components/Review';
+import ReviewLoading from '@/components/Review/ReviewLoading';
+import ReviewLoadingContainer from '@/components/Review/ReviewLoading';
 import {
   GetWriteReviewsData,
   ReservationDetails,
   WriteReview,
 } from '@/types/review';
-import { FetchError } from '@/types/types';
 
 interface ReviewProps {
   initialData: GetWriteReviewsData;
@@ -22,35 +23,25 @@ interface ReviewProps {
 }
 
 const MyReview = ({ initialData, classLists }: ReviewProps) => {
-  const [reviewList, setReviewList] = useState(initialData.item);
-  // const { authUser } = useUserStore((state) => ({
-  //   authUser: state.authUser,
-  // }));
+  const {
+    items: reviewList,
+    totalItemCount,
+    filterState,
+    isLoading,
+    changeFilterState,
+    changePage,
+  } = usePageNation<WriteReview>({
+    initialData,
+    defaultFilterState: {
+      take: REVIEW_TAKE,
+      targetPage: 1,
+      orderBy: '최신순',
+    },
+    queryType: 'userReview',
+    queryFn: getWriteReviews,
+  });
 
-  // console.log(reviewList);
-
-  // if (!authUser) return null;
-
-  const filterChange = async (e: ChangeEvent<HTMLSelectElement>) => {
-    try {
-      const writeReviews = await getWriteReviews(e.target.value);
-      setReviewList(writeReviews);
-    } catch (error) {
-      if (error instanceof Error) {
-        const fetchError = error as FetchError;
-        if (fetchError.status === 401) {
-          try {
-            await accessTokenReissuance();
-            await getWriteReviews(e.target.value);
-          } catch (error) {
-            console.error(error);
-          }
-        } else {
-          toast.error('잘못된 요청입니다!');
-        }
-      }
-    }
-  };
+  const pageCount = Math.ceil(totalItemCount / REVIEW_TAKE);
 
   return (
     <section className="z-0 col-span-1 flex w-full flex-col px-2 sm:px-6">
@@ -64,7 +55,7 @@ const MyReview = ({ initialData, classLists }: ReviewProps) => {
               <select
                 name="sorting"
                 className="h-7 border border-solid border-gray-500"
-                onChange={filterChange}
+                onChange={(e) => changeFilterState({ orderBy: e.target.value })}
               >
                 <option value="최신순">최신순</option>
                 <option value="좋아요순">좋아요순</option>
@@ -88,7 +79,9 @@ const MyReview = ({ initialData, classLists }: ReviewProps) => {
               </Button>
             </Link>
           </nav>
-          {reviewList.length > 0 ? (
+          {isLoading ? (
+            <ReviewLoadingContainer />
+          ) : reviewList.length > 0 ? (
             <ul className="flex flex-col gap-2">
               {reviewList.map(
                 ({
@@ -122,6 +115,21 @@ const MyReview = ({ initialData, classLists }: ReviewProps) => {
               <NotFoundSVG />
               <p>작성 하신 리뷰가 없습니다!</p>
             </div>
+          )}
+          {reviewList.length > 0 && pageCount === 0 ? (
+            <PaginationLoading />
+          ) : (
+            pageCount > 0 && (
+              <nav className="z-0">
+                <Pagination
+                  pageCount={pageCount}
+                  currentPage={
+                    filterState.currentPage ? filterState.currentPage - 1 : 0
+                  }
+                  onPageChange={changePage}
+                />
+              </nav>
+            )
           )}
         </div>
         <div className="w-full self-start sm:w-56 md:w-72 lg:w-80">

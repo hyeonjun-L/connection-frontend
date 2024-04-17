@@ -6,6 +6,8 @@ import {
   WriteReview,
   ReviewOrderType,
   IReviewResponse,
+  GetWriteReviewsData,
+  GetWriteReviews,
 } from '@/types/review';
 import { FetchError } from '@/types/types';
 
@@ -60,11 +62,15 @@ export const getInstructorReviews = async (
 };
 
 export const getWriteReviews = async (
-  orderBy: string,
-): Promise<WriteReview[]> => {
+  data: GetWriteReviews,
+  signal?: AbortSignal,
+): Promise<GetWriteReviewsData> => {
   try {
-    const response = await fetch(`/api/review/user?orderBy=${orderBy}`, {
+    const params = createParams(data);
+
+    const response = await fetch(`/api/review/user?${params}`, {
       method: 'GET',
+      signal,
       credentials: 'include',
     });
 
@@ -76,7 +82,7 @@ export const getWriteReviews = async (
     }
 
     const resData = await response.json();
-    return resData.data.review;
+    return { item: resData.data.reviews, count: resData.data.totalItemCount };
   } catch (error) {
     console.error('내 보유 강의 조회 오류', error);
     throw error;

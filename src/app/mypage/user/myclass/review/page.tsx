@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { REVIEW_TAKE } from '@/constants/constants';
 import {
   getReservationDetails,
   getWriteReviews,
@@ -6,12 +7,17 @@ import {
 import MyReview from './_components/MyReview';
 import { GetWriteReviewsData, ReservationDetails } from '@/types/review';
 
-const page = async () => {
+const page = async ({
+  searchParams,
+}: {
+  searchParams: { orderBy: string };
+}) => {
+  const { orderBy } = searchParams;
   let writeReviews: GetWriteReviewsData = { count: 0, item: [] };
   let reservationLists: ReservationDetails[] = [];
   const firstRender = {
-    take: 2,
-    orderBy: '최신순',
+    take: REVIEW_TAKE,
+    orderBy: orderBy ?? '최신순',
   };
 
   try {
