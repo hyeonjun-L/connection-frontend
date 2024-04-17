@@ -8,6 +8,7 @@ import {
   IReviewResponse,
   GetWriteReviewsData,
   GetWriteReviews,
+  ReviewMainContent,
 } from '@/types/review';
 import { FetchError } from '@/types/types';
 
@@ -141,9 +142,63 @@ export const writeReview = async (data: NewReviews) => {
     }
 
     const responseData = await response.json();
-    return responseData.data.coupon;
+    return responseData;
   } catch (error) {
     console.error('리뷰 작성 오류', error);
+    throw error;
+  }
+};
+
+export const deleteReview = async (reviewId: number) => {
+  try {
+    const response = await fetch(`/api/review/delete?reviewId=${reviewId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const error: FetchError = new Error(errorData.message || '');
+      error.status = response.status;
+      throw error;
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    console.error('리뷰 삭제 오류', error);
+    throw error;
+  }
+};
+
+export const updateReview = async (
+  data: ReviewMainContent,
+  reviewId: number,
+) => {
+  try {
+    const response = await fetch(`/api/review/update?reviewId=${reviewId}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const error: FetchError = new Error(errorData.message || '');
+      error.status = response.status;
+      throw error;
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    console.error('리뷰 수정 오류', error);
     throw error;
   }
 };

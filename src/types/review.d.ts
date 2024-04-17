@@ -6,13 +6,11 @@ export type ReviewOrderType =
   | '평점 높은순'
   | '평점 낮은순';
 
-export interface IReviewList {
+export interface IReviewList extends ReviewMainContent {
   id: number;
   lectureId: number;
   userId: number;
   reservationId: number;
-  stars: number;
-  description: string;
   user: {
     nickname: string;
     profileImage: null | string;
@@ -28,14 +26,12 @@ export interface IReviewResponse {
   totalItemCount: number;
 }
 
-export interface WriteReview {
+export interface WriteReview extends ReviewMainContent {
   id: number;
   lectureId: string;
   userId: string;
   reservationId: number;
   lectureTitle: string;
-  description: string;
-  stars: number;
   isLike: boolean;
   likeCount: number;
   startDateTime: string;
@@ -69,8 +65,11 @@ export interface SelectClassType {
   label: string;
 }
 
-export interface WriteReviewData {
+export interface WriteReviewData extends ReviewMainContent {
   classInfo: SelectClassType | null;
+}
+
+export interface ReviewMainContent {
   description: string;
   stars: number;
 }
@@ -94,13 +93,11 @@ export interface GetMyLecturersReviewsData {
   item: MyLecturersReviewsData[];
 }
 
-export interface MyLecturersReviewsData {
+export interface MyLecturersReviewsData extends ReviewMainContent {
   id: number;
   lectureId: number;
   userId: number;
   reservationId: number;
-  stars: number;
-  description: string;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -118,9 +115,7 @@ export interface MyLecturersReviewsData {
   };
 }
 
-export interface NewReviews {
+export interface NewReviews extends ReviewMainContent {
   lectureId: number;
   reservationId: number;
-  stars: number;
-  description: string;
 }

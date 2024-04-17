@@ -1,10 +1,14 @@
 'use client';
+import { useMutation } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { ButtonStyles } from '@/constants/constants';
 import { postReviewLikes, deleteReviewLikes } from '@/lib/apis/classApis';
+import { deleteReview, updateReview } from '@/lib/apis/reviewApis';
 import { useUserStore } from '@/store';
+import { reloadToast } from '@/utils/reloadMessage';
 import Review from './Review';
 import { CloseSVG, LikeSVG } from '../../../public/icons/svg';
 import Profile from '../Profile/ProfileImage';
@@ -67,6 +71,27 @@ const UserReview = ({
     router.push(link);
   };
 
+  const { mutate: deleteReviewMutate } = useMutation({
+    mutationFn: () => deleteReview(reviewId),
+    onSuccess: () => {
+      location.reload();
+      reloadToast('삭제가 완료 됐습니다.', 'success');
+    },
+    onError: () => {
+      toast.error('잠시후 다시 시도해주세요.');
+    },
+  });
+
+  const handleDeleteReview = () => {
+    if (
+      confirm(`해당 리뷰를 삭제하시겠습니까?
+            
+** 리뷰 제거 시 다시 재 작성이 불가합니다. **`)
+    ) {
+      deleteReviewMutate();
+    }
+  };
+
   const mine = userType === 'user' && authUser?.id === userId;
 
   return (
@@ -83,7 +108,7 @@ const UserReview = ({
         <div className="flex h-fit w-full flex-nowrap items-baseline justify-end whitespace-nowrap text-gray-500">
           <span className="gray-300">수강일 {date}</span>
           {mine ? (
-            <button className="my-auto ml-2">
+            <button className="my-auto ml-2" onClick={handleDeleteReview}>
               <CloseSVG className="size-[17px] stroke-gray-500 stroke-[3px]" />
             </button>
           ) : (
@@ -106,14 +131,6 @@ const UserReview = ({
             liked ? 'text-main-color' : 'text-gray-500'
           }`}
         >
-          {mine && (
-            <Link
-              href="/mypage/user/myclass/review/writeReviewModal"
-              className={`${ButtonStyles.secondary} mr-2 px-2`}
-            >
-              수정
-            </Link>
-          )}
           <button
             onClick={disabled ? undefined : handleLike}
             className={`${disabled && 'cursor-default'}`}

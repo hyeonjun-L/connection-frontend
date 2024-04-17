@@ -40,8 +40,6 @@ const MyReview = ({ initialData, classLists }: ReviewProps) => {
     queryFn: getWriteReviews,
   });
 
-  console.log(reviewList);
-
   const pageCount = Math.ceil(totalItemCount / REVIEW_TAKE);
 
   return (
