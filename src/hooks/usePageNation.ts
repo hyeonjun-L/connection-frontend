@@ -3,6 +3,26 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useChangeSearchParams from './useChangeSearchParams';
 import { FetchError, PagenationFilterState } from '@/types/types';
 
+/**
+ * usePageNation 훅은 React Query를 사용하여 페이지네이션과 필터링을 관리
+ * URL의 검색 파라미터와 동기화하여 사용자의 필터 상태를 관리하여 window history 이동에도 필터 상태 유지 가능 또한 페이지 상태를 쿼리 캐시 키와 함께 저장'
+ *
+ * @template T 확장된 ItemWithId 인터페이스를 가진 아이템 타입
+ * @param {PagenationFilterState} defaultFilterState - 기본 필터 값. reset이 true로 설정될 경우, 이 값으로 필터가 변경
+ * @param {string} queryType - 쿼리 캐시 키
+ * @param {(data: any, signal?: AbortSignal) => Promise<{ count: number; item: T[] }>} queryFn - 페이지네이션 아이템과 아이템의 총 개수(count)를 받아올 함수.
+ *  이 함수는 데이터와 선택적으로 AbortSignal을 매개변수로 받고, { count: number; item: T[] } 형태의 객체를 반환하는 Promise를 반환해야 함.
+ * @param {{ count: number; item: T[] }} initialData - SSR(Server-Side Rendering)에서 사전에 가져올 데이터. SSR에서 searchParams에 따라 initialData가 변경되어야 함.
+ * @param {number} staleTime - 캐시의 유효기간
+ *
+ * @return {T[]} items - 페이지네이션된 아이템 배열(T[])
+ * @return {number} totalItemCount - 페이지네이션 아이템의 총 개수
+ * @return {PagenationFilterState} filterState -  현재 페이지네이션 필터 값. 사용자가 설정한 필터 조건을 나타냄.
+ * @return {(filter: { [key: string]: any;}, reset?: boolean) => void} changeFilterState - 필터 상태를 변경하는 함수.
+ *  이 함수는 변경할 필터의 key와 value를 매개변수로 받고, 선택적으로 기본 필터 상태로 변경할지 여부를 결정하는 reset 매개변수를 가짐.
+ * @return {({ selected }: {selected: number;}) => void} changePage - 페이지를 변경하는 함수. 이 함수는 이동할 페이지 값을 매개변수로 받음.
+ */
+
 interface ItemWithId {
   id: number;
 }
