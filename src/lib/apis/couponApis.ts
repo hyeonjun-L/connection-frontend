@@ -1,6 +1,5 @@
 import createParams from '@/utils/createParams';
 import {
-  IcouponsData,
   IgetCouponLists,
   IgetFunction,
   createCouponData,
@@ -73,6 +72,9 @@ export const getCouponLists = async (
       count: resData.data.totalItemCount,
     };
   } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
     console.error('쿠폰 조회 오류', error);
     throw error;
   }

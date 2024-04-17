@@ -41,6 +41,9 @@ export const getIssuedPassLists = async (
       count: resData.data.totalItemCount,
     };
   } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
     console.error('발급한 패스권 조회 오류', error);
     throw error;
   }

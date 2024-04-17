@@ -251,6 +251,9 @@ export const getMyMembers = async (
       item,
     };
   } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
     console.error('회원 불러오기 에러', error);
     throw error;
   }
