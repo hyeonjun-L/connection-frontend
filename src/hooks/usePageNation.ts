@@ -115,6 +115,7 @@ const usePageNation = <T extends ItemWithId>({
         return initialData;
       }
     },
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
