@@ -192,7 +192,7 @@ const ProfileSection = async ({ id }: { id: string }) => {
             }}
             className="curriculum line-clamp-[18] peer-checked:line-clamp-none"
           />
-          <ReadMore labelName="강사소개 더보기" />
+          <ReadMore labelName="강사소개 더보기" id="introductionBtn" />
         </section>
         {/* 강사 경력 섹션 */}
         <section
@@ -204,7 +204,7 @@ const ProfileSection = async ({ id }: { id: string }) => {
             dangerouslySetInnerHTML={{ __html: sanitizeHtmlString(experience) }}
             className="curriculum line-clamp-[18] peer-checked:line-clamp-none"
           />
-          <ReadMore labelName="강사경력 더보기" />
+          <ReadMore labelName="강사경력 더보기" id="experienceBtn" />
         </section>
       </div>
     </>

@@ -36,7 +36,7 @@ const InstructorDetailPage = async ({
   params: { id: string };
 }) => {
   return (
-    <main className="mx-auto w-full">
+    <main className="mx-auto w-full overflow-x-hidden">
       <Suspense fallback={<ProfileSectionLoading />}>
         <ProfileSection id={id} />
       </Suspense>
@@ -50,7 +50,9 @@ const InstructorDetailPage = async ({
           <PassSection id={id} />
         </Suspense>
 
-        <ReviewSection stars={0} type="instructor" />
+        <div className="w-full px-4">
+          <ReviewSection stars={0} type="instructor" />
+        </div>
       </div>
     </main>
   );

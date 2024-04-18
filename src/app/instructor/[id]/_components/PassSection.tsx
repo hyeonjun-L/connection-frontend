@@ -34,7 +34,7 @@ const PassSection = async ({ id }: { id: string }) => {
             gap={32}
             mobileShowCurrentElement={false}
             itemStyle="w-72 sm:w-80"
-            carouselContainerStyle="flex h-full w-11/12 items-center overflow-hidden"
+            carouselContainerStyle="flex h-full w-full sm:w-11/12 items-center overflow-hidden"
           >
             {passLists.map((passInfo) => (
               <UserPass
