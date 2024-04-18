@@ -14,7 +14,7 @@ import {
   GetWriteReviewsData,
   RatingsData,
   ReservationDetails,
-  WriteReview,
+  IReviewList,
 } from '@/types/review';
 
 interface ReviewProps {
@@ -31,7 +31,7 @@ const MyReview = ({ initialData, classLists, ratingLists }: ReviewProps) => {
     isLoading,
     changeFilterState,
     changePage,
-  } = usePageNation<WriteReview>({
+  } = usePageNation<IReviewList>({
     initialData,
     defaultFilterState: {
       take: REVIEW_TAKE,

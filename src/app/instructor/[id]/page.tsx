@@ -51,7 +51,7 @@ const InstructorDetailPage = async ({
         </Suspense>
 
         <div className="w-full px-4">
-          <ReviewSection stars={0} type="instructor" />
+          <ReviewSection type="lecturers" targetId={id} />
         </div>
       </div>
     </main>

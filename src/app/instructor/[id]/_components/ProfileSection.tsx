@@ -85,7 +85,7 @@ const ProfileSection = async ({ id }: { id: string }) => {
             <div className="mb-4 mt-2 box-border flex h-4 gap-1 sm:pl-4">
               <Review average={stars} />
               <span className="text-sm font-bold text-gray-500">
-                ({reviewCount})
+                ({stars.toFixed(1)})
               </span>
             </div>
             {/* 강사 여러 정보 */}

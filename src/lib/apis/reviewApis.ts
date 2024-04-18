@@ -3,11 +3,10 @@ import {
   GetMyLecturersReviews,
   GetMyLecturersReviewsData,
   NewReviews,
-  WriteReview,
   ReviewOrderType,
   IReviewResponse,
   GetWriteReviewsData,
-  GetWriteReviews,
+  GetReviews,
   ReviewMainContent,
 } from '@/types/review';
 import { FetchError } from '@/types/types';
@@ -63,7 +62,7 @@ export const getInstructorReviews = async (
 };
 
 export const getWriteReviews = async (
-  data: GetWriteReviews,
+  data: GetReviews,
   signal?: AbortSignal,
 ): Promise<GetWriteReviewsData> => {
   try {

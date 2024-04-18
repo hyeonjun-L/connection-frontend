@@ -29,7 +29,7 @@ interface UserReviewProps {
   isLike: boolean;
   reviewId: number;
   link: string;
-  userId: string;
+  userId: number;
   noneShadow?: boolean;
 }
 
@@ -94,7 +94,7 @@ const UserReview = ({
     }
   };
 
-  const mine = userType === 'user' && authUser?.id === userId;
+  const mine = userType === 'user' && Number(authUser?.id) === userId;
   const disabled = userType === 'lecturer';
   const likeLoading = likeDeletePending || likePending;
 

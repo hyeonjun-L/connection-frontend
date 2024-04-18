@@ -24,21 +24,7 @@ export interface IReviewList extends ReviewMainContent {
 export interface IReviewResponse {
   reviews: IReviewList[];
   totalItemCount: number;
-}
-
-export interface WriteReview extends ReviewMainContent {
-  id: number;
-  lectureId: string;
-  userId: string;
-  reservationId: number;
-  lectureTitle: string;
-  isLike: boolean;
-  likeCount: number;
-  startDateTime: string;
-  user: {
-    nickname: string;
-    profileImage?: string;
-  };
+  totalStars: number;
 }
 
 export interface ReservationDetails {
@@ -80,13 +66,13 @@ export interface GetMyLecturersReviews extends PagenationFilterState {
   lectureId?: number;
 }
 
-export interface GetWriteReviews extends PagenationFilterState {
+export interface GetReviews extends PagenationFilterState {
   orderBy: string;
 }
 
 export interface GetWriteReviewsData {
   count: number;
-  item: WriteReview[];
+  item: IReviewList[];
 }
 
 export interface GetMyLecturersReviewsData {
@@ -97,7 +83,7 @@ export interface GetMyLecturersReviewsData {
 export interface MyLecturersReviewsData extends ReviewMainContent {
   id: number;
   lectureId: number;
-  userId: string;
+  userId: number;
   reservationId: number;
   createdAt: string;
   updatedAt: string;

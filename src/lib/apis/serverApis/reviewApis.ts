@@ -4,8 +4,9 @@ import { userType } from '@/types/auth';
 import {
   GetMyLecturersReviews,
   GetMyLecturersReviewsData,
-  GetWriteReviews,
+  GetReviews,
   GetWriteReviewsData,
+  IReviewResponse,
   RatingsData,
   ReservationDetails,
 } from '@/types/review';
@@ -14,7 +15,7 @@ import { FetchError } from '@/types/types';
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
 export const getWriteReviews = async (
-  data: GetWriteReviews,
+  data: GetReviews,
 ): Promise<GetWriteReviewsData> => {
   const cookieStore = cookies();
   const authorization = cookieStore.get('userAccessToken')?.value;
@@ -119,6 +120,7 @@ export const getRatings = async (
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${authorization}`,
+    'Content-Type': 'application/json',
   };
 
   const response = await fetch(
@@ -139,4 +141,38 @@ export const getRatings = async (
 
   const resData = await response.json();
   return resData.data.reviewRatings;
+};
+
+export const getReviews = async (
+  data: GetReviews,
+  targetId: string,
+  type: 'lectures' | 'lecturers',
+): Promise<IReviewResponse> => {
+  const params = createParams(data);
+  const cookieStore = cookies();
+  const authorization = cookieStore.get('userAccessToken')?.value;
+
+  const headers: Record<string, string> = {
+    Authorization: authorization ? `Bearer ${authorization}` : '',
+    'Content-Type': 'application/json',
+  };
+
+  const response = await fetch(
+    `${END_POINT}/lecture-reviews/lectureReviewId/${type}/${targetId}?${params}`,
+    {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    },
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
+  }
+
+  const resData = await response.json();
+  return resData.data;
 };

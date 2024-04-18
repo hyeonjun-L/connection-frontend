@@ -46,7 +46,6 @@ const ClassDetail = async ({ id }: { id: string }) => {
     location,
     maxCapacity,
     duration,
-    stars,
     lectureToRegion,
   } = classDetail;
 
@@ -193,7 +192,7 @@ const ClassDetail = async ({ id }: { id: string }) => {
         </section>
 
         {/* 클래스 후기 */}
-        <ReviewSection stars={stars} type="class" />
+        <ReviewSection type="lectures" targetId={id} />
       </section>
 
       {schedules && (
