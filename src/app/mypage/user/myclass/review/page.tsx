@@ -11,6 +11,7 @@ import {
   RatingsData,
   ReservationDetails,
 } from '@/types/review';
+import { FetchError } from '@/types/types';
 
 const page = async ({
   searchParams,
@@ -38,8 +39,13 @@ const page = async ({
     writeReviews = geyWriteReviews;
     reservationLists = getReservationLists;
   } catch (error) {
-    // redirect('/');
-    console.error(error);
+    if (error instanceof Error) {
+      const fetchError = error as FetchError;
+      if (fetchError.status === 400) {
+        redirect('/mypage/user/myclass/review');
+      }
+      console.error(error);
+    }
   }
 
   return (

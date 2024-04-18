@@ -85,6 +85,9 @@ export const getWriteReviews = async (
     const resData = await response.json();
     return { item: resData.data.reviews, count: resData.data.totalItemCount };
   } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
     console.error('내 보유 강의 조회 오류', error);
     throw error;
   }
@@ -202,6 +205,59 @@ export const updateReview = async (
     return responseData;
   } catch (error) {
     console.error('리뷰 수정 오류', error);
+    throw error;
+  }
+};
+
+export const postReviewLikes = async (id: number) => {
+  try {
+    const response = await fetch(`/api/post/review/likes/add?reviewId=${id}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const error: FetchError = new Error(errorData.message || '');
+      error.status = response.status;
+      throw error;
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    console.error('리뷰 좋아요 요청 오류', error);
+    throw error;
+  }
+};
+
+export const deleteReviewLikes = async (id: number) => {
+  try {
+    const response = await fetch(
+      `/api/post/review/likes/delete?reviewId=${id}`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const error: FetchError = new Error(errorData.message || '');
+      error.status = response.status;
+      throw error;
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    console.error('리뷰 좋아요 취소 요청 오류', error);
     throw error;
   }
 };

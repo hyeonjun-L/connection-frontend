@@ -1,12 +1,13 @@
 'use client';
 import { useMutation } from '@tanstack/react-query';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { ButtonStyles } from '@/constants/constants';
-import { postReviewLikes, deleteReviewLikes } from '@/lib/apis/classApis';
-import { deleteReview, updateReview } from '@/lib/apis/reviewApis';
+import {
+  deleteReview,
+  deleteReviewLikes,
+  postReviewLikes,
+} from '@/lib/apis/reviewApis';
 import { useUserStore } from '@/store';
 import { reloadToast } from '@/utils/reloadMessage';
 import Review from './Review';
@@ -23,7 +24,6 @@ interface UserReviewProps {
   count: number;
   isLike: boolean;
   reviewId: number;
-  disabled?: boolean;
   link: string;
   userId: string;
 }
@@ -38,7 +38,6 @@ const UserReview = ({
   count,
   isLike,
   reviewId,
-  disabled = false,
   link,
   userId,
 }: UserReviewProps) => {
@@ -50,22 +49,27 @@ const UserReview = ({
   const [likeCount, setLikeCount] = useState(count);
   const router = useRouter();
 
-  const style = liked
-    ? 'fill-main-color'
-    : 'fill-gray-500 hover:fill-main-color';
+  const { mutate: deleteReviewLikesMutate } = useMutation({
+    mutationFn: () => deleteReviewLikes(reviewId),
+    onSuccess: () => {
+      setLikeCount((prev) => prev - 1);
+      setLiked(false);
+    },
+    onError: () => {
+      toast.error('잠시후 다시 시도해주세요.');
+    },
+  });
 
-  const handleLike = async () => {
-    if (liked) {
-      await deleteReviewLikes(reviewId);
-      if (count > 0) {
-        setLikeCount((prev) => prev - 1);
-      }
-    } else {
-      await postReviewLikes(reviewId);
+  const { mutate: reviewLikesMutate } = useMutation({
+    mutationFn: () => postReviewLikes(reviewId),
+    onSuccess: () => {
       setLikeCount((prev) => prev + 1);
-    }
-    setLiked(!liked);
-  };
+      setLiked(true);
+    },
+    onError: () => {
+      toast.error('잠시후 다시 시도해주세요.');
+    },
+  });
 
   const handleReport = () => {
     router.push(link);
@@ -93,6 +97,7 @@ const UserReview = ({
   };
 
   const mine = userType === 'user' && authUser?.id === userId;
+  const disabled = userType !== 'user';
 
   return (
     <div className="w-full rounded-md border-b border-solid border-gray-700 bg-white text-sm shadow-vertical">
@@ -126,24 +131,31 @@ const UserReview = ({
       <p className="mb-2 px-[0.8rem] text-sm">{content}</p>
       <div className="flex items-center justify-between border-t border-solid border-gray-700 p-[0.8rem]">
         <p className="text-gray-300">{title}</p>
-        <p
-          className={`flex items-center gap-1.5 text-sm font-semibold ${
-            liked ? 'text-main-color' : 'text-gray-500'
+        <button
+          disabled={disabled}
+          onClick={() =>
+            liked ? deleteReviewLikesMutate() : reviewLikesMutate()
+          }
+          className={`group flex items-center gap-1.5 text-sm font-semibold ${
+            liked
+              ? 'text-main-color hover:text-gray-500'
+              : 'text-gray-500 hover:text-main-color'
           }`}
+          aria-label="리뷰 좋아요"
         >
-          <button
-            onClick={disabled ? undefined : handleLike}
-            className={`${disabled && 'cursor-default'}`}
-            aria-label="리뷰 좋아요"
-          >
-            <LikeSVG
-              width="15"
-              height="14"
-              className={disabled ? 'fill-gray-500' : style}
-            />
-          </button>
+          <LikeSVG
+            width="15"
+            height="14"
+            className={
+              disabled
+                ? 'fill-gray-500'
+                : liked
+                ? 'fill-main-color group-hover:fill-gray-500'
+                : 'fill-gray-500 group-hover:fill-main-color'
+            }
+          />
           {likeCount}
-        </p>
+        </button>
       </div>
     </div>
   );
