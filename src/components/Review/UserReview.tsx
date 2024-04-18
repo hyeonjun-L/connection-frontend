@@ -1,5 +1,6 @@
 'use client';
 import { useMutation } from '@tanstack/react-query';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -13,6 +14,10 @@ import { reloadToast } from '@/utils/reloadMessage';
 import Review from './Review';
 import { CloseSVG, LikeSVG } from '../../../public/icons/svg';
 import Profile from '../Profile/ProfileImage';
+
+const LikeAnimationSVG = dynamic(() => import('./LikeAnimationSVG'), {
+  ssr: false,
+});
 
 interface UserReviewProps {
   src?: string | null;
@@ -46,6 +51,7 @@ const UserReview = ({
     userType: state.userType,
   }));
   const [liked, setLiked] = useState(isLike);
+  const [likeLoading, setLikeLoading] = useState(false);
   const [likeCount, setLikeCount] = useState(count);
   const router = useRouter();
 
@@ -54,9 +60,13 @@ const UserReview = ({
     onSuccess: () => {
       setLikeCount((prev) => prev - 1);
       setLiked(false);
+      setLikeLoading(false);
     },
     onError: () => {
       toast.error('잠시후 다시 시도해주세요.');
+    },
+    onMutate: () => {
+      setLikeLoading(true);
     },
   });
 
@@ -65,9 +75,13 @@ const UserReview = ({
     onSuccess: () => {
       setLikeCount((prev) => prev + 1);
       setLiked(true);
+      setLikeLoading(false);
     },
     onError: () => {
       toast.error('잠시후 다시 시도해주세요.');
+    },
+    onMutate: () => {
+      setLikeLoading(true);
     },
   });
 
@@ -132,7 +146,7 @@ const UserReview = ({
       <div className="flex items-center justify-between border-t border-solid border-gray-700 p-[0.8rem]">
         <p className="text-gray-300">{title}</p>
         <button
-          disabled={disabled}
+          disabled={likeLoading || disabled}
           onClick={() =>
             liked ? deleteReviewLikesMutate() : reviewLikesMutate()
           }
@@ -143,17 +157,21 @@ const UserReview = ({
           }`}
           aria-label="리뷰 좋아요"
         >
-          <LikeSVG
-            width="15"
-            height="14"
-            className={
-              disabled
-                ? 'fill-gray-500'
-                : liked
-                ? 'fill-main-color group-hover:fill-gray-500'
-                : 'fill-gray-500 group-hover:fill-main-color'
-            }
-          />
+          {likeLoading ? (
+            <LikeAnimationSVG liked={liked} />
+          ) : (
+            <LikeSVG
+              width="15"
+              height="14"
+              className={
+                disabled
+                  ? 'fill-gray-500'
+                  : liked
+                  ? 'fill-main-color group-hover:fill-gray-500'
+                  : 'fill-gray-500 group-hover:fill-main-color'
+              }
+            />
+          )}
           {likeCount}
         </button>
       </div>
