@@ -117,11 +117,11 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
             {reviews.length > 0 ? (
               <ul className="flex flex-col">
                 {reviews.map(
-                  ({ id, stars, users, description, reservation }) => (
+                  ({ id, stars, user, userId, description, reservation }) => (
                     <Fragment key={id}>
                       <UserReview
-                        src={users.userProfileImage.imageUrl}
-                        nickname={users.nickname}
+                        src={user.profileImage}
+                        nickname={user.nickname}
                         average={stars}
                         date={formatDate(
                           reservation.lectureSchedule.startDateTime,
@@ -131,7 +131,7 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
                         isLike={false}
                         reviewId={id}
                         content={description}
-                        disabled={true}
+                        userId={userId}
                         link={`/report?lectureReviewId=${id}`}
                       />
                       <div className="h-1 bg-sub-color1-transparent" />
@@ -159,7 +159,7 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
           </div>
         </section>
         <section className="w-full self-start sm:w-56 md:w-72 lg:w-80">
-          <ReviewStatistics reviewList={initialData.item} />
+          {/* <ReviewStatistics reviewList={initialData.item} /> */}
         </section>
       </div>
     </main>

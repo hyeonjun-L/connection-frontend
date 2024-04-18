@@ -65,7 +65,10 @@ export const getReservationDetails = async (): Promise<
   );
 
   if (!response.ok) {
-    throw new Error(`작성가능한 예약 내역 불러오기: ${response.status}`);
+    const errorData = await response.json();
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
   }
 
   const resData = await response.json();
@@ -78,13 +81,7 @@ export const getMyLecturersReviews = async (
   const cookieStore = cookies();
   const authorization = cookieStore.get('lecturerAccessToken')?.value;
 
-  const params = new URLSearchParams();
-
-  Object.entries(data)
-    .filter(([_, v]) => v !== undefined)
-    .forEach(([k, v]) => {
-      params.append(k, String(v));
-    });
+  const params = createParams(data);
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${authorization}`,
@@ -103,11 +100,14 @@ export const getMyLecturersReviews = async (
   );
 
   if (!response.ok) {
-    throw new Error(`강사 내 리뷰 불러오기: ${response.status}`);
+    const errorData = await response.json();
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
   }
 
   const resData = await response.json();
-  return { count: resData.data.count, item: resData.data.review };
+  return { count: resData.data.count, item: resData.data.reviews };
 };
 
 export const getRatings = async (

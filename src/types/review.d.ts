@@ -96,7 +96,7 @@ export interface GetMyLecturersReviewsData {
 export interface MyLecturersReviewsData extends ReviewMainContent {
   id: number;
   lectureId: number;
-  userId: number;
+  userId: string;
   reservationId: number;
   createdAt: string;
   updatedAt: string;
@@ -107,12 +107,14 @@ export interface MyLecturersReviewsData extends ReviewMainContent {
       lecture: { title: string };
     };
   };
-  users: {
+  user: {
     nickname: string;
-    userProfileImage: {
-      imageUrl: string;
-    };
+    profileImage: string;
   };
+  lectureTitle: string;
+  startDateTime: string;
+  isLike: boolean;
+  likeCount: number;
 }
 
 export interface NewReviews extends ReviewMainContent {
