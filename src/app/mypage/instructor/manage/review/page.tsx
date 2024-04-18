@@ -1,10 +1,13 @@
 import { redirect } from 'next/navigation';
 import { REVIEW_TAKE } from '@/constants/constants';
 import { getMyLecture } from '@/lib/apis/serverApis/classApi';
-import { getMyLecturersReviews } from '@/lib/apis/serverApis/reviewApis';
+import {
+  getMyLecturersReviews,
+  getRatings,
+} from '@/lib/apis/serverApis/reviewApis';
 import MyReview from './_components/MyReview';
 import { OptionType } from '@/types/coupon';
-import { GetMyLecturersReviewsData } from '@/types/review';
+import { GetMyLecturersReviewsData, RatingsData } from '@/types/review';
 import { FetchError } from '@/types/types';
 
 const page = async ({
@@ -17,7 +20,7 @@ const page = async ({
   };
 }) => {
   const { orderBy, lecturerMyReviewType, lectureId } = searchParams;
-
+  let ratingLists: RatingsData[] = [];
   let myClassListsOption;
   const firstRender = {
     take: REVIEW_TAKE,
@@ -29,13 +32,16 @@ const page = async ({
   let resReview: GetMyLecturersReviewsData = { count: 0, item: [] };
 
   try {
-    const [responseReviews, resLectureLists] = await Promise.all([
-      getMyLecturersReviews(firstRender),
-      getMyLecture(),
-    ]);
+    const [responseReviews, resLectureLists, getRatingLists] =
+      await Promise.all([
+        getMyLecturersReviews(firstRender),
+        getMyLecture(),
+        getRatings('lecturer'),
+      ]);
     if (Array.isArray(responseReviews.item)) {
       resReview = responseReviews;
     }
+    ratingLists = getRatingLists;
 
     myClassListsOption = resLectureLists.map(
       ({ id, title }): OptionType => ({
@@ -63,6 +69,7 @@ const page = async ({
     <MyReview
       initialData={resReview}
       myClassListsOption={myClassListsOption ?? []}
+      ratingLists={ratingLists}
     />
   );
 };

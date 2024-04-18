@@ -11,14 +11,19 @@ import PaginationLoading from '@/components/Pagination/PaginationLoading';
 import { UserReview, ReviewStatistics } from '@/components/Review';
 import ReviewLoadingContainer from '@/components/Review/ReviewLoading';
 import { OptionType } from '@/types/coupon';
-import { MyLecturersReviewsData } from '@/types/review';
+import { MyLecturersReviewsData, RatingsData } from '@/types/review';
 
 interface MyReview {
   initialData: { count: number; item: MyLecturersReviewsData[] };
   myClassListsOption: OptionType[];
+  ratingLists: RatingsData[];
 }
 
-const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
+const MyReview = ({
+  initialData,
+  myClassListsOption,
+  ratingLists,
+}: MyReview) => {
   const {
     items: reviews,
     totalItemCount,
@@ -178,7 +183,7 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
           </div>
         </section>
         <section className="w-full self-start sm:w-56 md:w-72 lg:w-80">
-          {/* <ReviewStatistics reviewList={initialData.item} /> */}
+          <ReviewStatistics ratingLists={ratingLists} />
         </section>
       </div>
     </main>
