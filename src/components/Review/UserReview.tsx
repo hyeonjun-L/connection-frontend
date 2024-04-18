@@ -3,7 +3,6 @@ import { useMutation } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
 import {
   deleteReview,
   deleteReviewLikes,
@@ -53,31 +52,23 @@ const UserReview = ({
     userType: state.userType,
   }));
   const [liked, setLiked] = useState(isLike);
-  const [likeLoading, setLikeLoading] = useState(false);
   const [likeCount, setLikeCount] = useState(count);
   const router = useRouter();
 
-  const { mutate: deleteReviewLikesMutate } = useMutation({
-    mutationFn: () => deleteReviewLikes(reviewId),
-    onSuccess: () => {
-      setLikeCount((prev) => prev - 1);
-      setLiked(false);
-      setLikeLoading(false);
-    },
-    onMutate: () => {
-      setLikeLoading(true);
-    },
-  });
+  const { mutate: deleteReviewLikesMutate, isPending: likeDeletePending } =
+    useMutation({
+      mutationFn: () => deleteReviewLikes(reviewId),
+      onSuccess: () => {
+        setLikeCount((prev) => prev - 1);
+        setLiked(false);
+      },
+    });
 
-  const { mutate: reviewLikesMutate } = useMutation({
+  const { mutate: reviewLikesMutate, isPending: likePending } = useMutation({
     mutationFn: () => postReviewLikes(reviewId),
     onSuccess: () => {
       setLikeCount((prev) => prev + 1);
       setLiked(true);
-      setLikeLoading(false);
-    },
-    onMutate: () => {
-      setLikeLoading(true);
     },
   });
 
@@ -105,6 +96,7 @@ const UserReview = ({
 
   const mine = userType === 'user' && authUser?.id === userId;
   const disabled = userType === 'lecturer';
+  const likeLoading = likeDeletePending || likePending;
 
   return (
     <div

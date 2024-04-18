@@ -77,6 +77,7 @@ export interface ReviewMainContent {
 export interface GetMyLecturersReviews extends PagenationFilterState {
   lecturerMyReviewType: string;
   orderBy: string;
+  lectureId?: number;
 }
 
 export interface GetWriteReviews extends PagenationFilterState {
@@ -101,12 +102,7 @@ export interface MyLecturersReviewsData extends ReviewMainContent {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
-  reservation: {
-    lectureSchedule: {
-      startDateTime: string;
-      lecture: { title: string };
-    };
-  };
+  startDateTime: string;
   user: {
     nickname: string;
     profileImage: string;

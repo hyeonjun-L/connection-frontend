@@ -8,7 +8,6 @@ import {
   GetWriteReviewsData,
   RatingsData,
   ReservationDetails,
-  WriteReview,
 } from '@/types/review';
 import { FetchError } from '@/types/types';
 
@@ -107,7 +106,7 @@ export const getMyLecturersReviews = async (
   }
 
   const resData = await response.json();
-  return { count: resData.data.count, item: resData.data.reviews };
+  return { count: resData.data.totalItemCount, item: resData.data.reviews };
 };
 
 export const getRatings = async (

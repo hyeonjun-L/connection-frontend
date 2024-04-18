@@ -117,7 +117,7 @@ export const getMyLecturersReviews = async (
     }
 
     const resData = await response.json();
-    return { count: resData.data.count, item: resData.data.review };
+    return { count: resData.data.totalItemCount, item: resData.data.reviews };
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
       throw error;

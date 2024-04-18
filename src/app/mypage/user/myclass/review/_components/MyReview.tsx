@@ -63,7 +63,7 @@ const MyReview = ({ initialData, classLists, ratingLists }: ReviewProps) => {
                 <option value="평점 높은순">평점 높은순</option>
                 <option value="평점 낮은순">평점 낮은순</option>
               </select>
-              {/* {writeReviews.length}개의 리뷰 */}
+              {totalItemCount}개의 리뷰
             </div>
             <Link href="/mypage/user/myclass/review/writeReviewModal">
               <Button>
