@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import { reloadToast } from '@/utils/reloadMessage';
 import { accessTokenReissuance } from '../apis/userApi';
 import { FetchError } from '@/types/types';
@@ -21,14 +22,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
               await accessTokenReissuance();
               queryClient.invalidateQueries();
             } catch (error) {
-              reloadToast(
-                '세션이 만료되었습니다. 다시 로그인해주세요.',
-                'error',
-              );
+              reloadToast('로그인 후 이용할 수 있습니다.', 'error');
               console.error(error);
             }
             break;
           default:
+            toast.error('잠시후 다시 시도해주세요.');
             console.error(error);
             break;
         }

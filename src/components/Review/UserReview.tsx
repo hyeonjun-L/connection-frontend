@@ -31,6 +31,7 @@ interface UserReviewProps {
   reviewId: number;
   link: string;
   userId: string;
+  noneShadow?: boolean;
 }
 
 const UserReview = ({
@@ -45,6 +46,7 @@ const UserReview = ({
   reviewId,
   link,
   userId,
+  noneShadow,
 }: UserReviewProps) => {
   const { authUser, userType } = useUserStore((state) => ({
     authUser: state.authUser,
@@ -62,9 +64,6 @@ const UserReview = ({
       setLiked(false);
       setLikeLoading(false);
     },
-    onError: () => {
-      toast.error('잠시후 다시 시도해주세요.');
-    },
     onMutate: () => {
       setLikeLoading(true);
     },
@@ -76,9 +75,6 @@ const UserReview = ({
       setLikeCount((prev) => prev + 1);
       setLiked(true);
       setLikeLoading(false);
-    },
-    onError: () => {
-      toast.error('잠시후 다시 시도해주세요.');
     },
     onMutate: () => {
       setLikeLoading(true);
@@ -95,9 +91,6 @@ const UserReview = ({
       location.reload();
       reloadToast('삭제가 완료 됐습니다.', 'success');
     },
-    onError: () => {
-      toast.error('잠시후 다시 시도해주세요.');
-    },
   });
 
   const handleDeleteReview = () => {
@@ -111,10 +104,14 @@ const UserReview = ({
   };
 
   const mine = userType === 'user' && authUser?.id === userId;
-  const disabled = userType !== 'user';
+  const disabled = userType === 'lecturer';
 
   return (
-    <div className="w-full rounded-md border-b border-solid border-gray-700 bg-white text-sm shadow-vertical">
+    <div
+      className={`w-full rounded-md border-b border-solid border-gray-700 bg-white text-sm ${
+        noneShadow ? 'shadow-none' : 'shadow-vertical'
+      }`}
+    >
       <div className="flex w-full justify-between p-[0.8rem]">
         <div className="mr-1.5 flex w-[34px] items-center">
           <Profile size="small" nickname={nickname} src={src} label={false} />
@@ -151,7 +148,9 @@ const UserReview = ({
             liked ? deleteReviewLikesMutate() : reviewLikesMutate()
           }
           className={`group flex items-center gap-1.5 text-sm font-semibold ${
-            liked
+            disabled
+              ? 'text-gray-500'
+              : liked
               ? 'text-main-color hover:text-gray-500'
               : 'text-gray-500 hover:text-main-color'
           }`}
