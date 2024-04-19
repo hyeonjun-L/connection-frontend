@@ -4,6 +4,7 @@ import ClassSection from './_components/ClassSection';
 import ClassSectionLoading from './_components/loading/ClassSectionLoading';
 import PassSectionLoading from './_components/loading/PassSectionLoading';
 import ProfileSectionLoading from './_components/loading/ProfileSectionLoading';
+import ReviewSectionLoading from './_components/loading/ReviewSectionLoading';
 import PassSection from './_components/PassSection';
 import ProfileSection from './_components/ProfileSection';
 import ReviewSection from '@/components/uis/ReviewSection/ReviewSection';
@@ -50,9 +51,11 @@ const InstructorDetailPage = async ({
           <PassSection id={id} />
         </Suspense>
 
-        <div className="w-full px-4">
-          <ReviewSection type="lecturers" targetId={id} />
-        </div>
+        <Suspense fallback={<ReviewSectionLoading />}>
+          <div className="w-full px-4">
+            <ReviewSection type="lecturers" targetId={id} />
+          </div>
+        </Suspense>
       </div>
     </main>
   );
