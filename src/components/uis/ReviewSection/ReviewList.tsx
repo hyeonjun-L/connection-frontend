@@ -1,6 +1,7 @@
 'use client';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useClickAway } from 'react-use';
 import { REVIEW_SECTION_TAKE } from '@/constants/constants';
 import { ArrowUpSVG, StarSVG } from '@/icons/svg';
 import { getReviews } from '@/lib/apis/reviewApis';
@@ -26,6 +27,11 @@ const ReviewList = ({
 }: ReviewListProps) => {
   const [isListOpened, setIsListOpened] = useState(false);
   const [orderBy, setOrderBy] = useState<ReviewOrderType>(defaultOrderBy);
+  const dropDownRef = useRef(null);
+
+  useClickAway(dropDownRef, () => {
+    setIsListOpened(false);
+  });
 
   const changeOrderBy = (listValue: ReviewOrderType) => {
     setOrderBy(listValue);
@@ -93,6 +99,7 @@ const ReviewList = ({
         </h2>
 
         <button
+          ref={dropDownRef}
           onClick={() => setIsListOpened((prev) => !prev)}
           className="flex items-center gap-2 text-sm font-medium"
           aria-label="리뷰 정렬"

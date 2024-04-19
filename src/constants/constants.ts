@@ -392,7 +392,7 @@ export const REGIONS_SELECT_MAX = 30;
 
 export const DEFAULT_REVIEW_COUNT = 3;
 
-export const REVIEW_SECTION_TAKE = 1 as const;
+export const REVIEW_SECTION_TAKE = 5 as const;
 
 export const INITIAL_SCHEDULE_PROGRESS = [
   {
