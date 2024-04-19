@@ -6,7 +6,7 @@ import PassSectionLoading from './_components/loading/PassSectionLoading';
 import ProfileSectionLoading from './_components/loading/ProfileSectionLoading';
 import PassSection from './_components/PassSection';
 import ProfileSection from './_components/ProfileSection';
-import ReviewSection from '@/components/uis/ReviewSection';
+import ReviewSection from '@/components/uis/ReviewSection/ReviewSection';
 import type { Metadata } from 'next';
 
 export const generateMetadata = async ({

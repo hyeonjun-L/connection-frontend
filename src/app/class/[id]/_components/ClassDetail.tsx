@@ -22,7 +22,7 @@ import Nav from '@/components/Nav/Nav';
 import ProfileImage from '@/components/Profile/ProfileImage';
 import RegularScheduleView from '@/components/ScheduleView/RegularScheduleView';
 import ScheduleView from '@/components/ScheduleView/ScheduleView';
-import ReviewSection from '@/components/uis/ReviewSection';
+import ReviewSection from '@/components/uis/ReviewSection/ReviewSection';
 
 const ClassDetail = async ({ id }: { id: string }) => {
   const classDetailData = getClassDetail(id);

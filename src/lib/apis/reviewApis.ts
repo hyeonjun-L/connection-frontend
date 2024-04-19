@@ -37,7 +37,7 @@ export const getReviews = async (
     if (error instanceof DOMException && error.name === 'AbortError') {
       throw error;
     }
-    console.error('클래스 리뷰 목록 조회 오류', error);
+    console.error('리뷰 목록 조회 오류', error);
     throw error;
   }
 };

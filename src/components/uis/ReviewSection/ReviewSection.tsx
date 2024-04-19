@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation';
 import { REVIEW_SECTION_TAKE } from '@/constants/constants';
 import { getReviews } from '@/lib/apis/serverApis/reviewApis';
-import ReviewList from './ReviewSection/ReviewList';
-import { IReviewResponse } from '@/types/review';
+import ReviewList from './ReviewList';
+import { IReviewResponse, ReviewOrderType } from '@/types/review';
 
 interface ReviewSectionProps {
   type: 'lectures' | 'lecturers';
@@ -35,7 +35,14 @@ const ReviewSection = async ({
     return <div>리뷰 조회 에러</div>; // 변경
   }
 
-  return <ReviewList type={type} targetId={targetId} initalData={reviews} />;
+  return (
+    <ReviewList
+      type={type}
+      targetId={targetId}
+      initalData={reviews}
+      orderBy={filterOption.orderBy as ReviewOrderType}
+    />
+  );
 };
 
 export default ReviewSection;

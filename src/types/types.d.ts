@@ -125,13 +125,16 @@ export interface FetchError extends Error {
   status?: number;
 }
 
-export interface PagenationFilterState {
+export interface PagenationFilterState extends PageNavigationState {
   take: number | undefined;
+  [key: string]: any | undefined;
+}
+
+export interface PageNavigationState {
   firstItemId?: number;
   lastItemId?: number;
   currentPage?: number;
   targetPage?: number;
-  [key: string]: any | undefined;
 }
 
 export type TimeOfDay = 'MORNING' | 'AFTERNOON' | 'NIGHT' | 'DAWN';

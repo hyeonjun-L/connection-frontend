@@ -1,150 +1,81 @@
 'use client';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import {
-  useParams,
-  useRouter,
-  usePathname,
-  useSearchParams,
-} from 'next/navigation';
-import { useState, useRef, Fragment } from 'react';
-import { useClickAway } from 'react-use';
-import {
-  DEFAULT_REVIEW_COUNT,
-  FETCH_REVIEW_COUNT,
-} from '@/constants/constants';
-import { StarSVG, ArrowUpSVG } from '@/icons/svg';
-import { getClassReviews, getInstructorReviews } from '@/lib/apis/reviewApis';
+import { Fragment, useState } from 'react';
+import { REVIEW_SECTION_TAKE } from '@/constants/constants';
+import { ArrowUpSVG, StarSVG } from '@/icons/svg';
+import { getReviews } from '@/lib/apis/reviewApis';
 import { formatShortDate } from '@/utils/dateTimeUtils';
 import SortDropdown from '@/components/Dropdown/SortDropdown';
 import { Review, UserReview } from '@/components/Review';
 import Spinner from '@/components/Spinner/Spinner';
 import { IReviewResponse, ReviewOrderType } from '@/types/review';
+import { PageNavigationState } from '@/types/types';
 
 interface ReviewListProps {
   type: 'lectures' | 'lecturers';
   targetId: string;
   initalData: IReviewResponse;
+  orderBy: ReviewOrderType;
 }
 
-const ReviewList = ({ type }: ReviewListProps) => {
+const ReviewList = ({
+  type,
+  targetId,
+  initalData,
+  orderBy: defaultOrderBy,
+}: ReviewListProps) => {
   const [isListOpened, setIsListOpened] = useState(false);
+  const [orderBy, setOrderBy] = useState<ReviewOrderType>(defaultOrderBy);
 
-  const modalRef = useRef(null);
-  const pathname = usePathname();
-  const router = useRouter();
+  const changeOrderBy = (listValue: ReviewOrderType) => {
+    setOrderBy(listValue);
+  };
 
-  const searchParams = useSearchParams();
-  const sort = searchParams.get('sort') || '최신순';
-  const page = Number(searchParams.get('page') || 0);
-  const firstId = Number(searchParams.get('firstId') || 0);
-  const lastId = Number(searchParams.get('lastId') || 0);
-  const nextQueryRef = useRef({
-    sort,
-    page,
-    firstId,
-    lastId,
-  });
-
-  const selectedOption = decodeURIComponent(
-    sort || '최신순',
-  ) as ReviewOrderType;
-
-  const fetchReviewList = async () => {
-    const prevQuery = {
-      sort,
-      page,
-      firstId,
-      lastId,
-    };
-
-    const reviewCount = 1;
-
-    const fetchReviews = async (type: 'class' | 'instructor') => {
-      return await (type === 'class' ? getClassReviews : getInstructorReviews)(
-        id,
-        reviewCount,
-        page,
-        page + 1,
-        firstId,
-        lastId,
-        selectedOption,
-      );
-    };
-
-    const reviews = await fetchReviews(type);
-
-    if (reviews.totalItemCount) {
-      const nextQuery = {
-        ...prevQuery,
-        page: page + 1,
-        firstId: reviews.reviews[0].id,
-        lastId: reviews.reviews[reviews.reviews.length - 1].id,
-      };
-
-      nextQueryRef.current = nextQuery;
-    }
-
-    handleSearchParams(prevQuery);
-
-    return reviews;
+  const fetchReviews = async ({
+    pageParam,
+  }: {
+    pageParam: PageNavigationState | undefined;
+  }) => {
+    return await getReviews({
+      take: REVIEW_SECTION_TAKE,
+      orderBy,
+      type,
+      targetId,
+      ...pageParam,
+    });
   };
 
   const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: [type, id, selectedOption],
-      queryFn: fetchReviewList,
-      initialPageParam: 0,
-      getNextPageParam: (lastPage, pages) => {
-        const totalReviewsCount = pages.reduce(
-          (acc, item) => acc + item.reviews.length,
-          0,
-        );
-        if (totalReviewsCount < lastPage.totalItemCount) {
-          return pages.length + 1;
-        } else {
-          return undefined;
-        }
+      queryKey: ['reviews', type, targetId, orderBy],
+      queryFn: fetchReviews,
+      initialPageParam: undefined,
+      initialData: () => {
+        return {
+          pages: [initalData],
+          pageParams: [undefined],
+        };
+      },
+      getNextPageParam: (lastPage, allpages) => {
+        const currentPage = allpages.length;
+
+        return Math.ceil(lastPage.totalItemCount / REVIEW_SECTION_TAKE) >
+          currentPage
+          ? {
+              currentPage,
+              targetPage: currentPage + 1,
+              firstItemId: lastPage.reviews[0]?.id,
+              lastItemId: lastPage.reviews.at(-1)?.id,
+            }
+          : undefined;
       },
     });
 
-  console.log(data);
-
-  useClickAway(modalRef, () => {
-    setIsListOpened(false);
-  });
-
-  const onClickList = (listValue: ReviewOrderType) => {
-    const queryObj = {
-      sort: listValue,
-      page: 0,
-      firstId: 0,
-      lastId: 0,
-    };
-
-    handleSearchParams(queryObj);
-    setIsListOpened(false);
-  };
-
-  const handleSearchParams = (params: { [key: string]: string | number }) => {
-    const currentParams = new URLSearchParams(window.location.search);
-    for (const key in params) {
-      currentParams.set(key, String(params[key]));
-    }
-
-    router.replace(`${pathname}?${currentParams.toString()}`, {
-      scroll: false,
-    });
-  };
-
   return (
-    <section
-      id="review-section"
-      ref={modalRef}
-      className="relative mb-20 w-full scroll-mt-16"
-    >
+    <section id="review-section" className="relative mb-20 w-full scroll-mt-16">
       <div className="mb-4 flex w-full items-center justify-between">
         <h2 className="flex items-center scroll-smooth text-lg font-bold">
-          {type === 'class' ? '클래스' : '강사'} 후기{' '}
+          {type === 'lectures' ? '클래스' : '강사'} 후기
           {data?.pages[0].totalItemCount || 0}건
           <div className="ml-3 hidden md:block">
             <Review average={data?.pages[0].totalStars ?? 0} />
@@ -164,7 +95,7 @@ const ReviewList = ({ type }: ReviewListProps) => {
           className="flex items-center gap-2 text-sm font-medium"
           aria-label="리뷰 정렬"
         >
-          {selectedOption}
+          {orderBy}
           <ArrowUpSVG
             width="27"
             height="27"
@@ -174,10 +105,7 @@ const ReviewList = ({ type }: ReviewListProps) => {
           />
         </button>
         {isListOpened && (
-          <SortDropdown
-            selectedOption={selectedOption}
-            onClickList={onClickList}
-          />
+          <SortDropdown selectedOption={orderBy} onClickList={changeOrderBy} />
         )}
       </div>
 
