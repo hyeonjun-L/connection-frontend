@@ -11,54 +11,35 @@ import {
 } from '@/types/review';
 import { FetchError } from '@/types/types';
 
-export const getClassReviews = async (
-  lectureId: string,
-  displayCount: number,
-  currentPage: number,
-  targetPage: number,
-  firstItemId: number,
-  lastItemId: number,
-  orderBy: ReviewOrderType,
+export const getReviews = async (
+  data: GetReviews,
 ): Promise<IReviewResponse> => {
-  const query = `lectureId=${lectureId}&take=${displayCount}&currentPage=${currentPage}&targetPage=${targetPage}&firstItemId=${firstItemId}&lastItemId=${lastItemId}&orderBy=${orderBy}`;
+  try {
+    const params = createParams(data);
 
-  const response = await fetch(`/api/post/review/class?${query}`, {
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+    const response = await fetch(`/api/review/get?${params}`, {
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-  if (!response.ok) throw new Error('클래스 리뷰 목록 조회 오류!');
+    if (!response.ok) {
+      const errorData = await response.json();
+      const error: FetchError = new Error(errorData.message || '');
+      error.status = response.status;
+      throw error;
+    }
 
-  const { data } = await response.json();
-
-  return data;
-};
-
-export const getInstructorReviews = async (
-  lecturerId: string,
-  displayCount: number,
-  currentPage: number,
-  targetPage: number,
-  firstItemId: number,
-  lastItemId: number,
-  orderBy: ReviewOrderType,
-): Promise<IReviewResponse> => {
-  const query = `lecturerId=${lecturerId}&take=${displayCount}&currentPage=${currentPage}&targetPage=${targetPage}&firstItemId=${firstItemId}&lastItemId=${lastItemId}&orderBy=${orderBy}`;
-
-  const response = await fetch(`/api/post/review/instructor?${query}`, {
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) throw new Error('강사 리뷰 조회 요청 오류!');
-
-  const { data } = await response.json();
-
-  return data;
+    const resData = await response.json();
+    return resData.data;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
+    console.error('클래스 리뷰 목록 조회 오류', error);
+    throw error;
+  }
 };
 
 export const getWriteReviews = async (
