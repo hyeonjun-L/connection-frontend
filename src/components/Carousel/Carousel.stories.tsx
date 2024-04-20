@@ -1,11 +1,12 @@
+import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
-import Carousel from './Carousel';
-import ClassCard from '../ClassPreview/ClassPreview';
+import CarouselContainer from './CarouselContainer';
 import type { StoryObj, Meta } from '@storybook/react';
 
-const meta: Meta<typeof Carousel> = {
+const meta: Meta<typeof CarouselContainer> = {
   title: 'Components/Carousel',
-  component: Carousel,
+  component: CarouselContainer,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -78,18 +79,15 @@ const meta: Meta<typeof Carousel> = {
     priority: 1,
     carouselMoveIntervalTime: 2000,
     arrowPushMoveWaitTime: 2000,
+    itemStyle: 'relative h-80 w-80 overflow-hidden',
   },
 };
 
 export default meta;
-type Story = StoryObj<typeof Carousel>;
+type Story = StoryObj<typeof CarouselContainer>;
 
 export const 기본: Story = {
-  render: (args) => (
-    <div className="relative h-80 w-80 overflow-hidden">
-      <Carousel {...args} />
-    </div>
-  ),
+  render: (args) => <CarouselContainer {...args} />,
 };
 
 export function Focus동작() {
@@ -104,12 +102,8 @@ export function Focus동작() {
   };
 
   return (
-    <div
-      className="relative h-80 w-80 overflow-hidden"
-      onMouseLeave={offFocus}
-      onMouseOver={onFocus}
-    >
-      <Carousel
+    <div onMouseLeave={offFocus} onMouseOver={onFocus}>
+      <CarouselContainer
         imgURL={[
           'https://img.freepik.com/free-photo/pretty-woman-practising-hip-hop-dance_107420-85008.jpg?size=626&ext=jpg',
           'https://img.freepik.com/free-photo/girl-dancing-hip-hop-in-stylish-clothes-on-gradient-background-at-dance-hall-in-neon-light_155003-9249.jpg?size=626&ext=jpg',
@@ -120,6 +114,7 @@ export function Focus동작() {
         move={focus}
         arrow={focus}
         showCurrentElement={focus}
+        itemStyle="relative h-80 w-80 overflow-hidden"
       />
     </div>
   );
@@ -127,35 +122,24 @@ export function Focus동작() {
 
 export const 여러요소표시: Story = {
   render: ({ imgURL }) => (
-    <div className="relative w-full overflow-hidden">
-      <div className="h-80 w-1/3">
-        {imgURL && (
-          <Carousel imgURL={imgURL} move={true} priority={imgURL?.length} />
-        )}
-      </div>
+    <div className="h-80 w-[70vw]">
+      {imgURL && (
+        <CarouselContainer
+          imgURL={imgURL}
+          move={true}
+          priority={imgURL?.length}
+          itemStyle="h-full w-1/3"
+          carouselContainerStyle="relative size-full overflow-hidden"
+        />
+      )}
     </div>
   ),
 };
 
-const classCardData = [
+const list = [
   {
     id: 1,
-    status: '모집중' as const,
-    date: '08/04~09/25',
-    title: '가비쌤과 함께하는 왁킹 클래스',
-    location: ['서울 마포구'],
-    genre: ['락킹', '락킹'],
-    type: '개인레슨',
-    time: ['오전', '오후'],
-    review: { average: 4.5, count: 14 },
-    price: 80000,
-    isLiked: true,
-    profile: { src: null, nickname: 'nickname', id: 1 },
-    selectedDates: [
-      new Date(2023, 8, 4),
-      new Date(2023, 8, 6),
-      new Date(2023, 8, 8),
-    ],
+    nickname: '홍길동',
     imgURL: [
       'https://img.freepik.com/free-photo/pretty-woman-practising-hip-hop-dance_107420-85008.jpg?size=626&ext=jpg',
       'https://img.freepik.com/free-photo/girl-dancing-hip-hop-in-stylish-clothes-on-gradient-background-at-dance-hall-in-neon-light_155003-9249.jpg?size=626&ext=jpg',
@@ -166,18 +150,7 @@ const classCardData = [
   },
   {
     id: 2,
-    status: '모집중' as const,
-    date: '08/04~09/25',
-    title: '가비쌤과 함께하는 왁킹 클래스',
-    location: ['서울 마포구', '서울 동작구'],
-    genre: ['락킹', '락킹'],
-    type: '개인레슨',
-    isLiked: false,
-    time: ['오전'],
-    review: { average: 4.5, count: 14 },
-    price: 80000,
-    profile: { src: null, nickname: 'nickname', id: 1 },
-    selectedDates: [new Date()],
+    nickname: '고길동',
     imgURL: [
       'https://img.freepik.com/free-photo/pretty-woman-practising-hip-hop-dance_107420-85008.jpg?size=626&ext=jpg',
       'https://img.freepik.com/free-photo/girl-dancing-hip-hop-in-stylish-clothes-on-gradient-background-at-dance-hall-in-neon-light_155003-9249.jpg?size=626&ext=jpg',
@@ -188,18 +161,7 @@ const classCardData = [
   },
   {
     id: 3,
-    status: '마감' as const,
-    date: '08/04~09/25',
-    title: '가비쌤과 함께하는 왁킹 클래스',
-    location: ['서울 마포구', '서울 성동구'],
-    genre: ['락킹'],
-    type: '개인레슨',
-    time: ['오전'],
-    isLiked: false,
-    review: { average: 4, count: 12 },
-    price: 80000,
-    profile: { src: null, nickname: 'nickname', id: 1 },
-    selectedDates: [new Date()],
+    nickname: '이길동',
     imgURL: [
       'https://img.freepik.com/free-photo/pretty-woman-practising-hip-hop-dance_107420-85008.jpg?size=626&ext=jpg',
       'https://img.freepik.com/free-photo/girl-dancing-hip-hop-in-stylish-clothes-on-gradient-background-at-dance-hall-in-neon-light_155003-9249.jpg?size=626&ext=jpg',
@@ -210,7 +172,7 @@ const classCardData = [
   },
 ];
 
-export function ClassCard사용() {
+export function Children사용() {
   const [focus, setFocus] = useState(false);
 
   const onFocus = () => {
@@ -221,28 +183,47 @@ export function ClassCard사용() {
     setFocus(false);
   };
 
+  const repeatCount = Math.ceil(6 / list.length);
+
+  const InstructorList = Array(repeatCount).fill(list).flat().slice(0, 6);
+
   return (
-    <div className="relative flex h-80 w-full justify-center ">
-      <div className="flex h-full w-11/12 items-center overflow-hidden">
-        <div
-          className="w-[30rem]"
-          onMouseOver={onFocus}
-          onMouseLeave={offFocus}
-        >
-          <Carousel
-            move={true}
-            showCurrentElement={false}
-            carouselMoveIntervalTime={3000}
-            priority={3}
-            gap={2}
-            movePause={focus}
+    <div className="relative w-[70vw] bg-black px-4 py-3">
+      <CarouselContainer
+        move={true}
+        priority={6}
+        gap={16}
+        mobileShowCurrentElement={false}
+        showCurrentElement={false}
+        movePause={focus}
+        itemStyle="h-[9.375rem] w-[9.25rem]"
+        carouselContainerStyle="overflow-hidden w-full"
+      >
+        {InstructorList.map(({ id, imgURL, nickname }, index) => (
+          <div
+            key={imgURL[0] + index}
+            onMouseOver={onFocus}
+            onMouseLeave={offFocus}
+            className="size-full overflow-hidden rounded-md"
           >
-            {classCardData.map((state, index) => (
-              <ClassCard key={index} {...state} />
-            ))}
-          </Carousel>
-        </div>
-      </div>
+            <Link href={`/instructor/${id}`} className="flex h-full flex-col">
+              <div className="relative flex-grow">
+                <Image
+                  src={imgURL[0]}
+                  alt="Connection 댄스 춤 이미지"
+                  fill
+                  sizes="(max-width: 720px) 60vw, (max-width: 1440px) 30vw"
+                  style={{ objectFit: 'cover' }}
+                  priority={true}
+                />
+              </div>
+              <div className="flex h-6 items-center justify-center truncate bg-white text-sm lg:h-8 lg:text-base lg:font-bold">
+                {nickname}
+              </div>
+            </Link>
+          </div>
+        ))}
+      </CarouselContainer>
     </div>
   );
 }

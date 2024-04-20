@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import Carousel from './Carousel';
+import CarouselContainer from './CarouselContainer';
 
 describe('Carousel', () => {
   const mockImgURL = [
@@ -11,12 +11,12 @@ describe('Carousel', () => {
   ];
 
   it('focus 전용일때 캐러셀 렌더', () => {
-    render(<Carousel move={false} imgURL={mockImgURL} priority={1} />);
+    render(<CarouselContainer move={false} imgURL={mockImgURL} priority={1} />);
     expect(screen.getAllByRole('img')).toHaveLength(1);
   });
 
   it('move auto로 움직일때 캐러셀 렌더', () => {
-    render(<Carousel move={true} imgURL={mockImgURL} priority={2} />);
+    render(<CarouselContainer move={true} imgURL={mockImgURL} priority={2} />);
     expect(screen.getAllByRole('img')).toHaveLength(7);
   });
 });

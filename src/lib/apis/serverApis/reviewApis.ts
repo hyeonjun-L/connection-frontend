@@ -1,25 +1,32 @@
 import { cookies } from 'next/headers';
+import createParams from '@/utils/createParams';
+import { userType } from '@/types/auth';
 import {
   GetMyLecturersReviews,
   GetMyLecturersReviewsData,
+  GetReviews,
+  GetWriteReviewsData,
+  IReviewResponse,
+  RatingsData,
   ReservationDetails,
-  WriteReview,
 } from '@/types/review';
+import { FetchError } from '@/types/types';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
 export const getWriteReviews = async (
-  orderBy: string,
-): Promise<WriteReview[]> => {
+  data: GetReviews,
+): Promise<GetWriteReviewsData> => {
   const cookieStore = cookies();
   const authorization = cookieStore.get('userAccessToken')?.value;
+  const params = createParams(data);
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${authorization}`,
   };
 
   const response = await fetch(
-    END_POINT + `/lecture-reviews/my-reviews/users?orderBy=${orderBy}`,
+    END_POINT + `/lecture-reviews/lectureReviewId/my-reviews/users?${params}`,
     {
       method: 'GET',
       credentials: 'include',
@@ -28,11 +35,14 @@ export const getWriteReviews = async (
   );
 
   if (!response.ok) {
-    throw new Error(`작성한 리뷰 목록 불러오기: ${response.status}`);
+    const errorData = await response.json();
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
   }
 
   const resData = await response.json();
-  return resData.data.review;
+  return { item: resData.data.reviews, count: resData.data.totalItemCount };
 };
 
 export const getReservationDetails = async (): Promise<
@@ -45,14 +55,20 @@ export const getReservationDetails = async (): Promise<
     Authorization: `Bearer ${authorization}`,
   };
 
-  const response = await fetch(END_POINT + '/lecture-reviews/reservations', {
-    method: 'GET',
-    credentials: 'include',
-    headers,
-  });
+  const response = await fetch(
+    END_POINT + '/lecture-reviews/lectureReviewId/reservations',
+    {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    },
+  );
 
   if (!response.ok) {
-    throw new Error(`작성가능한 예약 내역 불러오기: ${response.status}`);
+    const errorData = await response.json();
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
   }
 
   const resData = await response.json();
@@ -65,13 +81,7 @@ export const getMyLecturersReviews = async (
   const cookieStore = cookies();
   const authorization = cookieStore.get('lecturerAccessToken')?.value;
 
-  const params = new URLSearchParams();
-
-  Object.entries(data)
-    .filter(([_, v]) => v !== undefined)
-    .forEach(([k, v]) => {
-      params.append(k, String(v));
-    });
+  const params = createParams(data);
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${authorization}`,
@@ -79,7 +89,8 @@ export const getMyLecturersReviews = async (
   };
 
   const response = await fetch(
-    END_POINT + `/lecture-reviews/my-reviews/lecturers?${params}`,
+    END_POINT +
+      `/lecture-reviews/lectureReviewId/my-reviews/lecturers?${params}`,
     {
       cache: 'no-store',
       method: 'GET',
@@ -89,9 +100,79 @@ export const getMyLecturersReviews = async (
   );
 
   if (!response.ok) {
-    throw new Error(`강사 내 리뷰 불러오기: ${response.status}`);
+    const errorData = await response.json();
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
   }
 
   const resData = await response.json();
-  return { count: resData.data.count, item: resData.data.review };
+  return { count: resData.data.totalItemCount, item: resData.data.reviews };
+};
+
+export const getRatings = async (
+  userType: userType,
+): Promise<RatingsData[]> => {
+  const cookieStore = cookies();
+  const authorization = cookieStore.get(
+    userType === 'user' ? 'userAccessToken' : 'lecturerAccessToken',
+  )?.value;
+
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${authorization}`,
+    'Content-Type': 'application/json',
+  };
+
+  const response = await fetch(
+    `${END_POINT}/lecture-reviews/lectureReviewId/ratings`,
+    {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    },
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
+  }
+
+  const resData = await response.json();
+  return resData.data.reviewRatings;
+};
+
+export const getReviews = async (
+  data: GetReviews,
+  targetId: string,
+  type: 'lectures' | 'lecturers',
+): Promise<IReviewResponse> => {
+  const params = createParams(data);
+  const cookieStore = cookies();
+  const authorization = cookieStore.get('userAccessToken')?.value;
+
+  const headers: Record<string, string> = {
+    Authorization: authorization ? `Bearer ${authorization}` : '',
+    'Content-Type': 'application/json',
+  };
+
+  const response = await fetch(
+    `${END_POINT}/lecture-reviews/lectureReviewId/${type}/${targetId}?${params}`,
+    {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    },
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
+  }
+
+  const resData = await response.json();
+  return resData.data;
 };

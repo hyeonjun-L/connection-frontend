@@ -28,7 +28,7 @@ export const POST = async (request: NextRequest) => {
     'Content-Type': 'application/json',
   };
 
-  const response = await fetch(END_POINT + '/lecture-reviews', {
+  const response = await fetch(END_POINT + '/lecture-reviews/lectureReviewId', {
     method: 'POST',
     credentials: 'include',
     headers,

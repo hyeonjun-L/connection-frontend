@@ -1,3 +1,5 @@
+import { PagenationFilterState } from '@/types/types';
+
 interface ValidityPeriod {
   startDate: string;
   endDate: string;
@@ -85,6 +87,11 @@ export interface IprivateCoupon {
   lectureCouponTarget: lectureCouponTarget[];
 }
 
+export interface IgetCouponLists {
+  count: number;
+  item: couponGET[];
+}
+
 export interface IcouponsData {
   totalItemCount: number;
   itemList?: couponGET[];
@@ -150,22 +157,35 @@ export interface createCouponData extends baseCouponData {
 
 export interface updateCouponData extends baseCouponData {}
 
-export interface IgetFunction {
-  take: number | undefined;
-  currentPage?: number;
-  targetPage?: number;
-  firstItemId?: number;
-  lastItemId?: number;
-  passStatusOptions?: 'AVAILABLE' | 'DISABLED' | 'USED' | 'EXPIRED';
-  couponStatusOption?: 'AVAILABLE' | 'DISABLED' | 'USED' | 'EXPIRED';
-  filterOption: 'LATEST' | 'UPCOMING' | 'HIGHEST_PRICE' | 'BEST_SELLING';
+export type StatusOptionType = 'AVAILABLE' | 'DISABLED';
+
+export type passStatusOptionType = 'USED' | 'EXPIRED';
+
+export type FilterOption =
+  | 'LATEST'
+  | 'UPCOMING'
+  | 'HIGHEST_PRICE'
+  | 'BEST_SELLING';
+
+export interface ISearchParams {
+  take?: number;
+  couponStatusOption?: StatusOptionType;
+  passStatusOptions?: StatusOptionType;
+  filterOption?: FilterOption;
+  lectureId?: number;
+}
+
+export interface IgetFunction extends PagenationFilterState {
+  passStatusOptions?: StatusOptionType | passStatusOptionType;
+  couponStatusOption?: StatusOptionType | passStatusOptionType;
+  filterOption: FilterOption;
   lectureId?: string | number;
 }
 
 export interface IFilterState {
   isInterested: 'COUPON' | 'PASS';
-  passStatusOptions: 'AVAILABLE' | 'DISABLED' | 'USED' | 'EXPIRED';
-  filterOption: 'LATEST' | 'UPCOMING' | 'HIGHEST_PRICE' | 'BEST_SELLING';
+  passStatusOptions: StatusOptionType | passStatusOptionType;
+  filterOption: FilterOption;
   selectedClass: { value: string; label: string } | null;
   currentPage: number;
   targetPage: number;

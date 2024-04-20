@@ -1,8 +1,10 @@
+import createParams from '@/utils/createParams';
 import {
-  IcouponsData,
+  IgetCouponLists,
   IgetFunction,
   createCouponData,
   updateCouponData,
+  userCouponGET,
 } from '@/types/coupon';
 import { FetchError } from '@/types/types';
 
@@ -36,18 +38,8 @@ export const getCouponLists = async (
   data: IgetFunction,
   type: 'lecturer' | 'user',
   signal?: AbortSignal,
-): Promise<IcouponsData> => {
-  const params = new URLSearchParams();
-
-  Object.entries(data)
-    .filter(([_, v]) => v !== undefined)
-    .forEach(([k, v]) => {
-      if (Array.isArray(v)) {
-        v.forEach((value) => params.append(`${k}[]`, value));
-      } else {
-        params.append(k, String(v));
-      }
-    });
+): Promise<IgetCouponLists> => {
+  const params = createParams(data);
 
   try {
     const response = await fetch(`/api/coupon/getCouponList?${params}`, {
@@ -56,7 +48,7 @@ export const getCouponLists = async (
       signal,
       headers: {
         'Content-Type': 'application/json',
-        type: type,
+        type,
       },
     });
 
@@ -69,10 +61,20 @@ export const getCouponLists = async (
 
     const resData = await response.json();
 
-    const { couponList: itemList, totalItemCount } = resData.data;
-
-    return { itemList, totalItemCount };
+    return {
+      item:
+        type === 'user'
+          ? (resData.data.couponList as userCouponGET[]).map((coupon) => ({
+              ...coupon,
+              ...coupon.lectureCoupon,
+            }))
+          : resData.data.couponList,
+      count: resData.data.totalItemCount,
+    };
   } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
     console.error('쿠폰 조회 오류', error);
     throw error;
   }

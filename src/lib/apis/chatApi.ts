@@ -1,3 +1,4 @@
+import createParams from '@/utils/createParams';
 import { userType } from '@/types/auth';
 import { Chat, ChatRoom, OpponentInfo, sendChatParams } from '@/types/chat';
 import { FetchError } from '@/types/types';
@@ -159,17 +160,7 @@ export const getChats = async (data: {
   try {
     if (!data.chatRoomId) return { chats: [], totalItemCount: 0 };
 
-    const params = new URLSearchParams();
-
-    Object.entries(data)
-      .filter(([_, v]) => v !== undefined)
-      .forEach(([k, v]) => {
-        if (Array.isArray(v)) {
-          v.forEach((value) => params.append(`${k}[]`, value));
-        } else {
-          params.append(k, String(v));
-        }
-      });
+    const params = createParams(data);
 
     const response = await fetch(`/api/chat/get-chat?${params}`, {
       method: 'GET',

@@ -15,22 +15,22 @@ const meta: Meta<typeof ReviewStatistics> = {
     },
   },
   argTypes: {
-    reviewList: {
+    ratingLists: {
       description:
         '리뷰의 별점 정보를 담고 있는 객체의 배열로부터 전체 평균 별점과 각 별점에 해당하는 개수 계산',
       control: { type: 'object' },
       table: {
-        type: { summary: '{ stars: number }[]' },
+        type: { summary: '{ stars: number, count: number }[]' },
       },
     },
   },
   args: {
-    reviewList: [
-      { stars: 1 },
-      { stars: 3 },
-      { stars: 3 },
-      { stars: 4 },
-      { stars: 5 },
+    ratingLists: [
+      { stars: 1, count: 3 },
+      { stars: 3, count: 5 },
+      { stars: 3, count: 4 },
+      { stars: 4, count: 10 },
+      { stars: 5, count: 8 },
     ],
   },
 };

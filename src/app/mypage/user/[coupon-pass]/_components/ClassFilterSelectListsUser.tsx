@@ -1,80 +1,53 @@
-import { useEffect, useRef, useState } from 'react';
-import { USER_COUPON_CLASS_LIST_TAKE } from '@/constants/constants';
+import { useMemo } from 'react';
 import { PlusesSVG } from '@/icons/svg';
 import { SelectClassType } from '@/types/coupon';
 
 interface ClassFilterSelectListsUserProps {
+  listViewCount: number;
   myLectureList: SelectClassType[];
   handleChangeSelectedClass: (selectedOptions: any) => void;
-  selectedClass: SelectClassType | null;
   userClassFilterView: boolean;
-  changeRefreshBtnView: (show: boolean) => void;
-  refreshTrigger: boolean;
+  showMoreClassFilter: () => void;
+  selectedClass?: string[];
 }
 
 const ClassFilterSelectListsUser = ({
+  listViewCount,
   myLectureList,
+  showMoreClassFilter,
   handleChangeSelectedClass,
   selectedClass,
   userClassFilterView,
-  changeRefreshBtnView,
-  refreshTrigger,
 }: ClassFilterSelectListsUserProps) => {
-  const [listViewCount, setListViewCount] = useState(
-    USER_COUPON_CLASS_LIST_TAKE,
+  const processSelectedClass = useMemo(
+    () => selectedClass?.map((value) => Number(value)),
+    [selectedClass],
   );
-  const [selectedClassValue, setSelectedClassValue] = useState<
-    string | number | number[] | undefined
-  >(selectedClass?.value);
-  const firstRender = useRef(true);
 
-  useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
+  const changeSelectedClass = (classId: number) => {
+    if (processSelectedClass === undefined) {
+      handleChangeSelectedClass([classId]);
       return;
     }
 
-    changeSelectedClass();
-    setListViewCount(USER_COUPON_CLASS_LIST_TAKE);
-    changeRefreshBtnView(false);
-  }, [refreshTrigger]);
-
-  const changeSelectedClass = (classId: number = -1) => {
-    let newValue;
-
-    if (classId === -1) {
-      newValue = 'select-all';
-    } else if (selectedClassValue === 'select-all') {
-      newValue = [classId];
-    } else if (Array.isArray(selectedClassValue)) {
-      if (selectedClassValue.includes(classId)) {
-        newValue = selectedClassValue.filter(
-          (selectedId) => selectedId !== classId,
-        );
-        if (newValue.length === 0) {
-          newValue = 'select-all';
-        }
-      } else {
-        newValue = [...selectedClassValue, classId];
-        if (newValue.length === myLectureList.length - 1) {
-          newValue = 'select-all';
-        }
-      }
+    if (processSelectedClass.length + 1 === myLectureList.length) {
+      handleChangeSelectedClass(undefined);
+      return;
     }
 
-    const isNotAllSelected =
-      (newValue !== 'select-all' &&
-        newValue!.length - 1 !== myLectureList.length) ||
-      listViewCount !== USER_COUPON_CLASS_LIST_TAKE;
+    if (processSelectedClass.includes(classId)) {
+      const filteredClasses = processSelectedClass.filter(
+        (value) => value !== classId,
+      );
 
-    changeRefreshBtnView(isNotAllSelected);
-    setSelectedClassValue(newValue);
-    handleChangeSelectedClass({ value: newValue });
-  };
+      handleChangeSelectedClass(
+        filteredClasses.length > 0 ? filteredClasses : undefined,
+      );
+      return;
+    }
 
-  const showMoreClasses = () => {
-    setListViewCount((count) => count + USER_COUPON_CLASS_LIST_TAKE);
-    changeRefreshBtnView(true);
+    const updatedClasses = [...processSelectedClass, classId];
+    handleChangeSelectedClass(updatedClasses);
   };
 
   return (
@@ -90,9 +63,9 @@ const ClassFilterSelectListsUser = ({
             <button
               key={value}
               className={`mb-2 mr-5  ${
-                selectedClassValue === 'select-all' ||
-                (Array.isArray(selectedClassValue) &&
-                  selectedClassValue.includes(Number(value)))
+                !processSelectedClass ||
+                (Array.isArray(processSelectedClass) &&
+                  processSelectedClass.includes(Number(value)))
                   ? 'text-sub-color1'
                   : 'text-black'
               }`}
@@ -105,7 +78,7 @@ const ClassFilterSelectListsUser = ({
       {myLectureList.length > listViewCount && (
         <button
           className="group mb-2 mr-5 flex gap-1 hover:text-sub-color1 sm:text-gray-500 sm:underline"
-          onClick={showMoreClasses}
+          onClick={showMoreClassFilter}
         >
           <p className="sm:hidden">+{myLectureList.length - listViewCount}</p>
           더보기

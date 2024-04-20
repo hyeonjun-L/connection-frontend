@@ -107,7 +107,7 @@ export const getUserLinks = (mode: 'more' | 'mypage') => {
           icon: <HeartSVG width="24" height="24" className={style.WSTROKE} />,
         },
         {
-          path: '/mypage/user/myclass/member',
+          path: '/mypage/user/myclass/review',
           text: '작성한 리뷰',
           icon: <BigStar width="20" height="20" className={style.WSTROKE} />,
         },

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import useChangeSearchParams from '@/hooks/useChangeSearchParams';
 import { getUserClass } from '@/lib/apis/classApis';
 import EmptyData from './EmptyData';
 import Pagination from '@/components/Pagination/Pagination';
@@ -15,23 +16,47 @@ const ClassList = dynamic(() => import('./ClassList'), {
 });
 
 const ListView = () => {
+  const { changeMultipleParams, getCurrentParamsToObject } =
+    useChangeSearchParams();
+
+  const {
+    activeTab: searchActiveTab,
+    displayCount: searchDisplayCount,
+    currentPage: searchCurrentPage,
+  } = getCurrentParamsToObject();
+
   const [activeTab, setActiveTab] = useState<'진행중/예정' | '수강 완료'>(
-    '진행중/예정',
+    searchActiveTab ?? '진행중/예정',
   );
-  const [displayCount, setDisplayCount] = useState(5);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [displayCount, setDisplayCount] = useState(
+    searchDisplayCount ? Number(searchDisplayCount) : 5,
+  );
+  const [currentPage, setCurrentPage] = useState(
+    searchCurrentPage ? Number(searchCurrentPage) : 0,
+  );
   const { data: classListData, isLoading } = useQuery({
     queryKey: ['user', 'apply', 'list', activeTab, displayCount, currentPage],
-    queryFn: () => getUserClass(activeTab, displayCount, currentPage - 1),
+    queryFn: () => getUserClass(activeTab, displayCount, currentPage),
   });
 
-  if (!classListData) return null;
+  useEffect(() => {
+    const filter = [
+      { name: 'activeTab', value: activeTab as string },
+      { name: 'displayCount', value: String(displayCount) },
+      { name: 'currentPage', value: String(currentPage) },
+    ];
+    changeMultipleParams(filter, false);
+  }, [classListData]);
 
-  const { totalItemCount, enrollLectureList } = classListData;
+  const { totalItemCount, enrollLectureList } = classListData ?? {
+    totalItemCount: 0,
+    enrollLectureList: [],
+  };
   const pageCount =
     totalItemCount > 0 ? Math.ceil(totalItemCount / displayCount) : 0;
 
   const handleActiveTab = (newStatus: '진행중/예정' | '수강 완료') => {
+    setCurrentPage(0);
     setActiveTab(newStatus);
   };
 
@@ -65,8 +90,7 @@ const ListView = () => {
 
         <PageSizeSelector value={displayCount} onChange={handleDisplayCount} />
       </div>
-      {/* 로딩 왜 안 보일까요... */}
-      {isLoading || !classListData ? (
+      {isLoading ? (
         <div className="mt-20 flex h-full items-center justify-center">
           <Spinner />
         </div>
@@ -78,14 +102,14 @@ const ListView = () => {
             ))}
           </ul>
 
-          {pageCount > displayCount && (
-            <div className="w-full">
+          {pageCount > 0 && (
+            <nav className="z-0 w-full">
               <Pagination
                 pageCount={pageCount}
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
               />
-            </div>
+            </nav>
           )}
         </>
       ) : (

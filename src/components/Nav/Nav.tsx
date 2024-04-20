@@ -66,6 +66,7 @@ const Nav = ({ sections }: { sections: NavSection[] }) => {
               ? 'text-sub-color1 underline underline-offset-8'
               : 'text-gray-500'
           }`}
+          replace
         >
           {label}
         </Link>

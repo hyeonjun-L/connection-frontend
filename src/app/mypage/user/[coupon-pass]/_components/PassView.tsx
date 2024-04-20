@@ -3,7 +3,7 @@ import { ChangeEvent, useMemo, useState } from 'react';
 import { NotFoundSVG } from '@/icons/svg';
 import Pass from './Pass';
 import PassDetail from './PassDetail';
-import Carousel from '@/components/Carousel/Carousel';
+import CarouselContainer from '@/components/Carousel/CarouselContainer';
 import { userPassList } from '@/types/pass';
 
 interface PassViewProps {
@@ -86,12 +86,13 @@ const PassView = ({ passList: reqPassList }: PassViewProps) => {
       ...prev,
       sort,
     }));
-    setCarouselIndex(0);
+    setCarouselIndex(undefined);
     setSelectPass(null);
   };
 
   const selectedPassChange = (pass: userPassList, index?: number) => {
     if (selectPass?.id === pass.id) {
+      setCarouselIndex(undefined);
       setSelectPass(null);
     } else {
       setSelectPass(pass);
@@ -144,13 +145,14 @@ const PassView = ({ passList: reqPassList }: PassViewProps) => {
       ) : passList.length > 1 ? (
         <div className="relative sm:px-11">
           <div className="overflow-hidden sm:px-5">
-            <div className="w-64 px-2 py-3 sm:px-0">
-              <Carousel
+            <div className="w-64 py-3 sm:px-0">
+              <CarouselContainer
                 move={!selectPass}
                 priority={4}
-                gap={1}
+                gap={16}
                 showCurrentElement={false}
                 carouselMoveIntervalTime={3000}
+                mobileShowCurrentElement={false}
                 gotoIndex={carouselIndex}
               >
                 {(passList.length < 4
@@ -170,7 +172,7 @@ const PassView = ({ passList: reqPassList }: PassViewProps) => {
                     expired={selectOption.default === 'EXPIRED'}
                   />
                 ))}
-              </Carousel>
+              </CarouselContainer>
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { Controller, FieldErrors, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { writeReview } from '@/lib/apis/reviewApis';
 import { accessTokenReissuance } from '@/lib/apis/userApi';
+import { reloadToast } from '@/utils/reloadMessage';
 import ClassSelect from './ClassSelect';
 import { Button } from '@/components/Button';
 import { Rating } from '@/components/Review';
@@ -23,6 +24,13 @@ const WriteReview = ({ options }: WriteReview) => {
   } = useForm<WriteReviewData>();
 
   const onValid = async (data: WriteReviewData) => {
+    if (
+      !confirm(`리뷰 작성을 완료 하겠습니까?
+      
+** 추후 삭제는 가능하지만 수정은 불가능 합니다. **`)
+    ) {
+      return;
+    }
     const { classInfo } = data;
 
     const reqData = {
@@ -32,18 +40,21 @@ const WriteReview = ({ options }: WriteReview) => {
       description: data.description,
     };
 
-    try {
+    const writeReviewAction = async () => {
       await writeReview(reqData);
-      toast.success('리뷰 작성 완료');
-
+      reloadToast('리뷰 작성 완료', 'success');
       window.location.reload();
+    };
+
+    try {
+      await writeReviewAction();
     } catch (error) {
       if (error instanceof Error) {
         const fetchError = error as FetchError;
         if (fetchError.status === 401) {
           try {
             await accessTokenReissuance();
-            await writeReview(reqData);
+            await writeReviewAction();
           } catch (error) {
             console.error(error);
           }

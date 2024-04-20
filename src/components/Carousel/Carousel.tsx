@@ -1,197 +1,100 @@
 'use client';
 import Image from 'next/image';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { Arrow } from '@/../public/icons/svg';
+import { Children, useMemo, useEffect, useRef, useCallback } from 'react';
+import { Arrow } from '../../../public/icons/svg';
+import { Props } from '@/types/cariusel';
 
-/**
- * CarouselProps Interface
- *
- * 사용법 1
- * <relative overflow-hidden 컨테이너>
- *  <이미지 크기 제어 컨테이너>
- *    <Carousel/>
- *  </이미지 크기 제어 컨테이너>
- * </ relative overflow-hidden 컨테이너>
- *
- * 사용법 2
- * <이미지 크기 제어 및 relative overflow-hidden>
- *   <Carousel/>
- * </ 이미지 크기 제어 및 relative overflow-hidden>
- *
- * 사용법 3
- * <relative overflow-hidden 컨테이너>
- *  <이미지 크기 제어 컨테이너>
- *    <Carousel>
- *      ...children 요소
- *    </Carousel>
- *  </이미지 크기 제어 컨테이너>
- * </ relative overflow-hidden 컨테이너>
- *
- * @property {string[]} imgURL - 표시할 이미지들의 URL들이 담긴 배열, children 우선 렌더
- * @property {React.ReactNode} children - 표시할 요소들, imgURL 보다 우선순위 높음
- * @property {boolean} move - 캐러셀 움직임 활성화
- * @property {boolean} [arrow=true] - 탐색을 위해 화살표를 표시해야 하는지 여부를 나타내는 선택적 플래그 (기본값 = true)
- * @property {boolean} [priority=1] - 해당 숫자 만큼 요소를 미리 렌더 (기본값 = 1)
- * @property {boolean} [showCurrentElement =true] - 현재 캐러셀 위치 표시의 상태창 표시 여부를 나타내는 선택적 플래그 (기본값 = true)
- * @property {boolean} [showCurrentElementBackGround =true] - 상태창 표시 배경 여부를 나타내는 선택적 플래그 (기본값 = true)
- * @property {number} [gap=0] - 캐러셀 요소 사이의 간격을 rem으로 지정하는 선택적 숫자 (기본값 = 0)
- * @property {number} [carouselMoveIntervalTime = 2000] - 캐러셀 움직이는 시간을 ms로 지정하는 선택적 숫자 (기본값 = 2000ms)
- * @property {number} [arrowPushMoveWaitTime = 2000] - Arrow를 누른 후 캐러셀 움직임을 멈추는 시간을 ms로 지정하는 선택적 숫자 (기본값 = 2000ms)
- * @property {boolean} [movePause = false] - 캐러셀의 움직임을 true 동안 일시정지 (기본값 = false)
- * @property {boolean} [gotoIndex = null] - 캐러셀의 인덱스를 변경 하는 선택적 플래그 (number)
- */
-
-interface Props {
-  move: boolean;
-  arrow?: boolean;
-  priority?: number;
-  showCurrentElement?: boolean;
-  showCurrentElementBackGround?: boolean;
-  gap?: number;
-  carouselMoveIntervalTime?: number;
-  arrowPushMoveWaitTime?: number;
-  movePause?: boolean;
-  gotoIndex?: number;
+interface CarouselProps extends Props {
+  isAnimating: boolean;
+  currentIndex: number;
+  touchDistanceX: number;
+  changeCurrentIndex: (index: number) => void;
+  changeisAnimating: (state: boolean) => void;
 }
-
-interface ChildrenProps extends Props {
-  children: React.ReactNode;
-  imgURL?: string[];
-}
-
-interface ImgURLProps extends Props {
-  imgURL: string[];
-  children?: React.ReactNode;
-}
-
-type CarouselProps = ChildrenProps | ImgURLProps;
 
 const Carousel = ({
+  isAnimating,
   imgURL,
-  move,
-  arrow = true,
-  priority = 1,
-  showCurrentElement = true,
-  gap = 0,
   children,
-  showCurrentElementBackGround = true,
+  currentIndex,
+  changeCurrentIndex,
+  changeisAnimating,
+  priority = 1,
+  move,
+  movePause,
+  gap = 0,
   carouselMoveIntervalTime = 2000,
-  arrowPushMoveWaitTime = 2000,
-  movePause = false,
   gotoIndex,
+  touchDistanceX,
+  arrow = true,
+  showCurrentElement = true,
+  showCurrentElementBackGround = true,
 }: CarouselProps) => {
-  const childrenArray = React.Children.toArray(children);
+  const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
+  const currentIndexRef = useRef(currentIndex);
+  const intervalTimeRef = useRef(carouselMoveIntervalTime);
+  const loadedCountRef = useRef(priority > 1 ? priority : 1);
 
-  const extendForCarousel = useCallback(
-    (elementArr: React.ReactNode[] | string[]) => {
-      if (elementArr.length > 1) {
-        const newElementArr = [...elementArr, elementArr[0]];
-        newElementArr.shift();
-        return [
-          newElementArr.at(-1),
-          ...newElementArr,
-          ...newElementArr.slice(0, priority - 1),
-        ];
-      }
-      return [...elementArr];
-    },
-    [priority],
+  const childrenArray = Children.toArray(children);
+
+  const originalElements = useMemo(
+    () => (children ? [...childrenArray] : [...(imgURL || [])]),
+    [children, childrenArray, imgURL],
   );
 
-  const carouselElements = useMemo(
-    () =>
-      extendForCarousel(children ? [...childrenArray] : [...(imgURL || [])]),
-    [childrenArray, imgURL],
-  );
+  const carouselElements = useMemo(() => {
+    if (originalElements.length > 1) {
+      const newElementArr = [...originalElements.slice(1), originalElements[0]];
+      return [
+        newElementArr.at(-1),
+        ...newElementArr,
+        ...newElementArr.slice(0, priority - 1),
+      ];
+    }
+    return [...originalElements];
+  }, [originalElements, priority]);
 
   const carouselLength = carouselElements.length;
-  const originalElements = children ? childrenArray : [...(imgURL || [])];
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [loadedElementCount, setLoadedElementCount] = useState(
-    priority > 1 ? priority : 1,
-  );
-  const [isAnimating, setIsAnimating] = useState(true);
-  const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
-  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
-
-  if (move && loadedElementCount < carouselLength) {
-    setLoadedElementCount(carouselLength);
-  }
-
-  const updateImageIndex = () => {
-    setCurrentIndex((prev) => {
-      if (prev === carouselLength - priority) {
-        setIsAnimating(false);
-        return 0;
-      } else if (prev === 0) {
-        setIsAnimating(true);
-        return prev + 1;
-      } else {
-        return prev + 1;
-      }
-    });
-  };
-
-  useEffect(() => {
-    if (movePause && intervalIdRef.current) {
-      clearInterval(intervalIdRef.current);
-    } else {
-      if (move && carouselLength > 1) {
-        setIsAnimating(true);
-        if (priority === 1) {
-          timeoutIdRef.current = setTimeout(() => updateImageIndex(), 100);
-        }
-
-        intervalIdRef.current = setInterval(
-          updateImageIndex,
-          carouselMoveIntervalTime,
-        );
-      } else {
-        setIsAnimating(false);
-        setCurrentIndex(0);
-        setTimeout(() => setIsAnimating(true), 100);
-        if (intervalIdRef.current) clearInterval(intervalIdRef.current);
-      }
+  const loadedElementCount = useMemo(() => {
+    if (move) {
+      loadedCountRef.current = carouselLength;
     }
 
-    return () => {
-      if (intervalIdRef.current) clearInterval(intervalIdRef.current);
-      if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [move, loadedElementCount, movePause]);
+    return loadedCountRef.current;
+  }, [carouselLength, move]);
 
-  useEffect(() => {
-    if (gotoIndex === undefined) return;
-    changeCarouselIndex(gotoIndex);
-  }, [gotoIndex]);
+  const changeCarouselIndexHandler = useCallback(
+    (index: number, isNotAnimation?: boolean) => {
+      let newIndex = index;
+      const lastIndex = originalElements.length;
+      const currentIndex = currentIndexRef.current;
 
-  const changeCarouselIndex = (index: number) => {
-    if (intervalIdRef.current) clearInterval(intervalIdRef.current);
-    if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
-
-    setIsAnimating(false);
-
-    setCurrentIndex(index);
-
-    timeoutIdRef.current = setTimeout(() => {
-      setIsAnimating(true);
-
-      if (move) {
-        intervalIdRef.current = setInterval(
-          updateImageIndex,
-          carouselMoveIntervalTime,
-        );
+      if (index < 0) {
+        newIndex = lastIndex;
+      } else if (index > lastIndex) {
+        newIndex = 0;
       }
-    }, arrowPushMoveWaitTime);
-  };
+
+      currentIndexRef.current = newIndex;
+
+      intervalTimeRef.current =
+        newIndex === 0
+          ? carouselMoveIntervalTime / 2
+          : carouselMoveIntervalTime;
+      changeCurrentIndex(newIndex);
+
+      changeisAnimating(
+        !isNotAnimation && Math.abs(currentIndex - newIndex) === 1,
+      );
+    },
+    [
+      carouselMoveIntervalTime,
+      changeCurrentIndex,
+      changeisAnimating,
+      originalElements.length,
+    ],
+  );
 
   const changeImage = (
     event: React.MouseEvent,
@@ -200,35 +103,58 @@ const Carousel = ({
     event.stopPropagation();
     event.nativeEvent.preventDefault();
 
+    const step = direction === 'FORWARD' ? 1 : -1;
     const index =
-      direction === 'FORWARD'
-        ? currentIndex >= carouselLength - priority
-          ? 0
-          : currentIndex + 1
-        : currentIndex <= 0
-        ? carouselLength - priority
-        : currentIndex - 1;
+      (currentIndex + step + originalElements.length) % originalElements.length;
 
-    changeCarouselIndex(index);
+    changeCarouselIndexHandler(index, true);
   };
+
+  useEffect(() => {
+    if (!move || movePause || originalElements.length === 1) {
+      if (intervalIdRef.current) clearInterval(intervalIdRef.current);
+      return;
+    }
+
+    intervalIdRef.current = setInterval(() => {
+      changeCarouselIndexHandler(currentIndexRef.current + 1);
+    }, intervalTimeRef.current);
+
+    return () => {
+      if (intervalIdRef.current) clearInterval(intervalIdRef.current);
+    };
+  }, [
+    carouselMoveIntervalTime,
+    changeCarouselIndexHandler,
+    move,
+    movePause,
+    originalElements.length,
+  ]);
+
+  useEffect(() => {
+    if (gotoIndex === undefined || currentIndex === gotoIndex) return;
+    changeCarouselIndexHandler(gotoIndex);
+  }, [changeCarouselIndexHandler, currentIndex, gotoIndex]);
+
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
 
   return (
     <>
-      <ul
+      <div
         className={`flex h-full ${
           isAnimating && 'transition-transform duration-[1600ms] ease-out'
         }`}
         style={{
-          transform: `translateX(calc(-${100 * currentIndex}% - ${
-            gap * currentIndex
-          }rem)`,
+          transform: `translateX(${touchDistanceX + gap}px)`,
         }}
       >
         {carouselElements.slice(0, loadedElementCount).map((element, index) => (
-          <li
+          <div
             key={index}
             className={`relative h-full w-full flex-shrink-0 `}
-            style={{ marginRight: `${gap}rem` }}
+            style={{ marginRight: `${gap}px` }}
           >
             {children
               ? element
@@ -242,9 +168,9 @@ const Carousel = ({
                     style={{ objectFit: 'cover' }}
                   />
                 )}
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
       {showCurrentElement && (
         <div
           className={`absolute bottom-0 flex h-[10%] w-full items-center justify-center ${
@@ -265,17 +191,20 @@ const Carousel = ({
           ))}
         </div>
       )}
-
       {arrow && carouselLength > 1 && (
         <>
-          <Arrow
+          <button
             onClick={(e: React.MouseEvent) => changeImage(e, 'BACKWARD')}
-            className="absolute left-3 top-1/2 hidden -translate-y-1/2 -scale-x-100 transform cursor-pointer sm:block"
-          />
-          <Arrow
+            className="absolute left-3 top-1/2 hidden -translate-y-1/2 -scale-x-100 transform sm:block"
+          >
+            <Arrow />
+          </button>
+          <button
             onClick={(e: React.MouseEvent) => changeImage(e, 'FORWARD')}
-            className="absolute right-3 top-1/2 hidden -translate-y-1/2 transform cursor-pointer sm:block"
-          />
+            className="absolute right-3 top-1/2 hidden -translate-y-1/2 transform sm:block"
+          >
+            <Arrow />
+          </button>
         </>
       )}
     </>

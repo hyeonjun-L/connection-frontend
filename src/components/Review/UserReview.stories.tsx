@@ -79,14 +79,6 @@ const meta: Meta<typeof UserReview> = {
         type: { summary: 'number' },
       },
     },
-    disabled: {
-      description: '리뷰 좋아요 기능 활성화 여부',
-      control: 'boolean',
-      defaultValue: { summary: false },
-      table: {
-        type: { summary: 'boolean' },
-      },
-    },
     link: {
       description: '신고 링크',
       control: 'text',
