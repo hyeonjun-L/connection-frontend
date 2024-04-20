@@ -43,9 +43,15 @@ const page = async ({
       <nav className="flex h-12 gap-3 border-b border-gray-500 py-2">
         {filterOption.map((filter) => (
           <Link
-            href="/"
+            href={`/notifications?filterOption=${filter}`}
+            replace={true}
             key={filter}
-            className="flex items-center rounded-md border border-solid border-sub-color1 bg-white px-3 text-sub-color1 hover:bg-sub-color1-transparent"
+            className={`flex items-center rounded-md border border-solid border-sub-color1 px-3 hover:bg-sub-color1-transparent ${
+              (!searchParamfilterOption && filter === '전체') ||
+              searchParamfilterOption === filter
+                ? 'bg-sub-color1 text-white'
+                : 'bg-white text-sub-color1'
+            }`}
           >
             {filter}
           </Link>
