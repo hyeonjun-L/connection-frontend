@@ -6,13 +6,11 @@ export type ReviewOrderType =
   | '평점 높은순'
   | '평점 낮은순';
 
-export interface IReviewList {
+export interface IReviewList extends ReviewMainContent {
   id: number;
   lectureId: number;
   userId: number;
   reservationId: number;
-  stars: number;
-  description: string;
   user: {
     nickname: string;
     profileImage: null | string;
@@ -26,52 +24,7 @@ export interface IReviewList {
 export interface IReviewResponse {
   reviews: IReviewList[];
   totalItemCount: number;
-}
-
-export interface WriteReview {
-  id: number;
-  lectureId: number;
-  userId: number;
-  reservationId: number;
-  stars: number;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  lecture: {
-    id: number;
-    lecturerId: number;
-    lectureTypeId: number;
-    lectureMethodId: number;
-    isGroup: boolean;
-    startDate: string;
-    endDate: string;
-    title: string;
-    introduction: string;
-    curriculum: string;
-    duration: number;
-    difficultyLevel: string;
-    minCapacity: number;
-    maxCapacity: number;
-    reservationDeadline: number;
-    reservationComment: string;
-    price: number;
-    noShowDeposit: number;
-    reviewCount: number;
-    stars: number;
-    isActive: boolean;
-    locationDescription: string;
-    createdAt: string;
-    updatedAt: string;
-    deletedAt: string | null;
-  };
-  likedLectureReview: [];
-  reservation: {
-    lectureSchedule: string;
-  };
-  _count: {
-    likedLectureReview: number;
-  };
+  totalStars: number;
 }
 
 export interface ReservationDetails {
@@ -98,8 +51,11 @@ export interface SelectClassType {
   label: string;
 }
 
-export interface WriteReviewData {
+export interface WriteReviewData extends ReviewMainContent {
   classInfo: SelectClassType | null;
+}
+
+export interface ReviewMainContent {
   description: string;
   stars: number;
 }
@@ -107,6 +63,16 @@ export interface WriteReviewData {
 export interface GetMyLecturersReviews extends PagenationFilterState {
   lecturerMyReviewType: string;
   orderBy: string;
+  lectureId?: number;
+}
+
+export interface GetReviews extends PagenationFilterState {
+  orderBy: string;
+}
+
+export interface GetWriteReviewsData {
+  count: number;
+  item: IReviewList[];
 }
 
 export interface GetMyLecturersReviewsData {
@@ -114,33 +80,31 @@ export interface GetMyLecturersReviewsData {
   item: MyLecturersReviewsData[];
 }
 
-export interface MyLecturersReviewsData {
+export interface MyLecturersReviewsData extends ReviewMainContent {
   id: number;
   lectureId: number;
   userId: number;
   reservationId: number;
-  stars: number;
-  description: string;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
-  reservation: {
-    lectureSchedule: {
-      startDateTime: string;
-      lecture: { title: string };
-    };
-  };
-  users: {
+  startDateTime: string;
+  user: {
     nickname: string;
-    userProfileImage: {
-      imageUrl: string;
-    };
+    profileImage: string;
   };
+  lectureTitle: string;
+  startDateTime: string;
+  isLike: boolean;
+  likeCount: number;
 }
 
-export interface NewReviews {
+export interface NewReviews extends ReviewMainContent {
   lectureId: number;
   reservationId: number;
+}
+
+export interface RatingsData {
   stars: number;
-  description: string;
+  count: number;
 }

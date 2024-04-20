@@ -2,14 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
-export const POST = async (request: NextRequest) => {
+export const PATCH = async (request: NextRequest) => {
   if (!END_POINT) {
     return NextResponse.json({
       status: 500,
       message: '환경 변수가 설정되지 않았습니다.',
     });
   }
-
   const searchParams = request.nextUrl.searchParams;
   const reviewId = searchParams.get('reviewId');
 
@@ -23,8 +22,7 @@ export const POST = async (request: NextRequest) => {
     );
   }
 
-  const tokenValue = request.cookies.get('userAccessToken')?.value;
-
+  const tokenValue = request.cookies.get(`userAccessToken`)?.value;
   if (!tokenValue) {
     return NextResponse.json(
       {
@@ -40,14 +38,14 @@ export const POST = async (request: NextRequest) => {
     'Content-Type': 'application/json',
   };
 
-  const response = await fetch(
-    `${END_POINT}/lecture-review/${reviewId}/likes`,
-    {
-      method: 'POST',
-      credentials: 'include',
-      headers,
-    },
-  );
+  const data = await request.json();
+
+  const response = await fetch(`${END_POINT}/lecture-reviews/${reviewId}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers,
+    body: JSON.stringify(data),
+  });
 
   if (!response.ok) {
     const errorData = await response.json();

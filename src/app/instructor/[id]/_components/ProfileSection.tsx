@@ -85,7 +85,7 @@ const ProfileSection = async ({ id }: { id: string }) => {
             <div className="mb-4 mt-2 box-border flex h-4 gap-1 sm:pl-4">
               <Review average={stars} />
               <span className="text-sm font-bold text-gray-500">
-                ({reviewCount})
+                ({stars.toFixed(1)})
               </span>
             </div>
             {/* 강사 여러 정보 */}
@@ -192,7 +192,7 @@ const ProfileSection = async ({ id }: { id: string }) => {
             }}
             className="curriculum line-clamp-[18] peer-checked:line-clamp-none"
           />
-          <ReadMore labelName="강사소개 더보기" />
+          <ReadMore labelName="강사소개 더보기" id="introductionBtn" />
         </section>
         {/* 강사 경력 섹션 */}
         <section
@@ -204,7 +204,7 @@ const ProfileSection = async ({ id }: { id: string }) => {
             dangerouslySetInnerHTML={{ __html: sanitizeHtmlString(experience) }}
             className="curriculum line-clamp-[18] peer-checked:line-clamp-none"
           />
-          <ReadMore labelName="강사경력 더보기" />
+          <ReadMore labelName="강사경력 더보기" id="experienceBtn" />
         </section>
       </div>
     </>

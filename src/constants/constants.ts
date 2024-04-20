@@ -392,7 +392,7 @@ export const REGIONS_SELECT_MAX = 30;
 
 export const DEFAULT_REVIEW_COUNT = 3;
 
-export const FETCH_REVIEW_COUNT = 5;
+export const REVIEW_SECTION_TAKE = 5 as const;
 
 export const INITIAL_SCHEDULE_PROGRESS = [
   {
@@ -545,3 +545,5 @@ export const PAYMENT_HISTORY_TAKE = 5 as const;
 export const INCOME_HISTORY_TAKE = 5 as const;
 
 export const INSTRUCTOR_H2_STYLE = 'mb-2 text-lg font-bold' as const;
+
+export const REVIEW_TAKE = 4 as const;

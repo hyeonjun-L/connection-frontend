@@ -22,18 +22,18 @@ const RecentReview = async () => {
           <div className="mb-3.5 flex items-center gap-1.5">
             <ProfileImg
               size="small"
-              src={data.users.userProfileImage.imageUrl}
+              src={data.user.profileImage}
               label={false}
             />
 
             <div className="flex flex-col gap-1">
               <div className="flex gap-1.5 whitespace-nowrap text-sm">
-                {data.users.nickname}
+                {data.user.nickname}
                 <Link
                   href={`/class/${data.lectureId}`}
                   className="line-clamp-1 text-gray-500 hover:underline"
                 >
-                  {data.reservation.lectureSchedule.lecture.title}
+                  {data.lectureTitle}
                 </Link>
               </div>
               <Review average={data.stars} />

@@ -1,21 +1,29 @@
 'use client';
 import { Fragment } from 'react';
+import { REVIEW_TAKE } from '@/constants/constants';
 import usePageNation from '@/hooks/usePageNation';
 import { NotFoundSVG } from '@/icons/svg';
 import { getMyLecturersReviews } from '@/lib/apis/reviewApis';
 import formatDate from '@/utils/formatDate';
 import ClassFilterSelect from './ClassFilterSelect';
 import Pagination from '@/components/Pagination/Pagination';
+import PaginationLoading from '@/components/Pagination/PaginationLoading';
 import { UserReview, ReviewStatistics } from '@/components/Review';
+import ReviewLoadingContainer from '@/components/Review/ReviewLoading';
 import { OptionType } from '@/types/coupon';
-import { MyLecturersReviewsData } from '@/types/review';
+import { MyLecturersReviewsData, RatingsData } from '@/types/review';
 
 interface MyReview {
   initialData: { count: number; item: MyLecturersReviewsData[] };
   myClassListsOption: OptionType[];
+  ratingLists: RatingsData[];
 }
 
-const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
+const MyReview = ({
+  initialData,
+  myClassListsOption,
+  ratingLists,
+}: MyReview) => {
   const {
     items: reviews,
     totalItemCount,
@@ -26,11 +34,11 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
   } = usePageNation<MyLecturersReviewsData>({
     initialData,
     defaultFilterState: {
-      take: 2,
+      take: REVIEW_TAKE,
       targetPage: 1,
       lecturerMyReviewType: '전체',
       orderBy: '최신순',
-      lectureId: myClassListsOption[0]?.value ?? undefined,
+      lectureId: undefined,
     },
     queryType: 'instructorReview',
     queryFn: getMyLecturersReviews,
@@ -54,7 +62,7 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
     },
   ];
 
-  const pageCount = Math.ceil(totalItemCount / 2);
+  const pageCount = Math.ceil(totalItemCount / REVIEW_TAKE);
 
   return (
     <main className="col-span-1 flex w-full flex-col px-2 sm:px-6">
@@ -114,25 +122,37 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
               </select>
               {totalItemCount}개의 리뷰
             </div>
-            {reviews.length > 0 ? (
+            {isLoading ? (
+              <ul className="flex flex-col">
+                <ReviewLoadingContainer type="lecturer" />
+              </ul>
+            ) : reviews.length > 0 ? (
               <ul className="flex flex-col">
                 {reviews.map(
-                  ({ id, stars, users, description, reservation }) => (
+                  ({
+                    id,
+                    stars,
+                    user,
+                    userId,
+                    description,
+                    startDateTime,
+                    lectureTitle,
+                    likeCount,
+                  }) => (
                     <Fragment key={id}>
                       <UserReview
-                        src={users.userProfileImage.imageUrl}
-                        nickname={users.nickname}
+                        src={user.profileImage}
+                        nickname={user.nickname}
                         average={stars}
-                        date={formatDate(
-                          reservation.lectureSchedule.startDateTime,
-                        )}
-                        title={reservation.lectureSchedule.lecture.title}
-                        count={3}
+                        date={formatDate(startDateTime)}
+                        title={lectureTitle}
+                        count={likeCount}
                         isLike={false}
                         reviewId={id}
                         content={description}
-                        disabled={true}
+                        userId={userId}
                         link={`/report?lectureReviewId=${id}`}
+                        noneShadow={true}
                       />
                       <div className="h-1 bg-sub-color1-transparent" />
                     </Fragment>
@@ -145,21 +165,25 @@ const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
                 <p>작성 된 리뷰가 없습니다!</p>
               </div>
             )}
-            {pageCount > 0 && (
-              <nav className="z-0">
-                <Pagination
-                  pageCount={pageCount}
-                  currentPage={
-                    filterState.currentPage ? filterState.currentPage - 1 : 0
-                  }
-                  onPageChange={changePage}
-                />
-              </nav>
+            {reviews.length > 0 && pageCount === 0 ? (
+              <PaginationLoading />
+            ) : (
+              pageCount > 0 && (
+                <nav className="z-0">
+                  <Pagination
+                    pageCount={pageCount}
+                    currentPage={
+                      filterState.currentPage ? filterState.currentPage - 1 : 0
+                    }
+                    onPageChange={changePage}
+                  />
+                </nav>
+              )
             )}
           </div>
         </section>
         <section className="w-full self-start sm:w-56 md:w-72 lg:w-80">
-          <ReviewStatistics reviewList={initialData.item} />
+          <ReviewStatistics ratingLists={ratingLists} />
         </section>
       </div>
     </main>

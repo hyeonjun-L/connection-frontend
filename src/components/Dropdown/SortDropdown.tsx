@@ -12,7 +12,7 @@ const SortDropdown = ({ selectedOption, onClickList }: SortDropdownProps) => (
     {filterOption.map((list: ReviewOrderType) => (
       <li
         key={list}
-        className={`flex h-7 w-[5.7rem] items-center gap-2 px-2.5 hover:bg-gray-900 ${
+        className={`flex h-7 w-[5.7rem] items-center gap-2 whitespace-nowrap px-2.5 hover:bg-gray-900 ${
           selectedOption === list && 'text-black'
         }`}
         onClick={() => onClickList(list)}

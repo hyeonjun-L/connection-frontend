@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
-export const POST = async (request: NextRequest) => {
+export const GET = async (request: NextRequest) => {
   if (!END_POINT) {
     return NextResponse.json({
       status: 500,
@@ -10,40 +10,33 @@ export const POST = async (request: NextRequest) => {
     });
   }
 
+  const tokenValue = request.cookies.get('userAccessToken')?.value;
   const searchParams = request.nextUrl.searchParams;
-  const reviewId = searchParams.get('reviewId');
 
-  if (!reviewId) {
+  const target = searchParams.get('type');
+  const targetId = searchParams.get('targetId');
+
+  if (!target || !targetId) {
     return NextResponse.json(
       {
         status: 403,
-        message: 'id값이 존재하지 않습니다.',
+        message: 'target값이 존재하지 않습니다.',
       },
       { status: 403 },
     );
   }
-
-  const tokenValue = request.cookies.get('userAccessToken')?.value;
-
-  if (!tokenValue) {
-    return NextResponse.json(
-      {
-        status: 401,
-        message: '토큰이 존재하지 않습니다.',
-      },
-      { status: 401 },
-    );
-  }
+  searchParams.delete('type');
+  searchParams.delete('targetId');
 
   const headers: Record<string, string> = {
-    Authorization: `Bearer ${tokenValue}`,
+    Authorization: tokenValue ? `Bearer ${tokenValue}` : '',
     'Content-Type': 'application/json',
   };
 
   const response = await fetch(
-    `${END_POINT}/lecture-review/${reviewId}/likes`,
+    `${END_POINT}/lecture-reviews/lectureReviewId/${target}/${targetId}?${searchParams.toString()}`,
     {
-      method: 'POST',
+      method: 'GET',
       credentials: 'include',
       headers,
     },

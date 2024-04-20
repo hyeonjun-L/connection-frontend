@@ -2,13 +2,18 @@
 import { useState } from 'react';
 import { ArrowUpSVG } from '@/icons/svg';
 
-const ReadMore = ({ labelName }: { labelName: string }) => {
+interface ReadMoreProps {
+  labelName: string;
+  id?: string;
+}
+
+const ReadMore = ({ labelName, id = 'more-btn' }: ReadMoreProps) => {
   const [isChecked, setIsChecked] = useState(false);
 
   return (
     <>
       <input
-        id="more-btn"
+        id={id}
         type="checkbox"
         onChange={(e) => {
           setIsChecked(e.target.checked);
@@ -16,7 +21,7 @@ const ReadMore = ({ labelName }: { labelName: string }) => {
         className="more-btn peer appearance-none"
       />
       <label
-        htmlFor="more-btn"
+        htmlFor={id}
         className={`absolute -bottom-4 flex h-28 w-full cursor-pointer items-end justify-center ${
           isChecked ? '' : 'bg-gradient-to-t from-white from-30%'
         } text-center text-lg font-bold text-sub-color1`}

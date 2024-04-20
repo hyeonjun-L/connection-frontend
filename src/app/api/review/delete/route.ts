@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
-export const POST = async (request: NextRequest) => {
+export const DELETE = async (request: NextRequest) => {
   if (!END_POINT) {
     return NextResponse.json({
       status: 500,
@@ -23,8 +23,7 @@ export const POST = async (request: NextRequest) => {
     );
   }
 
-  const tokenValue = request.cookies.get('userAccessToken')?.value;
-
+  const tokenValue = request.cookies.get(`userAccessToken`)?.value;
   if (!tokenValue) {
     return NextResponse.json(
       {
@@ -34,20 +33,16 @@ export const POST = async (request: NextRequest) => {
       { status: 401 },
     );
   }
-
   const headers: Record<string, string> = {
     Authorization: `Bearer ${tokenValue}`,
     'Content-Type': 'application/json',
   };
 
-  const response = await fetch(
-    `${END_POINT}/lecture-review/${reviewId}/likes`,
-    {
-      method: 'POST',
-      credentials: 'include',
-      headers,
-    },
-  );
+  const response = await fetch(`${END_POINT}/lecture-reviews/${reviewId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers,
+  });
 
   if (!response.ok) {
     const errorData = await response.json();

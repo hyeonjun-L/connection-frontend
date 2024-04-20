@@ -1,28 +1,31 @@
 import Rating from './Rating';
+import { RatingsData } from '@/types/review';
 
 interface ReviewStatisticsProps {
-  reviewList: {
-    stars: number;
-  }[];
+  ratingLists: RatingsData[];
 }
 
-const ReviewStatistics = ({ reviewList }: ReviewStatisticsProps) => {
-  const totalReviews = reviewList.length;
-  const totalScore = reviewList.reduce(
-    (total, review) => total + review.stars,
+const ReviewStatistics = ({ ratingLists }: ReviewStatisticsProps) => {
+  const totalReviews = ratingLists.reduce(
+    (total, { count }) => total + count,
+    0,
+  );
+  const totalScore = ratingLists.reduce(
+    (total, { stars, count }) => total + stars * count,
     0,
   );
   const averageScore = totalScore / totalReviews;
+  const formattedAverageScore = averageScore.toFixed(1);
 
   const scoreCount = Array(5).fill(0);
-  reviewList.forEach((review) => scoreCount[review.stars - 1]++);
+  ratingLists.forEach(({ stars, count }) => (scoreCount[stars - 1] = count));
 
   const scorePercent = scoreCount.map((count) => (count / totalReviews) * 100);
 
   return (
     <dl className="flex w-full flex-col gap-2 rounded-md bg-white p-5 shadow-vertical">
       <dt className="text-2xl font-bold">
-        {reviewList.length > 0 ? averageScore : 0}
+        {ratingLists.length > 0 ? formattedAverageScore : 0}
         <span className="text-gray-500">/ 5.0</span>
       </dt>
       <dd className="mb-4">
