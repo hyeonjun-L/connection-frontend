@@ -2,7 +2,10 @@ import Link from 'next/link';
 import { NOTIFICATIONS_TAKE } from '@/constants/constants';
 import { getNotifications } from '@/lib/apis/serverApis/notifications';
 import NotificationList from './_components/NotificationList';
-import { NotificationsFilterOption } from '@/types/notifications';
+import {
+  INotifications,
+  NotificationsFilterOption,
+} from '@/types/notifications';
 
 const page = async ({
   searchParams,
@@ -24,7 +27,7 @@ const page = async ({
       (searchParamfilterOption as NotificationsFilterOption) ?? '전체',
   };
 
-  let notifications = [];
+  let notifications: INotifications[] = [];
 
   try {
     notifications = await getNotifications(filterData);
@@ -48,7 +51,7 @@ const page = async ({
           </Link>
         ))}
       </nav>
-      <NotificationList />
+      <NotificationList notificationsList={notifications} />
     </main>
   );
 };
