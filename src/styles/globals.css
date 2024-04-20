@@ -178,3 +178,43 @@ html {
 .curriculum:has(+ .more-btn:checked) {
   -webkit-line-clamp: unset;
 }
+
+.landing {
+  background: url('/images/landing/landing_bg_lg.png') no-repeat;
+  background-position-x: center;
+  background-size: cover;
+  height: 685px;
+  overflow: hidden;
+  background-position: top;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .landing {
+    background: url('/images/landing/landing_bg_md.png') no-repeat;
+    background-position-x: center;
+    background-size: cover;
+    height: 450px;
+    overflow: hidden;
+    background-position: top;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 390px) {
+  .landing {
+    background: url('/images/landing/landing_bg_sm.png') no-repeat;
+    background-position-x: center;
+    background-size: cover;
+    height: 400px;
+    overflow: hidden;
+    background-position: top;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
