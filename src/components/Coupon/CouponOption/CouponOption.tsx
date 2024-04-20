@@ -1,4 +1,5 @@
 'use client';
+import { useQuery } from '@tanstack/react-query';
 import { ChangeEvent, useEffect, useState } from 'react';
 import {
   Control,
@@ -57,34 +58,31 @@ const CouponOption = ({
   type = 'CREATE',
 }: CouponOptionProps) => {
   const [options, setOptions] = useState<SelectClassType[]>([]);
-  const [render, setRender] = useState(false);
-  const [isAllSelected, setIsAllSelected] = useState(false);
 
-  const selectClass = watch('lectureIds');
   const couponQuantity = watch('couponQuantity');
 
-  useEffect(() => {
-    getMyLecture()
-      .then((resData) => {
-        const options = resData.data.lecture.map(({ id, title }) => ({
-          label: title,
-          value: id,
-        }));
-        setOptions(options);
-        setRender(true);
-      })
-      .catch((error) => console.error(error));
-  }, []);
+  const { data: classList, isLoading } = useQuery({
+    queryKey: ['myClass'],
+    queryFn: getMyLecture,
+  });
 
   useEffect(() => {
-    setIsAllSelected(selectClass?.length === options.length);
-  }, [selectClass, options]);
+    if (classList) {
+      const options = classList.map(({ id, title }) => ({
+        label: title,
+        value: id,
+      }));
+
+      setOptions(options);
+      setValue('lectureIds', options);
+    }
+  }, [classList, setValue]);
 
   useEffect(() => {
     if (couponQuantity === '원') {
       setValue('maxDiscountAmount', undefined);
     }
-  }, [couponQuantity]);
+  }, [couponQuantity, setValue]);
 
   return (
     <main className="flex flex-col gap-4 ">
@@ -293,7 +291,12 @@ const CouponOption = ({
       <section className="grid grid-cols-[1fr,5fr] items-stretch">
         <h2 className="mr-10 whitespace-nowrap font-semibold">적용할 클래스</h2>
 
-        {(options.length > 0 || render) && (
+        {isLoading ? (
+          <div className="flex flex-col gap-2">
+            <div className="h-7 w-full animate-pulse bg-gray-700" />
+            <div className="h-7 w-full animate-pulse bg-gray-700" />
+          </div>
+        ) : (
           <Controller
             name="lectureIds"
             control={control}
@@ -323,7 +326,7 @@ const CouponOption = ({
                       id="lectureIds"
                       type="checkbox"
                       className="peer mr-1 h-7 w-[1.12rem] accent-sub-color1"
-                      checked={isAllSelected}
+                      checked={field.value.length === options.length}
                       onChange={(e) => classSelectAll(e)}
                     />
                     <label
@@ -350,7 +353,7 @@ const CouponOption = ({
                     </div>
                   </div>
                   <div className="col-span-2 flex max-h-48 flex-col gap-1 overflow-y-auto sm:col-start-2">
-                    {selectClass?.map(({ label = '', value = '' }, index) => (
+                    {field.value?.map(({ label = '', value = '' }, index) => (
                       <p
                         key={label + index}
                         className="flex items-center justify-between text-sm text-sub-color1"

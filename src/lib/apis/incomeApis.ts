@@ -1,4 +1,6 @@
-import { IIncomeHistoryResponse } from '@/types/payment';
+import createParams from '@/utils/createParams';
+import { IIncomeHistoryParams, IIncomeHistoryResponse } from '@/types/payment';
+import { FetchError } from '@/types/types';
 
 export const getIncomeStatics = async (type: 'MONTHLY' | 'DAILY') => {
   const query =
@@ -65,26 +67,31 @@ export const getTotalIncome = async (
 };
 
 export const getIncomeHistory = async (
-  range: { from: Date; to: Date },
-  productType: string,
-  displayCount: number,
-  itemsId: { firstItemId: number; lastItemId: number },
-  lectureId?: string | number,
+  data: IIncomeHistoryParams,
+  signal?: AbortSignal,
 ): Promise<IIncomeHistoryResponse> => {
-  const { firstItemId, lastItemId } = itemsId;
-  const startISODate = range.from.toISOString().split('T')[0];
-  const endISODate = range.to.toISOString().split('T')[0];
-  const query = `take=${displayCount}&startDate=${startISODate}&endDate=${endISODate}&productType=${productType}&firstItemId=${firstItemId}&lastItemId=${lastItemId}${
-    lectureId ? `&lectureId=${lectureId}` : ''
-  }`;
+  const params = createParams(data);
 
-  const response = await fetch(`/api/income/history?${query}`, {
+  const response = await fetch(`/api/income/history?${params}`, {
     method: 'GET',
     credentials: 'include',
+    signal,
     headers: {
       'Content-Type': 'application/json',
     },
-  }).then((data) => data.json());
+  });
 
-  return response.data;
+  if (!response.ok) {
+    const errorData = await response.json();
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
+  }
+
+  const resData = await response.json();
+
+  return {
+    count: resData.data.totalItemCount,
+    item: resData.data?.lecturerPaymentList ?? [],
+  };
 };

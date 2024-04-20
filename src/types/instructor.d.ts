@@ -1,5 +1,6 @@
 import { IReservation } from './class';
 import { PaymentStatusType } from './payment';
+import { PagenationFilterState } from '@/types/types';
 
 export interface instructorPostResponse {
   profileCardImageUrl: string | null;
@@ -274,12 +275,7 @@ export interface bankAccount extends CommonBankAccount {
   id: number;
 }
 
-export interface GetMyMembersParameter {
-  take: number;
-  currentPage?: number;
-  targetPage?: number;
-  firstItemId?: number;
-  lastItemId?: number;
+export interface GetMyMembersParameter extends PagenationFilterState {
   sortOption: 'LATEST' | 'ASC' | 'HIGHEST_APPLICANTS';
   filterOption: 'ALL' | 'IN_PROGRESS' | 'COMPLETED';
   lectureId?: number;

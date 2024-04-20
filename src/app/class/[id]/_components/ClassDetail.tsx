@@ -22,7 +22,7 @@ import Nav from '@/components/Nav/Nav';
 import ProfileImage from '@/components/Profile/ProfileImage';
 import RegularScheduleView from '@/components/ScheduleView/RegularScheduleView';
 import ScheduleView from '@/components/ScheduleView/ScheduleView';
-import ReviewSection from '@/components/uis/ReviewSection';
+import ReviewSection from '@/components/uis/ReviewSection/ReviewSection';
 
 const ClassDetail = async ({ id }: { id: string }) => {
   const classDetailData = getClassDetail(id);
@@ -46,7 +46,6 @@ const ClassDetail = async ({ id }: { id: string }) => {
     location,
     maxCapacity,
     duration,
-    stars,
     lectureToRegion,
   } = classDetail;
 
@@ -193,7 +192,7 @@ const ClassDetail = async ({ id }: { id: string }) => {
         </section>
 
         {/* 클래스 후기 */}
-        <ReviewSection stars={stars} type="class" />
+        <ReviewSection type="lectures" targetId={id} />
       </section>
 
       {schedules && (

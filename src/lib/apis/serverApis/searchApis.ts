@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import createParams from '@/utils/createParams';
 import {
   searchBestClassData,
   searchClass,
@@ -109,17 +110,7 @@ export const searchInstructors = async (
     const cookieStroe = cookies();
     const authorization = cookieStroe.get('userAccessToken')?.value;
 
-    const params = new URLSearchParams();
-
-    Object.entries(data)
-      .filter(([_, v]) => v !== undefined)
-      .forEach(([k, v]) => {
-        if (Array.isArray(v)) {
-          v.forEach((value) => params.append(`${k}[]`, value));
-        } else {
-          params.append(k, String(v));
-        }
-      });
+    const params = createParams(data);
 
     const headers: Record<string, string> = userState
       ? {
@@ -223,17 +214,7 @@ export const searchClasses = async (
     const cookieStroe = cookies();
     const authorization = cookieStroe.get('userAccessToken')?.value;
 
-    const params = new URLSearchParams();
-
-    Object.entries(data)
-      .filter(([_, v]) => v !== undefined)
-      .forEach(([k, v]) => {
-        if (Array.isArray(v)) {
-          v.forEach((value) => params.append(`${k}[]`, value));
-        } else {
-          params.append(k, String(v));
-        }
-      });
+    const params = createParams(data);
 
     const headers: Record<string, string> = userState
       ? {
@@ -269,17 +250,7 @@ export const searchPasses = async (
     const cookieStroe = cookies();
     const authorization = cookieStroe.get('userAccessToken')?.value;
 
-    const params = new URLSearchParams();
-
-    Object.entries(data)
-      .filter(([_, v]) => v !== undefined)
-      .forEach(([k, v]) => {
-        if (Array.isArray(v)) {
-          v.forEach((value) => params.append(`${k}[]`, value));
-        } else {
-          params.append(k, String(v));
-        }
-      });
+    const params = createParams(data);
 
     const headers: Record<string, string> = userState
       ? {

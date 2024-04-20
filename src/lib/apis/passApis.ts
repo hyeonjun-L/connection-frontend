@@ -1,7 +1,7 @@
+import createParams from '@/utils/createParams';
 import { IgetFunction } from '@/types/coupon';
 import {
   IcreatePassReqData,
-  IgetPassFunction,
   IpassData,
   IresponsePassData,
   passSituation,
@@ -14,17 +14,7 @@ export const getIssuedPassLists = async (
   type: 'lecturer' | 'user',
   signal?: AbortSignal,
 ): Promise<IresponsePassData> => {
-  const params = new URLSearchParams();
-
-  Object.entries(data)
-    .filter(([_, v]) => v !== undefined)
-    .forEach(([k, v]) => {
-      if (Array.isArray(v)) {
-        v.forEach((value) => params.append(`${k}[]`, value));
-      } else {
-        params.append(k, String(v));
-      }
-    });
+  const params = createParams(data);
 
   try {
     const response = await fetch(`/api/pass/getIssuedPassList?${params}`, {
@@ -46,10 +36,14 @@ export const getIssuedPassLists = async (
 
     const resData = await response.json();
 
-    const { passList: itemList, totalItemCount } = resData.data;
-
-    return { itemList, totalItemCount };
+    return {
+      item: resData.data.passList,
+      count: resData.data.totalItemCount,
+    };
   } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
     console.error('발급한 패스권 조회 오류', error);
     throw error;
   }

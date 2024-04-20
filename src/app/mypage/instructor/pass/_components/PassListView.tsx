@@ -1,74 +1,68 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { LECTURE_COUPON_TAKE } from '@/constants/constants';
+import usePageNation from '@/hooks/usePageNation';
 import { NotFoundSVG } from '@/icons/svg';
 import { getIssuedPassLists } from '@/lib/apis/passApis';
 import { usePassSelectStore } from '@/store/passSelectStore';
-import useCouponPassHook from '@/utils/useCouponPassHook';
+import PassLoading from './loading/PassLoading';
+import CouponLoading from '../../coupon/_components/loading/CouponLoading';
 import ClassFilterSelect from '@/components/Filter/ClassSelectFilter';
 import Pagination from '@/components/Pagination/Pagination';
+import PaginationLoading from '@/components/Pagination/PaginationLoading';
 import InstructorPass from '@/components/Pass/InstructorPass';
-import Spinner from '@/components/Spinner/Spinner';
-import {
-  IgetListFunctionHandler,
-  IonChangeItemList,
-  SelectClassType,
-} from '@/types/coupon';
+import { IgetFunction, SelectClassType } from '@/types/coupon';
 import { IpassData } from '@/types/pass';
 
 interface PassListViewProps {
+  initialData: { count: number; item: IpassData[] };
   myLectureList: SelectClassType[];
-  totalItemCount: number;
-  passList: IpassData[];
 }
 
-const PassListView = ({
-  myLectureList,
-  totalItemCount: defaultItemCount,
-  passList,
-}: PassListViewProps) => {
-  const [passLists, setPassLists] = useState(passList);
+const PassListView = ({ myLectureList, initialData }: PassListViewProps) => {
   const router = useRouter();
-
   const { setpassInfo } = usePassSelectStore((state) => ({
     setpassInfo: state.setpassInfo,
   }));
 
-  const onChangeItemList = ({ itemList, prevPage }: IonChangeItemList) => {
-    if (prevPage) {
-      setPassLists((prevList) => [...prevList, ...(itemList ? itemList : [])]);
-    } else {
-      setPassLists([...itemList]);
-    }
-  };
-
-  const getListFunctionHandler = async ({
-    data,
-    signal,
-  }: IgetListFunctionHandler) => {
+  const getListFunctionHandler = async (
+    data: IgetFunction,
+    signal?: AbortSignal,
+  ) => {
     return await getIssuedPassLists(data, 'lecturer', signal);
   };
 
   const {
-    width,
-    loading,
-    filterState,
+    items: passLists,
     totalItemCount,
-    handleFilterOptionChange,
-    handleChangeOptions,
-    handleChangeSelectedClass,
-    lastItemElementRef,
-    handleChangePage,
-  } = useCouponPassHook({
-    myLectureList,
-    defaultItemCount,
-    itemList: passList,
-    onChange: onChangeItemList,
-    getFunction: getListFunctionHandler,
-    type: 'lecturer',
-    isInterested: 'PASS',
+    filterState,
+    isLoading,
+    changeFilterState,
+    changePage,
+  } = usePageNation<IpassData>({
+    initialData,
+    defaultFilterState: {
+      take: LECTURE_COUPON_TAKE,
+      targetPage: 1,
+      passStatusOptions: 'AVAILABLE',
+      filterOption: 'LATEST',
+      lectureId: undefined,
+    },
+    queryType: 'instructorPass',
+    queryFn: getListFunctionHandler,
   });
+
+  const selectClassHandler = (selectedOptions: any) => {
+    changeFilterState(
+      {
+        lectureId:
+          selectedOptions.value === 'select-all'
+            ? undefined
+            : selectedOptions.value,
+      },
+      true,
+    );
+  };
 
   const options: {
     id: 'AVAILABLE' | 'DISABLED';
@@ -93,6 +87,8 @@ const PassListView = ({
     { id: 'BEST_SELLING', label: '판매순' },
   ];
 
+  const pageCount = Math.ceil(totalItemCount / LECTURE_COUPON_TAKE);
+
   return (
     <>
       <nav className="flex flex-wrap items-center gap-2 border-y border-solid border-gray-500 py-5">
@@ -103,7 +99,9 @@ const PassListView = ({
               type="checkbox"
               className="peer h-[18px] w-[18px] accent-black"
               checked={filterState.passStatusOptions === option.id}
-              onChange={() => handleChangeOptions(option.id)}
+              onChange={() =>
+                changeFilterState({ passStatusOptions: option.id }, true)
+              }
             />
             <label
               htmlFor={option.id}
@@ -116,8 +114,12 @@ const PassListView = ({
         <div className="w-80">
           <ClassFilterSelect
             options={myLectureList}
-            value={filterState.selectedClass}
-            onChange={handleChangeSelectedClass}
+            value={
+              myLectureList.find(
+                ({ value }) => value === filterState.lectureId,
+              ) ?? myLectureList[0]
+            }
+            onChange={selectClassHandler}
           />
         </div>
       </nav>
@@ -130,53 +132,49 @@ const PassListView = ({
               className={`flex text-sm font-bold ${
                 filterState.filterOption !== option.id && 'text-gray-500'
               }`}
-              onClick={() => handleFilterOptionChange(option.id)}
+              onClick={() => changeFilterState({ filterOption: option.id })}
             >
               {option.label}
             </button>
           ))}
       </nav>
 
-      <div className="flex flex-wrap justify-center gap-4 pb-4 sm:justify-normal">
-        {passLists.map((pass, index) => (
-          <InstructorPass
-            key={pass.id}
-            passInfo={pass}
-            lastItemElementRef={
-              passLists.length === index + 1 &&
-              passLists.length < totalItemCount &&
-              width < 640
-                ? lastItemElementRef
-                : undefined
-            }
-            selectPassHandler={() => {
-              setpassInfo(pass);
-              router.push(`/mypage/instructor/pass/${pass.id}`);
-            }}
-          />
-        ))}
-      </div>
-      {loading && width < 640 && (
-        <div className="mb-5 flex justify-center">
-          <Spinner />
+      {isLoading ? (
+        <PassLoading />
+      ) : passLists.length > 0 ? (
+        <div className="flex flex-wrap justify-center gap-4 pb-4 sm:justify-normal">
+          {passLists.map((pass) => (
+            <InstructorPass
+              key={pass.id}
+              passInfo={pass}
+              selectPassHandler={() => {
+                setpassInfo(pass);
+                router.push(`/mypage/instructor/pass/${pass.id}`);
+              }}
+            />
+          ))}
         </div>
-      )}
-
-      {!!totalItemCount ? (
-        <nav className="my-8 hidden sm:block">
-          <Pagination
-            pageCount={Math.ceil(totalItemCount / LECTURE_COUPON_TAKE)}
-            currentPage={
-              filterState.targetPage === 0 ? 0 : filterState.targetPage - 1
-            }
-            onPageChange={handleChangePage}
-          />
-        </nav>
       ) : (
         <div className="my-7 flex w-full flex-col items-center justify-center gap-8 text-lg font-semibold text-gray-100">
           <NotFoundSVG />
           <p>해당 패스권이 없습니다!</p>
         </div>
+      )}
+
+      {passLists.length > 0 && pageCount === 0 ? (
+        <PaginationLoading />
+      ) : (
+        pageCount > 0 && (
+          <nav className="my-8">
+            <Pagination
+              pageCount={pageCount}
+              currentPage={
+                filterState.currentPage ? filterState.currentPage - 1 : 0
+              }
+              onPageChange={changePage}
+            />
+          </nav>
+        )
       )}
     </>
   );

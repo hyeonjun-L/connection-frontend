@@ -1,3 +1,4 @@
+import createParams from '@/utils/createParams';
 import {
   IPaymentInfo,
   IRefundRequest,
@@ -5,6 +6,7 @@ import {
   IVirtualAccountInfo,
   PaymentPassInfoParam,
   IMyPaymentResponse,
+  IMyPaymentParams,
 } from '@/types/payment';
 import { FetchError } from '@/types/types';
 
@@ -50,29 +52,29 @@ export const postPaymentCancel = async (id: string) => {
 };
 
 export const getPaymentHistory = async (
-  displayCount: number,
-  currentPage: number,
-  targetPage: number,
-  firstItemId: number,
-  lastItemId: number,
-  option: string,
+  data: IMyPaymentParams,
+  signal?: AbortSignal,
 ): Promise<IMyPaymentResponse> => {
-  const query = `displayCount=${displayCount}&currentPage=${currentPage}&targetPage=${targetPage}&firstItemId=${firstItemId}&lastItemId=${lastItemId}&option=${option}`;
+  const params = createParams(data);
 
-  const response = await fetch(`/api/payment/history?${query}`, {
+  const response = await fetch(`/api/payment/history?${params}`, {
     credentials: 'include',
+    signal,
     headers: {
       'Content-Type': 'application/json',
     },
   });
 
   if (!response.ok) {
-    throw new Error('유저 결제 내역 조회 오류!');
+    const errorData = await response.json();
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
   }
 
   const res = await response.json();
 
-  return res.data;
+  return { count: res.data.totalItemCount, item: res.data.userPaymentsHistory };
 };
 
 export const getAccountInfo = async (

@@ -1,35 +1,66 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
-if (!END_POINT) {
-  throw new Error('환경 변수 누락');
-}
-
 export const POST = async (request: NextRequest) => {
-  const searchParams = request.nextUrl.searchParams;
-  const id = searchParams.get('id');
-  const token = request.cookies.get('userAccessToken')?.value;
-
-  if (!token) {
-    return;
+  if (!END_POINT) {
+    return NextResponse.json({
+      status: 500,
+      message: '환경 변수가 설정되지 않았습니다.',
+    });
   }
 
-  const serverResponse = await fetch(
-    END_POINT + `/lecture-review/${id}/likes`,
+  const searchParams = request.nextUrl.searchParams;
+  const reviewId = searchParams.get('reviewId');
+
+  if (!reviewId) {
+    return NextResponse.json(
+      {
+        status: 403,
+        message: 'id값이 존재하지 않습니다.',
+      },
+      { status: 403 },
+    );
+  }
+
+  const tokenValue = request.cookies.get('userAccessToken')?.value;
+
+  if (!tokenValue) {
+    return NextResponse.json(
+      {
+        status: 401,
+        message: '토큰이 존재하지 않습니다.',
+      },
+      { status: 401 },
+    );
+  }
+
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${tokenValue}`,
+    'Content-Type': 'application/json',
+  };
+
+  const response = await fetch(
+    `${END_POINT}/lecture-review/${reviewId}/likes`,
     {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      credentials: 'include',
+      headers,
     },
-  ).then((data) => data.json());
+  );
 
-  if (serverResponse.statusCode !== 201) {
-    throw new Error('강의 좋아요 요청 에러!');
+  if (!response.ok) {
+    const errorData = await response.json();
+    return NextResponse.json(
+      {
+        status: response.status,
+        message: errorData.message || '서버 요청 오류',
+      },
+      { status: response.status },
+    );
   }
 
-  return NextResponse.json(serverResponse);
+  const result = await response.json();
+
+  return NextResponse.json(result);
 };

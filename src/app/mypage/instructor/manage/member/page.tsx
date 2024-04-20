@@ -1,21 +1,34 @@
+import { redirect } from 'next/navigation';
 import { MEMBER_MANAGE_TAKE } from '@/constants/constants';
 import { getMyLecture } from '@/lib/apis/serverApis/classApi';
 import { getMyMembers } from '@/lib/apis/serverApis/instructorPostApis';
 import MemberManage from './_components/MemberManage';
 import { OptionType } from '@/types/coupon';
 import { GetMyMembersData } from '@/types/instructor';
+import { FetchError } from '@/types/types';
 
-const page = async () => {
+const page = async ({
+  searchParams,
+}: {
+  searchParams: {
+    take: number;
+    sortOption: 'LATEST' | 'ASC' | 'HIGHEST_APPLICANTS';
+    filterOption: 'ALL' | 'IN_PROGRESS' | 'COMPLETED';
+    lectureId: number;
+  };
+}) => {
   let myClassListsOption: OptionType[] = [];
   let myMembers: GetMyMembersData = {
     count: 0,
     item: [],
   };
+  const { take, sortOption, filterOption, lectureId } = searchParams;
 
   const firstRender = {
-    take: MEMBER_MANAGE_TAKE,
-    sortOption: 'LATEST' as 'LATEST',
-    filterOption: 'ALL' as 'ALL',
+    take: take ?? MEMBER_MANAGE_TAKE,
+    sortOption: sortOption ?? 'LATEST',
+    filterOption: filterOption ?? 'ALL',
+    lectureId,
   };
 
   try {
@@ -43,7 +56,13 @@ const page = async () => {
         label: `전체 클래스(${myClassListsOption.length})`,
       });
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      const fetchError = error as FetchError;
+      if (fetchError.status === 400) {
+        redirect('/mypage/instructor/manage/member');
+      }
+      console.error(error);
+    }
   }
 
   return (

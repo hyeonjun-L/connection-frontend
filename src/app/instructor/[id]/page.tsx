@@ -4,9 +4,10 @@ import ClassSection from './_components/ClassSection';
 import ClassSectionLoading from './_components/loading/ClassSectionLoading';
 import PassSectionLoading from './_components/loading/PassSectionLoading';
 import ProfileSectionLoading from './_components/loading/ProfileSectionLoading';
+import ReviewSectionLoading from './_components/loading/ReviewSectionLoading';
 import PassSection from './_components/PassSection';
 import ProfileSection from './_components/ProfileSection';
-import ReviewSection from '@/components/uis/ReviewSection';
+import ReviewSection from '@/components/uis/ReviewSection/ReviewSection';
 import type { Metadata } from 'next';
 
 export const generateMetadata = async ({
@@ -36,7 +37,7 @@ const InstructorDetailPage = async ({
   params: { id: string };
 }) => {
   return (
-    <main className="mx-auto w-full">
+    <main className="mx-auto w-full overflow-x-hidden">
       <Suspense fallback={<ProfileSectionLoading />}>
         <ProfileSection id={id} />
       </Suspense>
@@ -50,7 +51,11 @@ const InstructorDetailPage = async ({
           <PassSection id={id} />
         </Suspense>
 
-        <ReviewSection stars={0} type="instructor" />
+        <Suspense fallback={<ReviewSectionLoading />}>
+          <div className="w-full px-4">
+            <ReviewSection type="lecturers" targetId={id} />
+          </div>
+        </Suspense>
       </div>
     </main>
   );

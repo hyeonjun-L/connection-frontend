@@ -1,5 +1,7 @@
 .pagination {
   display: flex;
+  flex-wrap: wrap;
+  width: 100%;
   gap: 1.37rem;
   justify-content: center;
   padding: 10px;
