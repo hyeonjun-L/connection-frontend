@@ -1,7 +1,15 @@
 import Link from 'next/link';
+import { NOTIFICATIONS_TAKE } from '@/constants/constants';
+import { getNotifications } from '@/lib/apis/serverApis/notifications';
 import NotificationList from './_components/NotificationList';
+import { NotificationsFilterOption } from '@/types/notifications';
 
-const page = async () => {
+const page = async ({
+  searchParams,
+}: {
+  searchParams: { filterOption: string };
+}) => {
+  const { filterOption: searchParamfilterOption } = searchParams;
   const filterOption = [
     '전체',
     '수강 클래스',
@@ -9,6 +17,20 @@ const page = async () => {
     '쿠폰/패스권',
     '읽지 않은 알림',
   ];
+
+  const filterData = {
+    pageSize: NOTIFICATIONS_TAKE,
+    filterOption:
+      (searchParamfilterOption as NotificationsFilterOption) ?? '전체',
+  };
+
+  let notifications = [];
+
+  try {
+    notifications = await getNotifications(filterData);
+  } catch (error) {
+    console.error(error);
+  }
 
   return (
     <main className="mx-auto mt-3 w-full max-w-[51.1rem]">

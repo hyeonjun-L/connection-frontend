@@ -547,3 +547,5 @@ export const INCOME_HISTORY_TAKE = 5 as const;
 export const INSTRUCTOR_H2_STYLE = 'mb-2 text-lg font-bold' as const;
 
 export const REVIEW_TAKE = 4 as const;
+
+export const NOTIFICATIONS_TAKE = 7 as const;
