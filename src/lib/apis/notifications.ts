@@ -27,6 +27,7 @@ export const getNotifications = async (
     }
 
     const resData = await response.json();
+
     return resData.data.notifications;
   } catch (error) {
     console.error('알림 불러오기 오류', error);

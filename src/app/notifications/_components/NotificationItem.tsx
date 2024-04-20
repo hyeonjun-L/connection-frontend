@@ -1,4 +1,3 @@
-'use client';
 import { differenceInHours, parseISO } from 'date-fns';
 import { TrashcanSVG } from '@/icons/svg';
 import { formatShortDate } from '@/utils/dateTimeUtils';

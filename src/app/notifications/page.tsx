@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { NOTIFICATIONS_TAKE } from '@/constants/constants';
 import { getNotifications } from '@/lib/apis/serverApis/notifications';
 import NotificationList from './_components/NotificationList';
@@ -6,6 +7,7 @@ import {
   INotifications,
   NotificationsFilterOption,
 } from '@/types/notifications';
+import { FetchError } from '@/types/types';
 
 const page = async ({
   searchParams,
@@ -32,7 +34,13 @@ const page = async ({
   try {
     notifications = await getNotifications(filterData);
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      const fetchError = error as FetchError;
+      if (fetchError.status === 400) {
+        redirect('/notifications');
+      }
+      console.error(error);
+    }
   }
 
   return (
@@ -57,7 +65,10 @@ const page = async ({
           </Link>
         ))}
       </nav>
-      <NotificationList notificationsList={notifications} />
+      <NotificationList
+        initalData={notifications}
+        filterOption={filterData.filterOption}
+      />
     </main>
   );
 };

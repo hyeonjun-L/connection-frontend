@@ -12,7 +12,7 @@ export interface IGetNotifications {
 }
 
 export interface INotifications {
-  id: string;
+  id: number;
   description: string;
   target: { userId?: number; lectureId?: number };
   lectureId?: number;
@@ -22,4 +22,10 @@ export interface INotifications {
   userPassId?: number;
   readedAt: null | string;
   createdAt: string;
+}
+
+export interface INotificationsPageParams {
+  pageSize: number;
+  lastItemId?: number;
+  filterOption: NotificationsFilterOption;
 }
