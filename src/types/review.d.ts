@@ -1,3 +1,5 @@
+import { PagenationFilterState } from '@/types/types';
+
 export type ReviewOrderType =
   | '최신순'
   | '좋아요순'
@@ -102,13 +104,8 @@ export interface WriteReviewData {
   stars: number;
 }
 
-export interface GetMyLecturersReviews {
-  take: number | undefined;
+export interface GetMyLecturersReviews extends PagenationFilterState {
   lecturerMyReviewType: string;
-  currentPage?: number;
-  targetPage?: number;
-  firstItemId?: number;
-  lastItemId?: number;
   orderBy: string;
 }
 

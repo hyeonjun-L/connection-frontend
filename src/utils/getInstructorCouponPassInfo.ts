@@ -1,12 +1,17 @@
+import { redirect } from 'next/navigation';
 import { LECTURE_COUPON_TAKE, LECTURE_PASS_TAKE } from '@/constants/constants';
 import { getMyLecture } from '@/lib/apis/serverApis/classApi';
 import { getCouponList } from '@/lib/apis/serverApis/couponApis';
 import { getIssuedPassList } from '@/lib/apis/serverApis/passApis';
 import { mapItemToCoupon } from '@/utils/apiDataProcessor';
-import { OptionType, couponGET } from '@/types/coupon';
+import { ISearchParams, OptionType, couponGET } from '@/types/coupon';
 import { IpassData } from '@/types/pass';
+import { FetchError } from '@/types/types';
 
-const getCouponPassInfo = async () => {
+const getCouponPassInfo = async (
+  type: 'COUPON' | 'PASS',
+  filterOption?: ISearchParams,
+) => {
   let myClassListsOption;
   let CouponCount = 0;
   let passCount = 0;
@@ -15,36 +20,51 @@ const getCouponPassInfo = async () => {
 
   try {
     const reqCouponData = {
-      take: LECTURE_COUPON_TAKE,
-      couponStatusOption: 'AVAILABLE' as 'AVAILABLE',
-      filterOption: 'LATEST' as 'LATEST',
+      take: filterOption?.take ?? LECTURE_COUPON_TAKE,
+      couponStatusOption:
+        type === 'COUPON'
+          ? filterOption?.couponStatusOption ?? 'AVAILABLE'
+          : 'AVAILABLE',
+      filterOption:
+        type === 'COUPON' ? filterOption?.filterOption ?? 'LATEST' : 'LATEST',
+      lectureId: type === 'COUPON' ? filterOption?.lectureId : undefined,
     };
 
     const reqPassData = {
       take: LECTURE_PASS_TAKE,
-      passStatusOptions: 'AVAILABLE' as 'AVAILABLE',
-      filterOption: 'LATEST' as 'LATEST',
+      passStatusOptions:
+        type === 'PASS'
+          ? filterOption?.passStatusOptions ?? 'AVAILABLE'
+          : 'AVAILABLE',
+      filterOption:
+        type === 'PASS' ? filterOption?.filterOption ?? 'LATEST' : 'LATEST',
+      lectureId: type === 'PASS' ? filterOption?.lectureId : undefined,
     };
 
-    const resultCoupon = await getCouponList(reqCouponData, 'lecturer');
-    const { itemList, totalItemCount } = await getIssuedPassList(
-      reqPassData,
-      'lecturer',
-    );
-    passList = itemList;
-    passCount = totalItemCount;
+    const resultLectureLists = getMyLecture();
+    const resultCoupon = getCouponList(reqCouponData, 'lecturer');
+    const resultPass = getIssuedPassList(reqPassData, 'lecturer');
 
-    if (resultCoupon) {
+    const [coupon, pass, lectureList] = await Promise.all([
+      resultCoupon,
+      resultPass,
+      resultLectureLists,
+    ]);
+
+    const { item, count } = pass;
+
+    passList = item;
+    passCount = count;
+
+    if (coupon) {
       const { totalItemCount: resTotalItemCount, itemList: resCouponList } =
-        resultCoupon;
+        coupon;
       CouponCount = resTotalItemCount;
 
       couponList = resCouponList?.map(mapItemToCoupon) ?? [];
     }
 
-    const resLectureLists = await getMyLecture();
-
-    myClassListsOption = resLectureLists.map(
+    myClassListsOption = lectureList.map(
       ({ id, title }): OptionType => ({
         value: id,
         label: title,
@@ -59,7 +79,17 @@ const getCouponPassInfo = async () => {
 
     return { CouponCount, couponList, passCount, myClassListsOption, passList };
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      const fetchError = error as FetchError;
+      if (fetchError.status === 400) {
+        redirect(
+          type === 'COUPON'
+            ? '/mypage/instructor/coupon'
+            : '/mypage/instructor/pass',
+        );
+      }
+      console.error(error);
+    }
   }
 };
 

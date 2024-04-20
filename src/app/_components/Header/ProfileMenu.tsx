@@ -20,7 +20,7 @@ const USER_MENU = [
 const LECTURER_MENU = [
   <Link href="/dashboard">대시보드</Link>,
   <Link href="/mypage/instructor/manage/myclass">클래스 관리</Link>,
-  <Link href="/mypage/instructor/manage/myclass">회원 관리</Link>,
+  <Link href="/mypage/instructor/manage/member">회원 관리</Link>,
 ];
 
 const ProfileMenu = () => {

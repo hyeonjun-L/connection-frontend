@@ -1,10 +1,15 @@
-import { AddressData, Polyline, RoadAddrPoint } from '@/types/address';
+import { AddressData, RoadAddrPoint } from '@/types/address';
 import { FetchError } from '@/types/types';
 
-export const searchAddress = async (keyword: string, page: number | string) => {
+export const searchAddress = async (
+  keyword: string,
+  page: number,
+  signal?: AbortSignal,
+) => {
   try {
     const response = await fetch(
       `/api/map/address?keyword=${encodeURIComponent(keyword)}&page=${page}`,
+      { signal },
     );
 
     if (!response.ok) throw new Error('Network response was not ok');
@@ -13,6 +18,9 @@ export const searchAddress = async (keyword: string, page: number | string) => {
 
     return data;
   } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
     console.error(error);
     throw error;
   }

@@ -136,8 +136,9 @@ export const getMyMembers = async (
 
   if (!response.ok) {
     const errorData = await response.json();
-    console.error(errorData.message);
-    throw new Error(`회원관리 회원 목록 불러오기 에러: ${response.status}`);
+    const error: FetchError = new Error(errorData.message || '');
+    error.status = response.status;
+    throw error;
   }
 
   const resData = await response.json();

@@ -9,13 +9,9 @@ import { FetchError } from '@/types/types';
 
 interface CouponCreatorProps {
   changeCouponList: (couponOption: createCoupon) => void;
-  isCouponSectionOpen: boolean;
 }
 
-const CouponCreator = ({
-  isCouponSectionOpen,
-  changeCouponList,
-}: CouponCreatorProps) => {
+const CouponCreator = ({ changeCouponList }: CouponCreatorProps) => {
   const {
     register,
     handleSubmit,

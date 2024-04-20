@@ -3,44 +3,49 @@ import type { NextRequest } from 'next/server';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
-if (!END_POINT) {
-  throw new Error('Required environment variables are missing');
-}
-
 export const GET = async (request: NextRequest) => {
+  if (!END_POINT) {
+    return NextResponse.json({
+      status: 500,
+      message: '환경 변수가 설정되지 않았습니다.',
+    });
+  }
+
   const token = request.cookies.get('userAccessToken')?.value;
-  if (!token) return new Response('유저 권한 없음!', { status: 401 });
-
-  const searchParams = request.nextUrl.searchParams;
-  const {
-    displayCount,
-    currentPage,
-    targetPage,
-    firstItemId,
-    lastItemId,
-    option,
-  } = Object.fromEntries(searchParams);
-
-  const query = `take=${displayCount}&currentPage=${currentPage}&targetPage=${targetPage}&firstItemId=${firstItemId}&lastItemId=${lastItemId}&paymentHistoryType=${option}`;
+  if (!token) {
+    return NextResponse.json(
+      {
+        status: 401,
+        message: '토큰이 존재하지 않습니다.',
+      },
+      { status: 401 },
+    );
+  }
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
   };
 
-  try {
-    const serverResponse = await fetch(
-      END_POINT + '/user-payments/history?' + query,
+  const serverResponse = await fetch(
+    `${END_POINT}/user-payments/history?${request.nextUrl.searchParams.toString()}`,
+    {
+      credentials: 'include',
+      headers,
+    },
+  );
+
+  if (!serverResponse.ok) {
+    const errorData = await serverResponse.json();
+    return NextResponse.json(
       {
-        credentials: 'include',
-        headers,
+        status: serverResponse.status,
+        message: errorData.message || '서버 요청 오류',
       },
-    ).then((res) => res.json());
-
-    return NextResponse.json(serverResponse);
-  } catch (error) {
-    console.error('결제 내역 요청 에러: ', error);
-
-    return NextResponse.json(error);
+      { status: serverResponse.status },
+    );
   }
+  const result = await serverResponse.json();
+
+  return NextResponse.json(result);
 };

@@ -1,50 +1,39 @@
 'use client';
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
+import usePageNation from '@/hooks/usePageNation';
 import { NotFoundSVG } from '@/icons/svg';
 import { getMyLecturersReviews } from '@/lib/apis/reviewApis';
 import formatDate from '@/utils/formatDate';
-import usePageNation from '@/utils/usePagenation';
 import ClassFilterSelect from './ClassFilterSelect';
 import Pagination from '@/components/Pagination/Pagination';
 import { UserReview, ReviewStatistics } from '@/components/Review';
 import { OptionType } from '@/types/coupon';
-import { GetMyLecturersReviews, MyLecturersReviewsData } from '@/types/review';
+import { MyLecturersReviewsData } from '@/types/review';
 
 interface MyReview {
-  reviewList: MyLecturersReviewsData[];
+  initialData: { count: number; item: MyLecturersReviewsData[] };
   myClassListsOption: OptionType[];
 }
 
-const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
-  const [reviews, setReviews] = useState(
-    reviewList.length > 2 ? reviewList.slice(0, 2) : reviewList,
-  );
-
-  const changeReviews = (reviews: MyLecturersReviewsData[]) => {
-    setReviews(reviews);
-  };
-
+const MyReview = ({ initialData, myClassListsOption }: MyReview) => {
   const {
-    filterState,
-    handleChangePage,
-    resetFilter,
-    updateFilter,
+    items: reviews,
     totalItemCount,
-  } = usePageNation({
+    filterState,
+    isLoading,
+    changeFilterState,
+    changePage,
+  } = usePageNation<MyLecturersReviewsData>({
+    initialData,
     defaultFilterState: {
       take: 2,
-      currentPage: 1,
       targetPage: 1,
       lecturerMyReviewType: '전체',
       orderBy: '최신순',
       lectureId: myClassListsOption[0]?.value ?? undefined,
     },
-    firstPageIndex: 1,
-    itemList: reviews,
-    totalItemCount: reviewList.length,
-    changeItemListFn: changeReviews,
-    getItemListFn: (data: GetMyLecturersReviews, signal: AbortSignal) =>
-      getMyLecturersReviews(data, signal),
+    queryType: 'instructorReview',
+    queryFn: getMyLecturersReviews,
   });
 
   const options: {
@@ -65,6 +54,8 @@ const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
     },
   ];
 
+  const pageCount = Math.ceil(totalItemCount / 2);
+
   return (
     <main className="col-span-1 flex w-full flex-col px-2 sm:px-6">
       <div className="flex flex-col-reverse gap-5 sm:flex-row">
@@ -82,7 +73,7 @@ const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
                   className="peer h-[18px] w-[18px]  accent-black"
                   checked={filterState.lecturerMyReviewType === option.id}
                   onChange={() =>
-                    resetFilter('lecturerMyReviewType', option.id)
+                    changeFilterState({ lecturerMyReviewType: option.id }, true)
                   }
                 />
                 <label
@@ -102,7 +93,7 @@ const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
                   ) ?? myClassListsOption[0]
                 }
                 onChange={(change: any) => {
-                  resetFilter('lectureId', change.value);
+                  changeFilterState({ lectureId: change.value }, true);
                 }}
                 isDisabled={filterState.lecturerMyReviewType !== '전체'}
               />
@@ -114,7 +105,7 @@ const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
                 name="sorting"
                 className="h-7 border border-solid border-gray-500"
                 value={filterState.orderBy}
-                onChange={(e) => updateFilter('orderBy', e.target.value)}
+                onChange={(e) => changeFilterState({ orderBy: e.target.value })}
               >
                 <option value="최신순">최신순</option>
                 <option value="좋아요순">좋아요순</option>
@@ -123,55 +114,52 @@ const MyReview = ({ reviewList, myClassListsOption }: MyReview) => {
               </select>
               {totalItemCount}개의 리뷰
             </div>
-            {totalItemCount > 0 ? (
-              <>
-                <ul className="flex flex-col">
-                  {reviews.map(
-                    ({ id, stars, users, description, reservation }) => (
-                      <Fragment key={id}>
-                        <UserReview
-                          src={users.userProfileImage.imageUrl}
-                          nickname={users.nickname}
-                          average={stars}
-                          date={formatDate(
-                            reservation.lectureSchedule.startDateTime,
-                          )}
-                          title={reservation.lectureSchedule.lecture.title}
-                          count={3}
-                          isLike={false}
-                          reviewId={id}
-                          content={description}
-                          disabled={true}
-                          link={`/report?lectureReviewId=${id}`}
-                        />
-                        <div className="h-1 bg-sub-color1-transparent" />
-                      </Fragment>
-                    ),
-                  )}
-                </ul>
-                <nav className="z-10">
-                  <Pagination
-                    pageCount={Math.ceil(totalItemCount / 2)}
-                    currentPage={
-                      filterState.targetPage !== undefined &&
-                      filterState.targetPage > 0
-                        ? filterState.targetPage - 1
-                        : 0
-                    }
-                    onPageChange={handleChangePage}
-                  />
-                </nav>
-              </>
+            {reviews.length > 0 ? (
+              <ul className="flex flex-col">
+                {reviews.map(
+                  ({ id, stars, users, description, reservation }) => (
+                    <Fragment key={id}>
+                      <UserReview
+                        src={users.userProfileImage.imageUrl}
+                        nickname={users.nickname}
+                        average={stars}
+                        date={formatDate(
+                          reservation.lectureSchedule.startDateTime,
+                        )}
+                        title={reservation.lectureSchedule.lecture.title}
+                        count={3}
+                        isLike={false}
+                        reviewId={id}
+                        content={description}
+                        disabled={true}
+                        link={`/report?lectureReviewId=${id}`}
+                      />
+                      <div className="h-1 bg-sub-color1-transparent" />
+                    </Fragment>
+                  ),
+                )}
+              </ul>
             ) : (
               <div className="my-7 flex w-full flex-col items-center justify-center gap-8 text-lg font-semibold text-gray-100">
                 <NotFoundSVG />
                 <p>작성 된 리뷰가 없습니다!</p>
               </div>
             )}
+            {pageCount > 0 && (
+              <nav className="z-0">
+                <Pagination
+                  pageCount={pageCount}
+                  currentPage={
+                    filterState.currentPage ? filterState.currentPage - 1 : 0
+                  }
+                  onPageChange={changePage}
+                />
+              </nav>
+            )}
           </div>
         </section>
         <section className="w-full self-start sm:w-56 md:w-72 lg:w-80">
-          <ReviewStatistics reviewList={reviewList} />
+          <ReviewStatistics reviewList={initialData.item} />
         </section>
       </div>
     </main>

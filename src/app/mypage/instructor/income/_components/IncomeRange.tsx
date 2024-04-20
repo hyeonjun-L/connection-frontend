@@ -1,4 +1,4 @@
-import { subMonths, isValid } from 'date-fns';
+import { subMonths, isValid, differenceInMonths, parseISO } from 'date-fns';
 import { useState, useRef, useEffect } from 'react';
 import { DateRange, SelectRangeEventHandler } from 'react-day-picker';
 import { useClickAway } from 'react-use';
@@ -13,14 +13,22 @@ import RangeCalendar from '@/components/Calendar/RangeCalendar';
 interface IncomeRangeProps {
   // eslint-disable-next-line no-unused-vars
   handleSetRange: (newRange: { from: Date; to: Date }) => void;
+  startDate?: string;
+  endDate?: string;
 }
 
-const IncomeRange = ({ handleSetRange }: IncomeRangeProps) => {
+const IncomeRange = ({
+  handleSetRange,
+  startDate,
+  endDate,
+}: IncomeRangeProps) => {
   const initialDate = initialDateString();
   const [fromValue, setFromValue] = useState<string | undefined>(
-    initialDate.from,
+    startDate ?? initialDate.from,
   );
-  const [toValue, setToValue] = useState<string | undefined>(initialDate.to);
+  const [toValue, setToValue] = useState<string | undefined>(
+    endDate ?? initialDate.to,
+  );
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
   const [activeButton, setActiveButton] = useState<number | null>(1);
   const ref = useRef(null);
@@ -29,9 +37,32 @@ const IncomeRange = ({ handleSetRange }: IncomeRangeProps) => {
     to: toValue ? parseHyphenatedDate(toValue) : undefined,
   };
 
+  const diffMonths = (startDate: string, endDate: string) => {
+    const start = parseISO(startDate);
+    const end = parseISO(endDate);
+
+    const diffMonths = differenceInMonths(end, start);
+
+    if (diffMonths >= 6) {
+      setActiveButton(6);
+    } else if (diffMonths >= 3) {
+      setActiveButton(3);
+    } else if (diffMonths >= 1) {
+      setActiveButton(1);
+    } else {
+      setActiveButton(null);
+    }
+  };
+
+  useEffect(() => {
+    setFromValue(startDate);
+    setToValue(endDate);
+  }, [startDate, endDate]);
+
   useEffect(() => {
     if (fromValue && toValue) {
       handleSetRange({ from: new Date(fromValue), to: new Date(toValue) });
+      diffMonths(fromValue, toValue);
     }
   }, [fromValue, toValue]);
 
