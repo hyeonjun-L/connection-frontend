@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { NOTIFICATIONS_TAKE } from '@/constants/constants';
 import { getNotifications } from '@/lib/apis/serverApis/notifications';
+import BackButton from './_components/BackButton';
 import NotificationList from './_components/NotificationList';
 import {
   IGetNotificationsData,
-  INotifications,
   NotificationsFilterOption,
 } from '@/types/notifications';
 import { FetchError } from '@/types/types';
@@ -49,16 +49,17 @@ const page = async ({
 
   return (
     <main className="mx-auto mt-3 w-full max-w-[51.1rem]">
-      <header className="border-b border-gray-500 py-3">
+      <header className="flex items-center gap-1 border-b border-gray-500 px-[18px] py-3 sm:px-0">
+        <BackButton />
         <h1 className="text-2xl font-semibold">알림</h1>
       </header>
-      <nav className="flex h-12 gap-3 border-b border-gray-500 py-2">
+      <nav className="flex flex-wrap gap-3 whitespace-nowrap border-b border-gray-500 px-[18px] py-2 text-sm sm:px-0 ">
         {filterOption.map((filter) => (
           <Link
             href={`/notifications?filterOption=${filter}`}
             replace={true}
             key={filter}
-            className={`flex items-center rounded-md border border-solid border-sub-color1 px-3 ${
+            className={`flex h-7 items-center rounded-md border border-solid border-sub-color1 px-3 ${
               (!searchParamfilterOption && filter === '전체') ||
               searchParamfilterOption === filter
                 ? 'bg-sub-color1 text-white'

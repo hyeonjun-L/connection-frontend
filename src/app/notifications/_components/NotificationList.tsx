@@ -4,7 +4,7 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
-import { useMemo, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { NOTIFICATIONS_TAKE } from '@/constants/constants';
 import { PlusesSVG } from '@/icons/svg';
 import {

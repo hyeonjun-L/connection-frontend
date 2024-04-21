@@ -14,7 +14,6 @@ const NotificationItem = ({
   deleteNotification,
 }: NotificationItemProps) => {
   const { description, createdAt, title } = notifications;
-  console.log(itemLocation);
 
   const formatRelativeOrShortDate = (date: Date | string) => {
     const currentDate = new Date();
@@ -39,10 +38,10 @@ const NotificationItem = ({
             </dd>
           </div>
           <button
-            onClick={deleteNotification}
-            className="group flex size-7 flex-shrink-0 items-center justify-center rounded-full shadow-vertical"
+            // onClick={deleteNotification}
+            className="group flex size-7 flex-shrink-0 items-center justify-center rounded-full shadow-vertical active:bg-gray-200 active:shadow-none"
           >
-            <TrashcanSVG className="size-5 stroke-gray-300 stroke-2 group-hover:stroke-sub-color1" />
+            <TrashcanSVG className="size-5 stroke-gray-300 stroke-2 group-hover:stroke-black" />
           </button>
         </div>
         <dd>{description}</dd>
