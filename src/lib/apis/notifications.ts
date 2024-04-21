@@ -1,10 +1,13 @@
 import createParams from '@/utils/createParams';
-import { IGetNotifications, INotifications } from '@/types/notifications';
+import {
+  IGetNotifications,
+  IGetNotificationsData,
+} from '@/types/notifications';
 import { FetchError } from '@/types/types';
 
 export const getNotifications = async (
   data: IGetNotifications,
-): Promise<INotifications[]> => {
+): Promise<IGetNotificationsData> => {
   try {
     const params = createParams(data);
 
@@ -28,7 +31,10 @@ export const getNotifications = async (
 
     const resData = await response.json();
 
-    return resData.data.notifications;
+    return {
+      notifications: resData.data.notifications,
+      totalItemCount: resData.data.totalItemCount,
+    };
   } catch (error) {
     console.error('알림 불러오기 오류', error);
     throw error;

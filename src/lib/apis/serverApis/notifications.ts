@@ -1,13 +1,16 @@
 import { cookies } from 'next/headers';
 import createParams from '@/utils/createParams';
-import { IGetNotifications, INotifications } from '@/types/notifications';
+import {
+  IGetNotifications,
+  IGetNotificationsData,
+} from '@/types/notifications';
 import { FetchError } from '@/types/types';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
 export const getNotifications = async (
   data: IGetNotifications,
-): Promise<INotifications[]> => {
+): Promise<IGetNotificationsData> => {
   const cookieStore = cookies();
   const userToken = cookieStore.get('userAccessToken')?.value;
   const lecturerToken = cookieStore.get('lecturerAccessToken')?.value;
@@ -36,5 +39,8 @@ export const getNotifications = async (
   }
 
   const resData = await response.json();
-  return resData.data.notifications;
+  return {
+    notifications: resData.data.notifications,
+    totalItemCount: resData.data.totalItemCount,
+  };
 };

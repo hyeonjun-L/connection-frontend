@@ -14,6 +14,7 @@ export interface IGetNotifications {
 export interface INotifications {
   id: number;
   description: string;
+  title: string;
   target: { userId?: number; lectureId?: number };
   lectureId?: number;
   lecturerId?: number;
@@ -24,8 +25,7 @@ export interface INotifications {
   createdAt: string;
 }
 
-export interface INotificationsPageParams {
-  pageSize: number;
-  lastItemId?: number;
-  filterOption: NotificationsFilterOption;
+export interface IGetNotificationsData {
+  notifications: INotifications[];
+  totalItemCount: number;
 }

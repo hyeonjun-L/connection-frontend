@@ -8,7 +8,8 @@ const NotificationItem = ({
 }: {
   notifications: INotifications;
 }) => {
-  const { description, createdAt } = notifications;
+  const { description, createdAt, title } = notifications;
+  console.log(notifications);
 
   const formatRelativeOrShortDate = (date: Date | string) => {
     const currentDate = new Date();
@@ -27,7 +28,7 @@ const NotificationItem = ({
       <dl>
         <div className="mb-2 flex w-full items-center justify-between gap-3">
           <div className="grid grid-cols-[auto_auto] gap-x-3 text-sm">
-            <dt className="truncate font-semibold">제목</dt>
+            <dt className="truncate font-semibold">{title}</dt>
             <dd className="text-gray-300">
               {formatRelativeOrShortDate(createdAt)}
             </dd>

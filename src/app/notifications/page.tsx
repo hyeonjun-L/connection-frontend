@@ -4,6 +4,7 @@ import { NOTIFICATIONS_TAKE } from '@/constants/constants';
 import { getNotifications } from '@/lib/apis/serverApis/notifications';
 import NotificationList from './_components/NotificationList';
 import {
+  IGetNotificationsData,
   INotifications,
   NotificationsFilterOption,
 } from '@/types/notifications';
@@ -29,7 +30,10 @@ const page = async ({
       (searchParamfilterOption as NotificationsFilterOption) ?? '전체',
   };
 
-  let notifications: INotifications[] = [];
+  let notifications: IGetNotificationsData = {
+    notifications: [],
+    totalItemCount: 0,
+  };
 
   try {
     notifications = await getNotifications(filterData);
