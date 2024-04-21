@@ -6,13 +6,13 @@ export type NotificationsFilterOption =
   | '읽지 않은 알림';
 
 export interface IGetNotifications {
-  lastItemId?: number;
+  lastItemId?: string;
   pageSize: number;
   filterOption: NotificationsFilterOption;
 }
 
 export interface INotifications {
-  id: number;
+  id: string;
   description: string;
   title: string;
   target: { userId?: number; lectureId?: number };
@@ -28,4 +28,9 @@ export interface INotifications {
 export interface IGetNotificationsData {
   notifications: INotifications[];
   totalItemCount: number;
+}
+
+export interface INotificationsPagesData {
+  pages: { notifications: INotifications[]; totalItemCount: number }[];
+  pageParams: string | undefined[];
 }

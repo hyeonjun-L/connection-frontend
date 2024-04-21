@@ -58,11 +58,11 @@ const page = async ({
             href={`/notifications?filterOption=${filter}`}
             replace={true}
             key={filter}
-            className={`flex items-center rounded-md border border-solid border-sub-color1 px-3 hover:bg-sub-color1-transparent ${
+            className={`flex items-center rounded-md border border-solid border-sub-color1 px-3 ${
               (!searchParamfilterOption && filter === '전체') ||
               searchParamfilterOption === filter
                 ? 'bg-sub-color1 text-white'
-                : 'bg-white text-sub-color1'
+                : 'bg-white text-sub-color1 hover:bg-sub-color1-transparent'
             }`}
           >
             {filter}

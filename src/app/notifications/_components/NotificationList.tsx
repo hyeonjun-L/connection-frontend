@@ -1,6 +1,6 @@
 'use client';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo, useRef, useState } from 'react';
 import { NOTIFICATIONS_TAKE } from '@/constants/constants';
 import { PlusesSVG } from '@/icons/svg';
 import { getNotifications } from '@/lib/apis/notifications';
@@ -8,6 +8,7 @@ import NotificationItem from './NotificationItem';
 import {
   IGetNotifications,
   IGetNotificationsData,
+  INotificationsPagesData,
   NotificationsFilterOption,
 } from '@/types/notifications';
 
@@ -18,6 +19,9 @@ const NotificationList = ({
   initalData: IGetNotificationsData;
   filterOption: NotificationsFilterOption;
 }) => {
+  const queryClient = useQueryClient();
+  const totalItemCount = useRef(initalData.totalItemCount);
+
   const fetchNotifications = async ({
     pageParam,
   }: {
@@ -48,16 +52,65 @@ const NotificationList = ({
     getNextPageParam: (lastPage, allpages) => {
       const currentPage = allpages.length;
 
-      return Math.ceil(initalData.totalItemCount / NOTIFICATIONS_TAKE) >
+      return Math.ceil(totalItemCount.current / NOTIFICATIONS_TAKE) >
         currentPage
         ? {
             pageSize: NOTIFICATIONS_TAKE,
             filterOption,
-            lastItemId: lastPage.notifications.at(-1)?.id,
+            lastItemId: lastPage?.notifications.at(-1)?.id,
           }
         : undefined;
     },
   });
+
+  const deleteNotificationQuery = (itemId: string, itemLocation: number) => {
+    queryClient.setQueryData<INotificationsPagesData>(
+      ['notifications', filterOption],
+      (data) => {
+        if (!data) {
+          return {
+            pages: [initalData],
+            pageParams: [undefined],
+          };
+        }
+
+        const { pages, pageParams } = data;
+
+        const updatedNotifications = pages[itemLocation].notifications.filter(
+          ({ id }) => id !== itemId,
+        );
+
+        totalItemCount.current -= 1;
+
+        if (updatedNotifications.length === 0) {
+          const filteredPages = pages.filter(
+            (_, index) => index !== itemLocation,
+          );
+          return {
+            pages: filteredPages,
+            pageParams,
+          };
+        }
+
+        const updatedPages = pages.map((page, index) =>
+          index === itemLocation
+            ? { ...page, notifications: updatedNotifications }
+            : page,
+        );
+
+        return {
+          pages: updatedPages,
+          pageParams,
+        };
+      },
+    );
+  };
+
+  const deleteNotifications = (itemId: string, itemLocation: number) => {
+    deleteNotificationQuery(itemId, itemLocation);
+  };
+
+  console.log(notificationsData);
 
   return (
     <section className="flex flex-col bg-sub-color1-transparent px-4 pb-12 pt-3">
@@ -67,7 +120,11 @@ const NotificationList = ({
             return notificationsList.map((notifications) => (
               <NotificationItem
                 key={notifications.id}
+                deleteNotification={() =>
+                  deleteNotifications(notifications.id, page)
+                }
                 notifications={notifications}
+                itemLocation={page}
               />
             ));
           },

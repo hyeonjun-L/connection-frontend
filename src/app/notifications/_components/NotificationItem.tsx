@@ -3,13 +3,18 @@ import { TrashcanSVG } from '@/icons/svg';
 import { formatShortDate } from '@/utils/dateTimeUtils';
 import { INotifications } from '@/types/notifications';
 
+interface NotificationItemProps {
+  notifications: INotifications;
+  itemLocation: number;
+  deleteNotification: () => void;
+}
 const NotificationItem = ({
   notifications,
-}: {
-  notifications: INotifications;
-}) => {
+  itemLocation,
+  deleteNotification,
+}: NotificationItemProps) => {
   const { description, createdAt, title } = notifications;
-  console.log(notifications);
+  console.log(itemLocation);
 
   const formatRelativeOrShortDate = (date: Date | string) => {
     const currentDate = new Date();
@@ -33,7 +38,10 @@ const NotificationItem = ({
               {formatRelativeOrShortDate(createdAt)}
             </dd>
           </div>
-          <button className="group flex size-7 flex-shrink-0 items-center justify-center rounded-full shadow-vertical">
+          <button
+            onClick={deleteNotification}
+            className="group flex size-7 flex-shrink-0 items-center justify-center rounded-full shadow-vertical"
+          >
             <TrashcanSVG className="size-5 stroke-gray-300 stroke-2 group-hover:stroke-sub-color1" />
           </button>
         </div>
