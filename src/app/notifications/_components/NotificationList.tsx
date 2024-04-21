@@ -1,13 +1,21 @@
 'use client';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { useMemo, useRef, useState } from 'react';
 import { NOTIFICATIONS_TAKE } from '@/constants/constants';
 import { PlusesSVG } from '@/icons/svg';
-import { getNotifications } from '@/lib/apis/notifications';
+import {
+  deleteNotifications,
+  getNotifications,
+} from '@/lib/apis/notifications';
 import NotificationItem from './NotificationItem';
 import {
   IGetNotifications,
   IGetNotificationsData,
+  INotificationQuery,
   INotificationsPagesData,
   NotificationsFilterOption,
 } from '@/types/notifications';
@@ -63,7 +71,10 @@ const NotificationList = ({
     },
   });
 
-  const deleteNotificationQuery = (itemId: string, itemLocation: number) => {
+  const deleteNotificationQuery = ({
+    itemId,
+    itemLocation,
+  }: INotificationQuery) => {
     queryClient.setQueryData<INotificationsPagesData>(
       ['notifications', filterOption],
       (data) => {
@@ -106,11 +117,10 @@ const NotificationList = ({
     );
   };
 
-  const deleteNotifications = (itemId: string, itemLocation: number) => {
-    deleteNotificationQuery(itemId, itemLocation);
-  };
-
-  console.log(notificationsData);
+  const { mutate: deleteNotificationsMutate } = useMutation({
+    mutationFn: deleteNotifications,
+    onSuccess: (data) => deleteNotificationQuery({ ...data }),
+  });
 
   return (
     <section className="flex flex-col bg-sub-color1-transparent px-4 pb-12 pt-3">
@@ -121,7 +131,10 @@ const NotificationList = ({
               <NotificationItem
                 key={notifications.id}
                 deleteNotification={() =>
-                  deleteNotifications(notifications.id, page)
+                  deleteNotificationsMutate({
+                    itemId: notifications.id,
+                    itemLocation: page,
+                  })
                 }
                 notifications={notifications}
                 itemLocation={page}

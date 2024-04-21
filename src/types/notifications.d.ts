@@ -34,3 +34,8 @@ export interface INotificationsPagesData {
   pages: { notifications: INotifications[]; totalItemCount: number }[];
   pageParams: string | undefined[];
 }
+
+export interface INotificationQuery {
+  itemId: string;
+  itemLocation: number;
+}
