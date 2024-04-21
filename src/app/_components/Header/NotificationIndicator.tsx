@@ -6,6 +6,7 @@ import { dummyUserInfo } from '@/constants/dummy';
 import { AlarmSVG, ChatSVG, CloseSVG } from '@/icons/svg';
 import { getOpponentInfo, getUnreadCount } from '@/lib/apis/chatApi';
 import { useChatStore } from '@/store';
+import NotificationList from './NotificationList';
 import ProfileImg from '@/components/Profile/ProfileImage';
 import { userType } from '@/types/auth';
 import { Chat, ChatRoom } from '@/types/chat';
@@ -19,6 +20,7 @@ const NotificationIndicator = ({
   id,
   userType,
 }: NotificationIndicatorProps) => {
+  const [openAlarm, setOpenAlarm] = useState(false);
   const [preview, setPreview] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -56,8 +58,7 @@ const NotificationIndicator = ({
     if (timerRef.current) clearTimeout(timerRef.current);
   };
 
-  const clickChatPreviewHandler = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
+  const clickChatPreviewHandler = () => {
     if (!newChat) return;
     closeChatPreview();
     setChatView(true);
@@ -90,20 +91,37 @@ const NotificationIndicator = ({
     return () => stopTimer();
   }, [newChat]);
 
+  const displayChatCount = chatCount
+    ? chatCount > 99
+      ? '99+'
+      : chatCount > 0
+      ? chatCount.toString()
+      : ''
+    : '';
+
   return (
-    <>
-      <button className="relative">
-        <AlarmSVG className="fill-black pt-0.5" width="31" height="31" />
-        <span className="absolute -right-1.5 top-0 min-w-[1rem] rounded-full bg-main-color px-1 text-xs font-bold text-white">
-          {alarmCount}
-        </span>
-      </button>
-      <button className="relative" onClick={() => setChatView(!chatView)}>
-        <ChatSVG fill="black" width="29" height="30" />
-        <motion.div layoutId="chat" />
-        <span className="absolute -right-1.5 top-0 min-w-[1rem] rounded-full bg-main-color px-1 text-xs font-bold text-white">
-          {chatCount ? (chatCount > 99 ? '99+' : chatCount) : ''}
-        </span>
+    <div className="flex items-center gap-3">
+      <div className="relative flex items-center">
+        <button>
+          <AlarmSVG className="fill-black pt-0.5" width="31" height="31" />
+          <span className="absolute -right-1.5 top-0 min-w-[1rem] rounded-full bg-main-color px-1 text-xs font-bold text-white">
+            {alarmCount}
+          </span>
+        </button>
+        <NotificationList />
+      </div>
+      <div className="relative flex items-center">
+        <button onClick={() => setChatView(!chatView)}>
+          <ChatSVG
+            width="29"
+            height="30"
+            className={chatView ? 'fill-main-color' : 'fill-black'}
+          />
+          <motion.div layoutId="chat" />
+          <span className="absolute -right-1.5 top-0 min-w-[1rem] rounded-full bg-main-color px-1 text-xs font-bold text-white">
+            {displayChatCount}
+          </span>
+        </button>
         {newChat && preview && !chatView && (
           <ChatPreview
             chat={newChat}
@@ -114,8 +132,8 @@ const NotificationIndicator = ({
             closeChatPreview={closeChatPreview}
           />
         )}
-      </button>
-    </>
+      </div>
+    </div>
   );
 };
 
@@ -126,7 +144,7 @@ interface ChatPreviewProps {
   opponentType: userType;
   startTimer: () => void;
   stopTimer: () => void;
-  onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onClick: () => void;
   closeChatPreview: () => void;
 }
 
@@ -167,7 +185,7 @@ const ChatPreview = ({
   };
 
   return (
-    <motion.div
+    <motion.button
       onClick={onClick}
       onMouseEnter={stopTimer}
       onMouseLeave={startTimer}
@@ -199,6 +217,6 @@ const ChatPreview = ({
       <p className="line-clamp-2 whitespace-pre-wrap text-left text-sm">
         {chat.imageUrl ? '이미지' : chat.content}
       </p>
-    </motion.div>
+    </motion.button>
   );
 };

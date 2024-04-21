@@ -1,6 +1,5 @@
-import { differenceInHours, parseISO } from 'date-fns';
 import { TrashcanSVG } from '@/icons/svg';
-import { formatShortDate } from '@/utils/dateTimeUtils';
+import { formatRelativeOrShortDate } from '@/utils/dateTimeUtils';
 import { INotifications } from '@/types/notifications';
 
 interface NotificationItemProps {
@@ -13,18 +12,6 @@ const NotificationItem = ({
 }: NotificationItemProps) => {
   const { description, createdAt, title } = notifications;
 
-  const formatRelativeOrShortDate = (date: Date | string) => {
-    const currentDate = new Date();
-    const targetDate = date instanceof Date ? date : parseISO(date);
-    const hoursDiff = differenceInHours(currentDate, targetDate);
-
-    if (hoursDiff < 24) {
-      return `${hoursDiff}시간 전`;
-    } else {
-      return formatShortDate(targetDate);
-    }
-  };
-
   return (
     <li className="w-full rounded-md bg-white px-4 py-3 shadow-float">
       <dl>
@@ -36,7 +23,7 @@ const NotificationItem = ({
             </dd>
           </div>
           <button
-            // onClick={deleteNotification}
+            onClick={deleteNotification}
             className="group flex size-7 flex-shrink-0 items-center justify-center rounded-full shadow-vertical active:bg-gray-200 active:shadow-none"
           >
             <TrashcanSVG className="size-5 stroke-gray-300 stroke-2 group-hover:stroke-black" />
