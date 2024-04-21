@@ -11,6 +11,7 @@ import {
   deleteNotifications,
   getNotifications,
 } from '@/lib/apis/notifications';
+import NotificationLoading from './loading/NotificationLoading';
 import NotificationItem from './NotificationItem';
 import {
   IGetNotifications,
@@ -137,10 +138,16 @@ const NotificationList = ({
                   })
                 }
                 notifications={notifications}
-                itemLocation={page}
               />
             ));
           },
+        )}
+        {isFetchingNextPage && (
+          <li className="flex flex-col gap-3.5">
+            {Array.from({ length: NOTIFICATIONS_TAKE }, (_, index) => (
+              <NotificationLoading key={index} />
+            ))}
+          </li>
         )}
       </ul>
       {hasNextPage && (

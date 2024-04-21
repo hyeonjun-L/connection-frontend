@@ -1,14 +1,8 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import { NOTIFICATIONS_TAKE } from '@/constants/constants';
-import { getNotifications } from '@/lib/apis/serverApis/notifications';
+import { Suspense } from 'react';
 import BackButton from './_components/BackButton';
-import NotificationList from './_components/NotificationList';
-import {
-  IGetNotificationsData,
-  NotificationsFilterOption,
-} from '@/types/notifications';
-import { FetchError } from '@/types/types';
+import NotificationsSectionLoading from './_components/loading/NotificationsSectionLoading';
+import NotificationsSection from './_components/NotificationsSection';
 
 const page = async ({
   searchParams,
@@ -23,29 +17,6 @@ const page = async ({
     '쿠폰/패스권',
     '읽지 않은 알림',
   ];
-
-  const filterData = {
-    pageSize: NOTIFICATIONS_TAKE,
-    filterOption:
-      (searchParamfilterOption as NotificationsFilterOption) ?? '전체',
-  };
-
-  let notifications: IGetNotificationsData = {
-    notifications: [],
-    totalItemCount: 0,
-  };
-
-  try {
-    notifications = await getNotifications(filterData);
-  } catch (error) {
-    if (error instanceof Error) {
-      const fetchError = error as FetchError;
-      if (fetchError.status === 400) {
-        redirect('/notifications');
-      }
-      console.error(error);
-    }
-  }
 
   return (
     <main className="mx-auto mt-3 w-full max-w-[51.1rem]">
@@ -70,10 +41,9 @@ const page = async ({
           </Link>
         ))}
       </nav>
-      <NotificationList
-        initalData={notifications}
-        filterOption={filterData.filterOption}
-      />
+      <Suspense fallback={<NotificationsSectionLoading />}>
+        <NotificationsSection filterOption={searchParamfilterOption} />
+      </Suspense>
     </main>
   );
 };

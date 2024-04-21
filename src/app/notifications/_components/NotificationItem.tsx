@@ -5,12 +5,10 @@ import { INotifications } from '@/types/notifications';
 
 interface NotificationItemProps {
   notifications: INotifications;
-  itemLocation: number;
   deleteNotification: () => void;
 }
 const NotificationItem = ({
   notifications,
-  itemLocation,
   deleteNotification,
 }: NotificationItemProps) => {
   const { description, createdAt, title } = notifications;
