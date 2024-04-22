@@ -1,13 +1,14 @@
 'use client';
-import { useQuery } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import { PanInfo, motion, useMotionValue, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { dummyUserInfo } from '@/constants/dummy';
 import { AlarmSVG, ChatSVG, CloseSVG } from '@/icons/svg';
 import { getOpponentInfo, getUnreadCount } from '@/lib/apis/chatApi';
+import { getNotificationsUnreadCount } from '@/lib/apis/notifications';
 import { useChatStore } from '@/store';
 import NotificationList from './NotificationList';
 import ProfileImg from '@/components/Profile/ProfileImage';
@@ -31,8 +32,6 @@ const NotificationIndicator = ({
   const notificationRef = useRef(null);
   const pathName = usePathname();
 
-  const { alarmCount } = dummyUserInfo;
-
   const { chatView, newChat, setChatView, setChatRoomSelect, setNewChat } =
     useChatStore((state) => ({
       setChatView: state.setChatView,
@@ -42,11 +41,21 @@ const NotificationIndicator = ({
       setNewChat: state.setNewChat,
     }));
 
-  const { data: chatCount } = useQuery({
-    queryKey: ['commentCount'],
-    queryFn: () => getUnreadCount(),
-    staleTime: Infinity,
-    refetchOnWindowFocus: 'always',
+  const [{ data: chatCount }, { data: alarmCount }] = useQueries({
+    queries: [
+      {
+        queryKey: ['commentCount'],
+        queryFn: () => getUnreadCount(),
+        staleTime: Infinity,
+        refetchOnWindowFocus: 'always',
+      },
+      {
+        queryKey: ['notificationCount'],
+        queryFn: () => getNotificationsUnreadCount(),
+        staleTime: Infinity,
+        refetchOnWindowFocus: 'always',
+      },
+    ],
   });
 
   const closeChatPreview = () => {
@@ -98,13 +107,25 @@ const NotificationIndicator = ({
     return () => stopTimer();
   }, [newChat]);
 
-  const displayChatCount = chatCount
-    ? chatCount > 99
-      ? '99+'
-      : chatCount > 0
-      ? chatCount.toString()
-      : ''
-    : '';
+  const displatCountHandler = (count?: number) => {
+    return count
+      ? count > 99
+        ? '99+'
+        : count > 0
+        ? count.toString()
+        : ''
+      : '';
+  };
+
+  const displayChatCount = useMemo(
+    () => displatCountHandler(chatCount),
+    [chatCount],
+  );
+
+  const displayAlarmCount = useMemo(
+    () => displatCountHandler(alarmCount),
+    [alarmCount],
+  );
 
   useClickAway(notificationRef, () => {
     setOpenAlarm(false);
@@ -116,14 +137,14 @@ const NotificationIndicator = ({
         {isMobile ? (
           <Link href="/notifications">
             <AlarmIconWrapper
-              alarmCount={alarmCount}
+              alarmCount={displayAlarmCount}
               isView={pathName.startsWith('/notifications') || openAlarm}
             />
           </Link>
         ) : (
           <button onClick={() => setOpenAlarm((prev) => !prev)}>
             <AlarmIconWrapper
-              alarmCount={alarmCount}
+              alarmCount={displayAlarmCount}
               isView={pathName.startsWith('/notifications') || openAlarm}
             />
           </button>
@@ -244,8 +265,8 @@ const ChatPreview = ({
 };
 
 interface AlarmIconWrapperProps {
-  alarmCount: number;
   isView: boolean;
+  alarmCount?: string;
 }
 
 const AlarmIconWrapper = ({ alarmCount, isView }: AlarmIconWrapperProps) => (

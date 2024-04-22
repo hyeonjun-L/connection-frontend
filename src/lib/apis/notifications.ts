@@ -71,3 +71,29 @@ export const deleteNotifications = async ({
     throw error;
   }
 };
+
+export const getNotificationsUnreadCount = async (): Promise<number> => {
+  try {
+    const response = await fetch(`/api/notifications/unread-count`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const error: FetchError = new Error(errorData.message || '');
+      error.status = response.status;
+      throw error;
+    }
+
+    const resData = await response.json();
+
+    return resData.data.unreadNotificationCount;
+  } catch (error) {
+    console.error('안읽은 알림 개수 불러오기 오류', error);
+    throw error;
+  }
+};

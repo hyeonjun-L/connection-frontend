@@ -30,7 +30,7 @@ export const GET = async (request: NextRequest) => {
   };
 
   const response = await fetch(
-    `${END_POINT}/notifications/notificationsId?${request.nextUrl.searchParams.toString()}`,
+    `${END_POINT}/notifications/notificationsId/unread-count`,
     {
       method: 'GET',
       credentials: 'include',
