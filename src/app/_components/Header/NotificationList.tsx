@@ -1,7 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useMemo, useRef } from 'react';
-import { useClickAway } from 'react-use';
+import { useMemo } from 'react';
 import {
   NOTIFICATIONS_REF_OPTIONS,
   NOTIFICATIONS_TAKE,
@@ -14,17 +13,7 @@ import {
   NotificationsFilterOption,
 } from '@/types/notifications';
 
-interface NotificationListProps {
-  closeNotification: () => void;
-}
-
-const NotificationList = ({ closeNotification }: NotificationListProps) => {
-  const notificationRef = useRef(null);
-
-  useClickAway(notificationRef, () => {
-    closeNotification();
-  });
-
+const NotificationList = () => {
   const fetchNotifications = ({
     pageParam,
   }: {
@@ -77,10 +66,7 @@ const NotificationList = ({ closeNotification }: NotificationListProps) => {
   );
 
   return (
-    <article
-      ref={notificationRef}
-      className="absolute right-0 top-[2.625rem] flex w-[17.188rem] flex-col rounded-md bg-white text-sm shadow-vertical"
-    >
+    <article className="absolute right-0 top-[2.625rem] flex w-[17.188rem] flex-col rounded-md bg-white text-sm shadow-vertical">
       <header className="flex items-center justify-between px-3 py-3">
         <h1
           className={`font-semibold ${

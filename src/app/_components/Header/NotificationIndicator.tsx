@@ -1,7 +1,10 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
 import { PanInfo, motion, useMotionValue, useTransform } from 'framer-motion';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useClickAway } from 'react-use';
 import { dummyUserInfo } from '@/constants/dummy';
 import { AlarmSVG, ChatSVG, CloseSVG } from '@/icons/svg';
 import { getOpponentInfo, getUnreadCount } from '@/lib/apis/chatApi';
@@ -14,15 +17,19 @@ import { Chat, ChatRoom } from '@/types/chat';
 interface NotificationIndicatorProps {
   id: string;
   userType: userType;
+  isMobile: boolean;
 }
 
 const NotificationIndicator = ({
   id,
   userType,
+  isMobile,
 }: NotificationIndicatorProps) => {
   const [openAlarm, setOpenAlarm] = useState(false);
   const [preview, setPreview] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const notificationRef = useRef(null);
+  const pathName = usePathname();
 
   const { alarmCount } = dummyUserInfo;
 
@@ -99,20 +106,31 @@ const NotificationIndicator = ({
       : ''
     : '';
 
-  const closeAlarm = () => {
+  useClickAway(notificationRef, () => {
     setOpenAlarm(false);
-  };
+  });
 
   return (
     <div className="flex items-center gap-3">
-      <div className="relative flex items-center">
-        <button onClick={() => setOpenAlarm(!openAlarm)}>
-          <AlarmSVG className="fill-black pt-0.5" width="31" height="31" />
-          <span className="absolute -right-1.5 top-0 min-w-[1rem] rounded-full bg-main-color px-1 text-xs font-bold text-white">
-            {alarmCount}
-          </span>
-        </button>
-        {openAlarm && <NotificationList closeNotification={closeAlarm} />}
+      <div ref={notificationRef} className="relative flex items-center">
+        {isMobile ? (
+          <Link href="/notifications">
+            <AlarmIconWrapper
+              alarmCount={alarmCount}
+              isView={pathName.startsWith('/notifications') || openAlarm}
+            />
+          </Link>
+        ) : (
+          <button onClick={() => setOpenAlarm((prev) => !prev)}>
+            <AlarmIconWrapper
+              alarmCount={alarmCount}
+              isView={pathName.startsWith('/notifications') || openAlarm}
+            />
+          </button>
+        )}
+        {!pathName.startsWith('/notifications') && openAlarm && (
+          <NotificationList />
+        )}
       </div>
       <div className="relative flex items-center">
         <button onClick={() => setChatView(!chatView)}>
@@ -224,3 +242,21 @@ const ChatPreview = ({
     </motion.button>
   );
 };
+
+interface AlarmIconWrapperProps {
+  alarmCount: number;
+  isView: boolean;
+}
+
+const AlarmIconWrapper = ({ alarmCount, isView }: AlarmIconWrapperProps) => (
+  <>
+    <AlarmSVG
+      className={`${isView ? 'fill-main-color' : 'fill-black'} pt-0.5`}
+      width="31"
+      height="31"
+    />
+    <span className="absolute -right-1.5 top-0 min-w-[1rem] rounded-full bg-main-color px-1 text-xs font-bold text-white">
+      {alarmCount}
+    </span>
+  </>
+);
