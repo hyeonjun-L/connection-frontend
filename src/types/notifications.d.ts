@@ -5,10 +5,36 @@ export type NotificationsFilterOption =
   | '쿠폰/패스권'
   | '읽지 않은 알림';
 
+export type NotificationType = 'CHAT' | 'NOTIFICATIONS';
+
 export interface IGetNotifications {
   lastItemId?: string;
   pageSize: number;
   filterOption: NotificationsFilterOption;
+}
+
+export interface IBaseNotification {
+  description: string;
+  title: string;
+  lectureId?: number;
+  lecturerId?: number;
+  couponId?: number;
+  lecturePassId?: number;
+  userPassId?: number;
+  readedAt: null | string;
+  createdAt: string;
+  target: { userId: number | null; lecturerId: number | null };
+}
+
+export interface INotifications extends IBaseNotification {
+  id: string;
+}
+
+export interface INewNotifications extends IBaseNotification {
+  deletedAt: null | string;
+  updatedAt: string;
+  __v: number;
+  _id: string;
 }
 
 export interface INotifications {
@@ -23,6 +49,23 @@ export interface INotifications {
   userPassId?: number;
   readedAt: null | string;
   createdAt: string;
+}
+
+export interface INewNotifications {
+  createdAt: string;
+  deletedAt: null;
+  description: string;
+  lectureId?: number;
+  lecturerId?: number;
+  couponId?: number;
+  lecturePassId?: number;
+  userPassId?: number;
+  readedAt: null;
+  target: { userId: number; lecturerId: null; _id: string };
+  title: string;
+  updatedAt: string;
+  __v: number;
+  _id: string;
 }
 
 export interface IGetNotificationsData {

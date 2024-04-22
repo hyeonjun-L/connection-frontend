@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { CHATS_TAKE } from '@/constants/constants';
 import { useChatStore, useSocketStore } from '@/store';
+import { useNotificationsStore } from '@/store/notificationsStore';
 import { userType } from '@/types/auth';
 import {
   ChatPagesData,
@@ -12,6 +13,7 @@ import {
   JoinUserData,
   ExitUserData,
 } from '@/types/chat';
+import { INewNotifications } from '@/types/notifications';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT_DOMAIN ?? '';
 
@@ -37,6 +39,10 @@ const SocketInitializer = ({
   const { setNewChat, setChatRoomSelect } = useChatStore((state) => ({
     setNewChat: state.setNewChat,
     setChatRoomSelect: state.setChatRoomSelect,
+  }));
+
+  const { setNewNotifications } = useNotificationsStore((state) => ({
+    setNewNotifications: state.setNewNotifications,
   }));
 
   const queryClient = useQueryClient();
@@ -120,6 +126,11 @@ const SocketInitializer = ({
         if (hasChatListQuery) {
           updateChatRoomList(newChat, isReceiver);
         }
+      });
+
+      socket.on('handleNewNotification', (data: INewNotifications) => {
+        console.log(data);
+        setNewNotifications(data);
       });
 
       socket.emit('login', {

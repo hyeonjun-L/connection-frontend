@@ -1,19 +1,23 @@
 'use client';
-import { useQueries, useQuery } from '@tanstack/react-query';
-import { PanInfo, motion, useMotionValue, useTransform } from 'framer-motion';
+import { useQueries } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
-import { dummyUserInfo } from '@/constants/dummy';
-import { AlarmSVG, ChatSVG, CloseSVG } from '@/icons/svg';
-import { getOpponentInfo, getUnreadCount } from '@/lib/apis/chatApi';
+import { AlarmSVG, ChatSVG } from '@/icons/svg';
+import { getUnreadCount } from '@/lib/apis/chatApi';
 import { getNotificationsUnreadCount } from '@/lib/apis/notifications';
 import { useChatStore } from '@/store';
+import { useNotificationsStore } from '@/store/notificationsStore';
+import { useScrollStore } from '@/store/scrollStore';
 import NotificationList from './NotificationList';
-import ProfileImg from '@/components/Profile/ProfileImage';
+import ChatPreviews from './Previews/ChatPreviews';
+import NotificationsPreviews from './Previews/NotificationsPreviews';
+import PreviewsContainer from './Previews/PreviewsContainer';
 import { userType } from '@/types/auth';
-import { Chat, ChatRoom } from '@/types/chat';
+import { ChatRoom } from '@/types/chat';
+import { NotificationType } from '@/types/notifications';
 
 interface NotificationIndicatorProps {
   id: string;
@@ -27,10 +31,14 @@ const NotificationIndicator = ({
   isMobile,
 }: NotificationIndicatorProps) => {
   const [openAlarm, setOpenAlarm] = useState(false);
-  const [preview, setPreview] = useState(false);
+  const [previews, setPreviews] = useState<NotificationType | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const notificationRef = useRef(null);
   const pathName = usePathname();
+
+  const isNotificationsPath = pathName.startsWith('/notifications');
+  const userIdType = userType === 'user' ? 'userId' : 'lecturerId';
+  const opponentType = userType === 'user' ? 'lecturer' : 'user';
 
   const { chatView, newChat, setChatView, setChatRoomSelect, setNewChat } =
     useChatStore((state) => ({
@@ -40,6 +48,17 @@ const NotificationIndicator = ({
       setChatRoomSelect: state.setChatRoomSelect,
       setNewChat: state.setNewChat,
     }));
+
+  const { newNotifications, setNewNotifications } = useNotificationsStore(
+    (state) => ({
+      newNotifications: state.newNotifications,
+      setNewNotifications: state.setNewNotifications,
+    }),
+  );
+
+  const { isScrollingUp } = useScrollStore((state) => ({
+    isScrollingUp: state.isScrollingUp,
+  }));
 
   const [{ data: chatCount }, { data: alarmCount }] = useQueries({
     queries: [
@@ -58,25 +77,23 @@ const NotificationIndicator = ({
     ],
   });
 
-  const closeChatPreview = () => {
-    setPreview(false);
+  const closePreviews = useCallback(() => {
+    setPreviews(null);
     setNewChat(null);
-  };
+    setNewNotifications(null);
+  }, [setNewChat, setNewNotifications]);
 
-  const userIdType = userType === 'user' ? 'userId' : 'lecturerId';
-  const opponentType = userType === 'user' ? 'lecturer' : 'user';
-
-  const startTimer = () => {
-    timerRef.current = setTimeout(() => closeChatPreview(), 5000);
-  };
+  const startTimer = useCallback(() => {
+    timerRef.current = setTimeout(() => closePreviews(), 5000);
+  }, [closePreviews]);
 
   const stopTimer = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
   };
 
-  const clickChatPreviewHandler = () => {
+  const clickChatPreviewsHandler = () => {
     if (!newChat) return;
-    closeChatPreview();
+    closePreviews();
     setChatView(true);
 
     const newChatRoom: ChatRoom = {
@@ -98,14 +115,27 @@ const NotificationIndicator = ({
     setChatRoomSelect(newChatRoom);
   };
 
+  useClickAway(notificationRef, () => {
+    setOpenAlarm(false);
+  });
+
   useEffect(() => {
-    if (newChat && newChat.receiver[userIdType] === Number(id)) {
-      setPreview(true);
+    if (!isScrollingUp) {
+      setOpenAlarm(false);
+    }
+  }, [isScrollingUp]);
+
+  useEffect(() => {
+    if (
+      newNotifications ||
+      (newChat && newChat.receiver[userIdType] === Number(id))
+    ) {
+      setPreviews(newChat ? 'CHAT' : 'NOTIFICATIONS');
       startTimer();
     }
 
     return () => stopTimer();
-  }, [newChat]);
+  }, [id, newChat, newNotifications, startTimer, userIdType]);
 
   const displatCountHandler = (count?: number) => {
     return count
@@ -127,31 +157,38 @@ const NotificationIndicator = ({
     [alarmCount],
   );
 
-  useClickAway(notificationRef, () => {
-    setOpenAlarm(false);
-  });
-
   return (
     <div className="flex items-center gap-3">
       <div ref={notificationRef} className="relative flex items-center">
+        <motion.div layoutId="NOTIFICATIONS" />
         {isMobile ? (
           <Link href="/notifications">
             <AlarmIconWrapper
               alarmCount={displayAlarmCount}
-              isView={pathName.startsWith('/notifications') || openAlarm}
+              isView={isNotificationsPath || openAlarm}
             />
           </Link>
         ) : (
           <button onClick={() => setOpenAlarm((prev) => !prev)}>
             <AlarmIconWrapper
               alarmCount={displayAlarmCount}
-              isView={pathName.startsWith('/notifications') || openAlarm}
+              isView={isNotificationsPath || openAlarm}
             />
           </button>
         )}
-        {!pathName.startsWith('/notifications') && openAlarm && (
-          <NotificationList />
-        )}
+        {!isNotificationsPath && openAlarm && <NotificationList />}
+        {!isNotificationsPath &&
+          previews === 'NOTIFICATIONS' &&
+          newNotifications && (
+            <PreviewsContainer
+              layoutId="NOTIFICATIONS"
+              startTimer={startTimer}
+              stopTimer={stopTimer}
+              closePreviews={closePreviews}
+            >
+              <NotificationsPreviews notifications={newNotifications} />
+            </PreviewsContainer>
+          )}
       </div>
       <div className="relative flex items-center">
         <button onClick={() => setChatView(!chatView)}>
@@ -160,20 +197,25 @@ const NotificationIndicator = ({
             height="30"
             className={chatView ? 'fill-main-color' : 'fill-black'}
           />
-          <motion.div layoutId="chat" />
+          <motion.div layoutId="CHAT" />
           <span className="absolute -right-1.5 top-0 min-w-[1rem] rounded-full bg-main-color px-1 text-xs font-bold text-white">
             {displayChatCount}
           </span>
         </button>
-        {newChat && preview && !chatView && (
-          <ChatPreview
-            chat={newChat}
-            opponentType={opponentType}
+        {newChat && previews === 'CHAT' && !chatView && (
+          <PreviewsContainer
+            layoutId="CHAT"
             startTimer={startTimer}
             stopTimer={stopTimer}
-            onClick={clickChatPreviewHandler}
-            closeChatPreview={closeChatPreview}
-          />
+            onClick={clickChatPreviewsHandler}
+            closePreviews={closePreviews}
+          >
+            <ChatPreviews
+              chat={newChat}
+              opponentType={opponentType}
+              closeChatPreview={closePreviews}
+            />
+          </PreviewsContainer>
         )}
       </div>
     </div>
@@ -181,88 +223,6 @@ const NotificationIndicator = ({
 };
 
 export default NotificationIndicator;
-
-interface ChatPreviewProps {
-  chat: Chat;
-  opponentType: userType;
-  startTimer: () => void;
-  stopTimer: () => void;
-  onClick: () => void;
-  closeChatPreview: () => void;
-}
-
-const ChatPreview = ({
-  chat,
-  opponentType,
-  startTimer,
-  stopTimer,
-  onClick,
-  closeChatPreview,
-}: ChatPreviewProps) => {
-  const opponentId = chat.sender[
-    opponentType === 'lecturer' ? 'lecturerId' : 'userId'
-  ] as number;
-
-  const x = useMotionValue(0);
-
-  const opacity = useTransform(x, [-100, 0, 100], [0, 1, 0]);
-
-  const { data, isLoading } = useQuery({
-    queryKey: ['opponentProfile', opponentType, opponentId],
-    queryFn: () => getOpponentInfo(opponentType, opponentId),
-    staleTime: Infinity,
-  });
-
-  const closePreviewHandler = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    closeChatPreview();
-  };
-
-  const handleDragEnd = (
-    event: PointerEvent | MouseEvent | TouchEvent,
-    info: PanInfo,
-  ) => {
-    if (Math.abs(info.offset.x) < -90 || Math.abs(info.offset.x) > 100) {
-      closeChatPreview();
-    }
-  };
-
-  return (
-    <motion.button
-      onClick={onClick}
-      onMouseEnter={stopTimer}
-      onMouseLeave={startTimer}
-      className="absolute -bottom-36 right-0 grid h-[6.5rem] w-72 grid-rows-[auto_1fr] gap-y-2 rounded-md border border-solid border-main-color bg-white/90 p-3 backdrop-blur-3xl sm:-right-20"
-      style={{ x, opacity }}
-      drag="x"
-      layoutId="chat"
-      dragConstraints={{ left: 0, right: 0 }}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="relative grid grid-cols-[auto_1fr] items-center">
-        {isLoading ? (
-          <>
-            <div className="mr-3 size-[34px] flex-shrink-0 animate-pulse rounded-full bg-gray-500" />
-            <div className="h-4 w-14 animate-pulse bg-gray-500" />
-          </>
-        ) : (
-          <>
-            <ProfileImg src={data?.profileImg} size="small" />
-            <div className="flex-grow truncate text-left font-bold">
-              {data?.nickname}
-            </div>
-          </>
-        )}
-        <div className="absolute -right-1 -top-1" onClick={closePreviewHandler}>
-          <CloseSVG className="size-[17px] stroke-[#414141] stroke-[3px]" />
-        </div>
-      </div>
-      <p className="line-clamp-2 whitespace-pre-wrap text-left text-sm">
-        {chat.imageUrl ? '이미지' : chat.content}
-      </p>
-    </motion.button>
-  );
-};
 
 interface AlarmIconWrapperProps {
   isView: boolean;
