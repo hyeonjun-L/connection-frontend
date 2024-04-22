@@ -99,16 +99,20 @@ const NotificationIndicator = ({
       : ''
     : '';
 
+  const closeAlarm = () => {
+    setOpenAlarm(false);
+  };
+
   return (
     <div className="flex items-center gap-3">
       <div className="relative flex items-center">
-        <button>
+        <button onClick={() => setOpenAlarm(!openAlarm)}>
           <AlarmSVG className="fill-black pt-0.5" width="31" height="31" />
           <span className="absolute -right-1.5 top-0 min-w-[1rem] rounded-full bg-main-color px-1 text-xs font-bold text-white">
             {alarmCount}
           </span>
         </button>
-        <NotificationList />
+        {openAlarm && <NotificationList closeNotification={closeAlarm} />}
       </div>
       <div className="relative flex items-center">
         <button onClick={() => setChatView(!chatView)}>
