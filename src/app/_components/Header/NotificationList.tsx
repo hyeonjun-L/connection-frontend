@@ -39,6 +39,7 @@ const NotificationList = ({ closeNotification }: NotificationListProps) => {
   const {
     data: notificationsList,
     hasNextPage,
+    isLoading,
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
@@ -81,8 +82,17 @@ const NotificationList = ({ closeNotification }: NotificationListProps) => {
       className="absolute right-0 top-[2.625rem] flex w-[17.188rem] flex-col rounded-md bg-white text-sm shadow-vertical"
     >
       <header className="flex items-center justify-between px-3 py-3">
-        <h1 className="font-semibold">
-          알림({notificationsList?.pages[0].totalItemCount ?? 0})
+        <h1
+          className={`font-semibold ${
+            notificationsList ? '' : 'flex items-center gap-1'
+          }`}
+        >
+          알림
+          {notificationsList ? (
+            `(${notificationsList.pages[0].totalItemCount ?? 0})`
+          ) : (
+            <div className="h-4 w-6 animate-pulse bg-gray-700" />
+          )}
         </h1>
         <Link href="/notifications" className="text-gray-500 hover:underline">
           전체보기
@@ -90,23 +100,32 @@ const NotificationList = ({ closeNotification }: NotificationListProps) => {
       </header>
       <section className="max-h-[16.75rem] overflow-y-auto">
         <ul className="flex flex-col gap-1">
-          {notifications.map(({ id, title, description, createdAt }, index) => (
-            <li key={id} className="bg-sub-color1-transparent px-3 py-2">
-              <div
-                ref={
-                  index === notifications.length - 1 && hasNextPage
-                    ? lastNotificationsRef
-                    : undefined
-                }
-              >
-                <p className="line-clamp-2 truncate text-wrap">{description}</p>
-                <p className="truncate text-sub-color1">{title}</p>
-                <p className="text-gray-500">
-                  {formatRelativeOrShortDate(createdAt)}
-                </p>
-              </div>
-            </li>
-          ))}
+          {isLoading ? (
+            <NotificationLoading />
+          ) : (
+            notifications.map(
+              ({ id, title, description, createdAt }, index) => (
+                <li key={id} className="bg-sub-color1-transparent px-3 py-2">
+                  <div
+                    ref={
+                      index === notifications.length - 1 && hasNextPage
+                        ? lastNotificationsRef
+                        : undefined
+                    }
+                  >
+                    <p className="line-clamp-2 truncate text-wrap">
+                      {description}
+                    </p>
+                    <p className="truncate text-sub-color1">{title}</p>
+                    <p className="text-gray-500">
+                      {formatRelativeOrShortDate(createdAt)}
+                    </p>
+                  </div>
+                </li>
+              ),
+            )
+          )}
+          {isFetchingNextPage && <NotificationLoading />}
         </ul>
       </section>
     </article>
@@ -114,3 +133,16 @@ const NotificationList = ({ closeNotification }: NotificationListProps) => {
 };
 
 export default NotificationList;
+
+const NotificationLoading = () => {
+  return Array.from({ length: NOTIFICATIONS_TAKE }, (_, index) => (
+    <li
+      key={index}
+      className="flex flex-col gap-1 bg-sub-color1-transparent px-3 py-2"
+    >
+      <div className="h-4 w-full animate-pulse bg-gray-700" />
+      <div className="h-4 w-full animate-pulse bg-gray-700" />
+      <div className="h-4 w-16 animate-pulse bg-gray-700" />
+    </li>
+  ));
+};
