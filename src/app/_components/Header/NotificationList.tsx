@@ -40,7 +40,8 @@ const NotificationList = ({ userType }: { userType: userType }) => {
     getNextPageParam: (lastPage, allpages) => {
       const currentCount = allpages.length * NOTIFICATIONS_TAKE;
 
-      return allpages[0].totalItemCount > currentCount
+      return allpages[0]?.totalItemCount &&
+        allpages[0].totalItemCount > currentCount
         ? {
             pageSize: NOTIFICATIONS_TAKE,
             filterOption: '읽지 않은 알림' as NotificationsFilterOption,

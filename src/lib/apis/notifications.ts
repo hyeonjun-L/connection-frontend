@@ -99,10 +99,14 @@ export const getNotificationsUnreadCount = async (): Promise<number> => {
   }
 };
 
-export const readNotifications = async (notificationsId: string) => {
+export const readNotifications = async ({
+  itemId,
+  itemLocation,
+  itemFilterOption,
+}: INotificationQuery): Promise<INotificationQuery> => {
   try {
     const response = await fetch(
-      `/api/notifications/read?notificationsId=${notificationsId}`,
+      `/api/notifications/read?notificationsId=${itemId}`,
       {
         method: 'PATCH',
         credentials: 'include',
@@ -119,8 +123,7 @@ export const readNotifications = async (notificationsId: string) => {
       throw error;
     }
 
-    const resData = await response.json();
-    return resData;
+    return { itemId, itemLocation, itemFilterOption };
   } catch (error) {
     console.error('알림 읽음 처리 오류', error);
     throw error;

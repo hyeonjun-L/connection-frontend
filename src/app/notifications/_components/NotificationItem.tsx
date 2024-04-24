@@ -10,7 +10,8 @@ import { INotifications } from '@/types/notifications';
 
 interface NotificationItemProps {
   notifications: INotifications;
-  deleteNotification: () => void;
+  readNotifications: () => void;
+  deleteNotifications: () => void;
   userType: userType;
   lastNotificationsRef?: RefObject<HTMLDivElement>;
   isDeletLoading: boolean;
@@ -18,9 +19,10 @@ interface NotificationItemProps {
 const NotificationItem = ({
   userType,
   notifications,
-  deleteNotification,
   lastNotificationsRef,
   isDeletLoading,
+  deleteNotifications,
+  readNotifications,
 }: NotificationItemProps) => {
   const { description, createdAt, title, lecturerId, userId, readedAt } =
     notifications;
@@ -34,11 +36,16 @@ const NotificationItem = ({
     event.stopPropagation();
     event.nativeEvent.preventDefault();
 
-    deleteNotification();
+    deleteNotifications();
+  };
+
+  const readNotificationHandler = (event: React.MouseEvent) => {
+    readNotifications();
   };
 
   return (
     <Link
+      onClick={readNotificationHandler}
       href={href}
       className="w-full rounded-md bg-white px-4 py-3 shadow-float hover:shadow-inner"
     >

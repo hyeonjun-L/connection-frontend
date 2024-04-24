@@ -10,6 +10,7 @@ import {
   NOTIFICATIONS_TAKE,
 } from '@/constants/constants';
 import useIntersect from '@/hooks/useIntersect';
+import useReadNotification from '@/hooks/useReadNotification';
 import {
   deleteNotifications,
   getNotifications,
@@ -84,6 +85,8 @@ const NotificationList = ({
     itemLocation,
     itemFilterOption,
   }: INotificationQuery) => {
+    totalItemRef.current -= 1;
+
     const getFilterOptionData = (option?: string) => {
       const data = queryClient.getQueryData<INotificationsPagesData>([
         'notifications',
@@ -92,8 +95,6 @@ const NotificationList = ({
       return data ? ['notifications', option] : false;
     };
     const filterOptions = ['전체', '읽지 않은 알림', itemFilterOption];
-
-    totalItemRef.current -= 1;
 
     queryClient.setQueryData(['notificationCount'], (data: number) => {
       return data ? data - 1 : data;
@@ -129,7 +130,7 @@ const NotificationList = ({
             );
 
             return {
-              pages: filteredPages.length > 0 ? filteredPages : [initalData],
+              pages: filteredPages.length > 0 ? filteredPages : [],
               pageParams,
             };
           },
@@ -157,6 +158,8 @@ const NotificationList = ({
     NOTIFICATIONS_REF_OPTIONS,
   );
 
+  const { readNotificationsMutate } = useReadNotification();
+
   return (
     <section className="flex flex-col bg-sub-color1-transparent px-4 pb-12 pt-3">
       <ul className="flex flex-col gap-3.5">
@@ -168,8 +171,15 @@ const NotificationList = ({
                 lastNotificationsRef={
                   hasNextPage ? lastNotificationsRef : undefined
                 }
-                deleteNotification={() =>
+                deleteNotifications={() =>
                   deleteNotificationsMutate({
+                    itemId: notifications.id,
+                    itemLocation: page,
+                    itemFilterOption: checkFilterOption(notifications),
+                  })
+                }
+                readNotifications={() =>
+                  readNotificationsMutate({
                     itemId: notifications.id,
                     itemLocation: page,
                     itemFilterOption: checkFilterOption(notifications),
