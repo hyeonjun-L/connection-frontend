@@ -45,6 +45,7 @@ export const getNotifications = async (
 export const deleteNotifications = async ({
   itemId,
   itemLocation,
+  itemFilterOption,
 }: INotificationQuery): Promise<INotificationQuery> => {
   try {
     const response = await fetch(
@@ -65,7 +66,7 @@ export const deleteNotifications = async ({
       throw error;
     }
 
-    return { itemId, itemLocation };
+    return { itemId, itemLocation, itemFilterOption };
   } catch (error) {
     console.error('알림 삭제 오류', error);
     throw error;

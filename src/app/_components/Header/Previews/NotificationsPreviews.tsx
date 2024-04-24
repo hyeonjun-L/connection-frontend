@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import generateNotificationLink from '@/utils/generateNotificationLink';
+import { generateNotificationLink } from '@/utils/notificationUtils';
 import { userType } from '@/types/auth';
 import { INewNotifications } from '@/types/notifications';
 

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { TrashcanSVG } from '@/icons/svg';
 import { formatRelativeOrShortDate } from '@/utils/dateTimeUtils';
-import generateNotificationLink from '@/utils/generateNotificationLink';
+import { generateNotificationLink } from '@/utils/notificationUtils';
 import Profile from './Profile';
 import { userType } from '@/types/auth';
 import { INotifications } from '@/types/notifications';

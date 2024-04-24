@@ -12,6 +12,7 @@ import {
   getNotifications,
 } from '@/lib/apis/notifications';
 import { useUserStore } from '@/store';
+import { checkFilterOption } from '@/utils/notificationUtils';
 import NotificationLoading from './loading/NotificationLoading';
 import NotificationItem from './NotificationItem';
 import {
@@ -78,47 +79,61 @@ const NotificationList = ({
   const deleteNotificationQuery = ({
     itemId,
     itemLocation,
+    itemFilterOption,
   }: INotificationQuery) => {
-    queryClient.setQueryData<INotificationsPagesData>(
-      ['notifications', filterOption],
-      (data) => {
-        if (!data) {
-          return {
-            pages: [initalData],
-            pageParams: [undefined],
-          };
-        }
+    const getFilterOptionData = (option?: string) => {
+      const data = queryClient.getQueryData<INotificationsPagesData>([
+        'notifications',
+        option,
+      ]);
+      return data ? ['notifications', option] : false;
+    };
 
-        const { pages, pageParams } = data;
+    queryClient.setQueryData(['notificationCount'], (data: number) => {
+      return data ? data - 1 : data;
+    });
 
-        const updatedNotifications = pages[itemLocation].notifications.filter(
-          ({ id }) => id !== itemId,
+    const filterOptions = ['전체', '읽지 않은 알림', itemFilterOption];
+
+    filterOptions.forEach((option) => {
+      const filterOptionData = getFilterOptionData(option);
+      if (filterOptionData) {
+        queryClient.setQueryData<INotificationsPagesData>(
+          filterOptionData,
+          (data) => {
+            if (!data) {
+              return {
+                pages: [initalData],
+                pageParams: [undefined],
+              };
+            }
+
+            const { pages, pageParams } = data;
+            const updatedPages = pages.map((page, index) =>
+              index === itemLocation
+                ? {
+                    ...page,
+                    notifications: page.notifications.filter(
+                      ({ id }) => id !== itemId,
+                    ),
+                  }
+                : page,
+            );
+
+            const filteredPages = updatedPages.filter(
+              (page) => page.notifications.length > 0,
+            );
+
+            totalItemCount.current -= 1;
+
+            return {
+              pages: filteredPages.length > 0 ? filteredPages : [initalData],
+              pageParams,
+            };
+          },
         );
-
-        totalItemCount.current -= 1;
-
-        if (updatedNotifications.length === 0) {
-          const filteredPages = pages.filter(
-            (_, index) => index !== itemLocation,
-          );
-          return {
-            pages: filteredPages,
-            pageParams,
-          };
-        }
-
-        const updatedPages = pages.map((page, index) =>
-          index === itemLocation
-            ? { ...page, notifications: updatedNotifications }
-            : page,
-        );
-
-        return {
-          pages: updatedPages,
-          pageParams,
-        };
-      },
-    );
+      }
+    });
   };
 
   const { mutate: deleteNotificationsMutate } = useMutation({
@@ -138,6 +153,7 @@ const NotificationList = ({
                   deleteNotificationsMutate({
                     itemId: notifications.id,
                     itemLocation: page,
+                    itemFilterOption: checkFilterOption(notifications),
                   })
                 }
                 userType={userType!}

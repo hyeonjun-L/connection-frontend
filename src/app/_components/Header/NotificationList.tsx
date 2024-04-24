@@ -8,7 +8,7 @@ import {
 import useIntersect from '@/hooks/useIntersect';
 import { getNotifications } from '@/lib/apis/notifications';
 import { formatRelativeOrShortDate } from '@/utils/dateTimeUtils';
-import generateNotificationLink from '@/utils/generateNotificationLink';
+import { generateNotificationLink } from '@/utils/notificationUtils';
 import { userType } from '@/types/auth';
 import {
   IGetNotifications,
