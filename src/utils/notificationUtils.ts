@@ -8,7 +8,7 @@ export const generateNotificationLink = (
   notificationDetails: INotificationType,
   userType: userType,
 ) => {
-  const { lectureId, userId, couponId, userPassId, reservationId } =
+  const { lectureId, couponId, userPassId, reservationId } =
     notificationDetails;
 
   if (lectureId) {
@@ -26,7 +26,7 @@ export const generateNotificationLink = (
   if (reservationId) {
     return userType === 'user'
       ? '/mypage/user/payment-history'
-      : `/mypage/instructor/manage/member/${userId}`;
+      : `/mypage/instructor/manage/member`;
   }
 
   return '/';

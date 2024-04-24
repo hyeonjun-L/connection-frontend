@@ -10,6 +10,7 @@ import { INotifications } from '@/types/notifications';
 
 interface NotificationItemProps {
   userType: userType;
+  authUserId?: number;
   notifications: INotifications;
   readNotifications: () => void;
   deleteNotifications: () => void;
@@ -18,6 +19,7 @@ interface NotificationItemProps {
 }
 const NotificationItem = ({
   userType,
+  authUserId,
   notifications,
   lastNotificationsRef,
   isDeletLoading,
@@ -40,7 +42,9 @@ const NotificationItem = ({
   };
 
   const readNotificationHandler = () => {
-    readNotifications();
+    if (!readedAt) {
+      readNotifications();
+    }
   };
 
   return (
@@ -56,12 +60,12 @@ const NotificationItem = ({
         >
           <div
             className={`grid ${
-              opponentId && userId !== opponentId
+              opponentId && opponentId !== authUserId
                 ? 'grid-cols-[auto_auto_auto]'
                 : 'grid-cols-[auto_auto]'
             } items-center gap-x-3 text-sm`}
           >
-            {opponentId && userId !== opponentId && (
+            {opponentId && opponentId !== authUserId && (
               <Profile opponentId={opponentId} opponentType={opponentType} />
             )}
             <dt className="truncate font-semibold">{title}</dt>

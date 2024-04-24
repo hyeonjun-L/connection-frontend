@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import BackButton from './_components/BackButton';
@@ -9,14 +10,24 @@ const page = async ({
 }: {
   searchParams: { filterOption: string };
 }) => {
+  const cookieStore = cookies();
+  const user = cookieStore.get('userAccessToken')?.value;
   const { filterOption: searchParamfilterOption } = searchParams;
-  const filterOption = [
+  const userFilterOption = [
     '전체',
     '수강 클래스',
     '관심 클래스',
     '쿠폰/패스권',
     '읽지 않은 알림',
-  ];
+  ] as const;
+
+  const instructorFilterOption = [
+    '전체',
+    '수강 클래스',
+    '읽지 않은 알림',
+  ] as const;
+
+  const filterOption = user ? userFilterOption : instructorFilterOption;
 
   return (
     <main className="mx-auto mt-3 w-full max-w-[51.1rem]">
