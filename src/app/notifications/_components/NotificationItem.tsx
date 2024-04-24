@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { RefObject } from 'react';
 import { TrashcanSVG } from '@/icons/svg';
 import { formatRelativeOrShortDate } from '@/utils/dateTimeUtils';
 import { generateNotificationLink } from '@/utils/notificationUtils';
@@ -10,11 +11,13 @@ interface NotificationItemProps {
   notifications: INotifications;
   deleteNotification: () => void;
   userType: userType;
+  lastNotificationsRef?: RefObject<HTMLDivElement>;
 }
 const NotificationItem = ({
   userType,
   notifications,
   deleteNotification,
+  lastNotificationsRef,
 }: NotificationItemProps) => {
   const { description, createdAt, title, lecturerId, userId } = notifications;
 
@@ -36,7 +39,10 @@ const NotificationItem = ({
       className="w-full rounded-md bg-white px-4 py-3 shadow-float hover:shadow-inner"
     >
       <dl>
-        <div className="mb-2 flex w-full items-center justify-between gap-3">
+        <div
+          ref={lastNotificationsRef}
+          className="mb-2 flex w-full items-center justify-between gap-3"
+        >
           <div
             className={`grid ${
               opponentId
@@ -48,9 +54,9 @@ const NotificationItem = ({
               <Profile opponentId={opponentId} opponentType={opponentType} />
             )}
             <dt className="truncate font-semibold">{title}</dt>
-            <dd className="text-gray-300">
+            <time className="text-gray-300" suppressHydrationWarning>
               {formatRelativeOrShortDate(createdAt)}
-            </dd>
+            </time>
           </div>
           <button
             onClick={deletNotificationHandler}

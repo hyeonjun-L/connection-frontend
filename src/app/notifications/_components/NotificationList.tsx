@@ -5,7 +5,11 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { useRef } from 'react';
-import { NOTIFICATIONS_TAKE } from '@/constants/constants';
+import {
+  NOTIFICATIONS_REF_OPTIONS,
+  NOTIFICATIONS_TAKE,
+} from '@/constants/constants';
+import useIntersect from '@/hooks/useIntersect';
 import { PlusesSVG } from '@/icons/svg';
 import {
   deleteNotifications,
@@ -31,7 +35,7 @@ const NotificationList = ({
   filterOption: NotificationsFilterOption;
 }) => {
   const queryClient = useQueryClient();
-  const totalItemCount = useRef(initalData.totalItemCount);
+  const totalItemRef = useRef(initalData.totalItemCount);
 
   const { userType } = useUserStore((state) => ({ userType: state.userType }));
 
@@ -63,10 +67,9 @@ const NotificationList = ({
       };
     },
     getNextPageParam: (lastPage, allpages) => {
-      const currentPage = allpages.length;
+      const currentCount = allpages.length * NOTIFICATIONS_TAKE;
 
-      return Math.ceil(totalItemCount.current / NOTIFICATIONS_TAKE) >
-        currentPage
+      return totalItemRef.current > currentCount
         ? {
             pageSize: NOTIFICATIONS_TAKE,
             filterOption,
@@ -88,12 +91,13 @@ const NotificationList = ({
       ]);
       return data ? ['notifications', option] : false;
     };
+    const filterOptions = ['전체', '읽지 않은 알림', itemFilterOption];
+
+    totalItemRef.current -= 1;
 
     queryClient.setQueryData(['notificationCount'], (data: number) => {
       return data ? data - 1 : data;
     });
-
-    const filterOptions = ['전체', '읽지 않은 알림', itemFilterOption];
 
     filterOptions.forEach((option) => {
       const filterOptionData = getFilterOptionData(option);
@@ -124,8 +128,6 @@ const NotificationList = ({
               (page) => page.notifications.length > 0,
             );
 
-            totalItemCount.current -= 1;
-
             return {
               pages: filteredPages.length > 0 ? filteredPages : [initalData],
               pageParams,
@@ -141,6 +143,16 @@ const NotificationList = ({
     onSuccess: (data) => deleteNotificationQuery({ ...data }),
   });
 
+  const fetchNextPageHandler = async () => {
+    if (isFetchingNextPage) return;
+    await fetchNextPage();
+  };
+
+  const { ref: lastNotificationsRef } = useIntersect(
+    fetchNextPageHandler,
+    NOTIFICATIONS_REF_OPTIONS,
+  );
+
   return (
     <section className="flex flex-col bg-sub-color1-transparent px-4 pb-12 pt-3">
       <ul className="flex flex-col gap-3.5">
@@ -149,6 +161,9 @@ const NotificationList = ({
             return notificationsList.map((notifications) => (
               <NotificationItem
                 key={notifications.id}
+                lastNotificationsRef={
+                  hasNextPage ? lastNotificationsRef : undefined
+                }
                 deleteNotification={() =>
                   deleteNotificationsMutate({
                     itemId: notifications.id,
@@ -170,17 +185,6 @@ const NotificationList = ({
           </li>
         )}
       </ul>
-      {hasNextPage && (
-        <button
-          onClick={() => fetchNextPage()}
-          className="group mx-auto mt-5 flex items-center gap-1.5 text-sm font-semibold text-sub-color1 underline-offset-2 hover:underline"
-        >
-          더보기
-          <div className="flex size-[23px] items-center justify-center rounded-full border border-solid border-sub-color1 group-hover:border-[1.5px]">
-            <PlusesSVG className="fill-sub-color1" />
-          </div>
-        </button>
-      )}
     </section>
   );
 };
