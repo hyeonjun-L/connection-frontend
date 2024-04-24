@@ -8,12 +8,14 @@ import {
 import useIntersect from '@/hooks/useIntersect';
 import { getNotifications } from '@/lib/apis/notifications';
 import { formatRelativeOrShortDate } from '@/utils/dateTimeUtils';
+import generateNotificationLink from '@/utils/generateNotificationLink';
+import { userType } from '@/types/auth';
 import {
   IGetNotifications,
   NotificationsFilterOption,
 } from '@/types/notifications';
 
-const NotificationList = () => {
+const NotificationList = ({ userType }: { userType: userType }) => {
   const fetchNotifications = ({
     pageParam,
   }: {
@@ -89,27 +91,35 @@ const NotificationList = () => {
           {isLoading ? (
             <NotificationLoading />
           ) : (
-            notifications.map(
-              ({ id, title, description, createdAt }, index) => (
-                <li key={id} className="bg-sub-color1-transparent px-3 py-2">
-                  <div
-                    ref={
-                      index === notifications.length - 1 && hasNextPage
-                        ? lastNotificationsRef
-                        : undefined
-                    }
+            notifications.map((notificationsInfo, index) => {
+              const { id, description, title, createdAt } = notificationsInfo;
+              return (
+                <li
+                  key={id}
+                  className="group bg-sub-color1-transparent px-3 py-2"
+                >
+                  <Link
+                    href={generateNotificationLink(notificationsInfo, userType)}
                   >
-                    <p className="line-clamp-2 truncate text-wrap">
-                      {description}
-                    </p>
-                    <p className="truncate text-sub-color1">{title}</p>
-                    <p className="text-gray-500">
-                      {formatRelativeOrShortDate(createdAt)}
-                    </p>
-                  </div>
+                    <div
+                      ref={
+                        index === notifications.length - 1 && hasNextPage
+                          ? lastNotificationsRef
+                          : undefined
+                      }
+                    >
+                      <p className="line-clamp-2 truncate text-wrap">
+                        {description}
+                      </p>
+                      <p className="truncate text-sub-color1">{title}</p>
+                      <p className="text-gray-500">
+                        {formatRelativeOrShortDate(createdAt)}
+                      </p>
+                    </div>
+                  </Link>
                 </li>
-              ),
-            )
+              );
+            })
           )}
           {isFetchingNextPage && <NotificationLoading />}
         </ul>

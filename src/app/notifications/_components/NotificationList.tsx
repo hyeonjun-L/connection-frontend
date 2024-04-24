@@ -11,6 +11,7 @@ import {
   deleteNotifications,
   getNotifications,
 } from '@/lib/apis/notifications';
+import { useUserStore } from '@/store';
 import NotificationLoading from './loading/NotificationLoading';
 import NotificationItem from './NotificationItem';
 import {
@@ -30,6 +31,8 @@ const NotificationList = ({
 }) => {
   const queryClient = useQueryClient();
   const totalItemCount = useRef(initalData.totalItemCount);
+
+  const { userType } = useUserStore((state) => ({ userType: state.userType }));
 
   const fetchNotifications = async ({
     pageParam,
@@ -137,6 +140,7 @@ const NotificationList = ({
                     itemLocation: page,
                   })
                 }
+                userType={userType!}
                 notifications={notifications}
               />
             ));

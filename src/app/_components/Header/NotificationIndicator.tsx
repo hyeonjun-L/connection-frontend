@@ -176,7 +176,9 @@ const NotificationIndicator = ({
             />
           </button>
         )}
-        {!isNotificationsPath && openAlarm && <NotificationList />}
+        {!isNotificationsPath && openAlarm && (
+          <NotificationList userType={userType} />
+        )}
         {!isNotificationsPath &&
           previews === 'NOTIFICATIONS' &&
           newNotifications && (
@@ -186,7 +188,10 @@ const NotificationIndicator = ({
               stopTimer={stopTimer}
               closePreviews={closePreviews}
             >
-              <NotificationsPreviews notifications={newNotifications} />
+              <NotificationsPreviews
+                notifications={newNotifications}
+                userType={userType}
+              />
             </PreviewsContainer>
           )}
       </div>

@@ -13,17 +13,22 @@ export interface IGetNotifications {
   filterOption: NotificationsFilterOption;
 }
 
-export interface IBaseNotification {
+export interface IBaseNotification extends INotificationType {
   description: string;
   title: string;
+  readedAt: null | string;
+  createdAt: string;
+  target: { userId: number | null; lecturerId: number | null };
+}
+
+export interface INotificationType {
   lectureId?: number;
+  userId?: number;
   lecturerId?: number;
   couponId?: number;
   lecturePassId?: number;
   userPassId?: number;
-  readedAt: null | string;
-  createdAt: string;
-  target: { userId: number | null; lecturerId: number | null };
+  reservationId?: number;
 }
 
 export interface INotifications extends IBaseNotification {
