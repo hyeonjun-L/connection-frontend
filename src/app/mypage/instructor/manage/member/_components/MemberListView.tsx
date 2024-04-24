@@ -9,7 +9,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
-import { ChatSVG, MemoSVG } from '@/icons/svg';
+import { AlarmSVG, ChatSVG, MemoSVG } from '@/icons/svg';
 import { useMemberStore } from '@/store/memberStore';
 import formatDate from '@/utils/formatDate';
 import ChatButton from '@/components/Chat/ChatButton';
@@ -26,6 +26,7 @@ interface MemberListViewProps {
     },
     reset?: boolean | undefined,
   ) => void;
+  notificationModalOpen: () => void;
 }
 
 const ExcelDownload = dynamic(() => import('./ExcelDownload'), {
@@ -39,6 +40,7 @@ const MemberListView = ({
   memberList,
   filterState,
   updateFilter,
+  notificationModalOpen,
 }: MemberListViewProps) => {
   const sortingOptions = [
     { value: 'LATEST', label: '최신순' },
@@ -139,7 +141,6 @@ const MemberListView = ({
           return <div className="hidden md:block">수업 일정</div>;
         },
         cell: ({ getValue }) => {
-          const test = getValue();
           const { lectureSchedule, regularLectureStatus } = getValue();
 
           let schedule;
@@ -241,10 +242,13 @@ const MemberListView = ({
             options={takeOptions}
           />
 
-          {/* <ChatButton  btnClassName="flex h-7 items-center justify-center whitespace-nowrap rounded-md bg-gray-100 px-2 text-sm text-white">
-            <ChatSVG className="h-5 w-5 fill-white" />
-            전체 <p className="hidden sm:block">채팅</p>
-          </ChatButton> */}
+          <button
+            onClick={notificationModalOpen}
+            className="flex h-7 items-center justify-center whitespace-nowrap rounded-md bg-gray-100 px-2 text-sm text-white"
+          >
+            <AlarmSVG className="h-5 w-5 fill-white" />
+            전체 <p className="hidden sm:block">알림</p>
+          </button>
 
           <ExcelDownload memberList={memberList} />
         </div>
