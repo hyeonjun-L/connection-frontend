@@ -3,6 +3,7 @@ import { RefObject } from 'react';
 import { TrashcanSVG } from '@/icons/svg';
 import { formatRelativeOrShortDate } from '@/utils/dateTimeUtils';
 import { generateNotificationLink } from '@/utils/notificationUtils';
+import NotificationDeleteLoading from './loading/NotificationDeleteLoading';
 import Profile from './Profile';
 import { userType } from '@/types/auth';
 import { INotifications } from '@/types/notifications';
@@ -12,12 +13,14 @@ interface NotificationItemProps {
   deleteNotification: () => void;
   userType: userType;
   lastNotificationsRef?: RefObject<HTMLDivElement>;
+  isDeletLoading: boolean;
 }
 const NotificationItem = ({
   userType,
   notifications,
   deleteNotification,
   lastNotificationsRef,
+  isDeletLoading,
 }: NotificationItemProps) => {
   const { description, createdAt, title, lecturerId, userId, readedAt } =
     notifications;
@@ -59,12 +62,16 @@ const NotificationItem = ({
               {formatRelativeOrShortDate(createdAt)}
             </time>
           </div>
-          <button
-            onClick={deletNotificationHandler}
-            className="group flex size-7 flex-shrink-0 items-center justify-center rounded-full shadow-vertical active:bg-gray-200 active:shadow-none"
-          >
-            <TrashcanSVG className="size-5 stroke-gray-300 stroke-2 group-hover:stroke-black" />
-          </button>
+          {isDeletLoading ? (
+            <NotificationDeleteLoading />
+          ) : (
+            <button
+              onClick={deletNotificationHandler}
+              className="group flex size-7 flex-shrink-0 items-center justify-center rounded-full shadow-vertical active:bg-gray-200 active:shadow-none"
+            >
+              <TrashcanSVG className="size-5 stroke-gray-300 stroke-2 group-hover:stroke-black" />
+            </button>
+          )}
         </div>
         <dd>{description}</dd>
       </dl>

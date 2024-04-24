@@ -4,7 +4,7 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
   NOTIFICATIONS_REF_OPTIONS,
   NOTIFICATIONS_TAKE,
@@ -35,6 +35,7 @@ const NotificationList = ({
 }) => {
   const queryClient = useQueryClient();
   const totalItemRef = useRef(initalData.totalItemCount);
+  const [deletLoading, setDeleteLoading] = useState<string | null>(null);
 
   const { userType } = useUserStore((state) => ({ userType: state.userType }));
 
@@ -139,7 +140,11 @@ const NotificationList = ({
 
   const { mutate: deleteNotificationsMutate } = useMutation({
     mutationFn: deleteNotifications,
-    onSuccess: (data) => deleteNotificationQuery({ ...data }),
+    onSuccess: (data) => {
+      deleteNotificationQuery({ ...data });
+      setDeleteLoading(null);
+    },
+    onMutate: (data) => setDeleteLoading(data.itemId),
   });
 
   const fetchNextPageHandler = async () => {
@@ -170,6 +175,7 @@ const NotificationList = ({
                     itemFilterOption: checkFilterOption(notifications),
                   })
                 }
+                isDeletLoading={deletLoading === notifications.id}
                 userType={userType!}
                 notifications={notifications}
               />
