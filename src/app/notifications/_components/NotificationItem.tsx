@@ -19,7 +19,8 @@ const NotificationItem = ({
   deleteNotification,
   lastNotificationsRef,
 }: NotificationItemProps) => {
-  const { description, createdAt, title, lecturerId, userId } = notifications;
+  const { description, createdAt, title, lecturerId, userId, readedAt } =
+    notifications;
 
   const href = generateNotificationLink(notifications, userType);
 
@@ -38,7 +39,7 @@ const NotificationItem = ({
       href={href}
       className="w-full rounded-md bg-white px-4 py-3 shadow-float hover:shadow-inner"
     >
-      <dl>
+      <dl className={`${readedAt ? 'text-gray-300' : ''}`}>
         <div
           ref={lastNotificationsRef}
           className="mb-2 flex w-full items-center justify-between gap-3"

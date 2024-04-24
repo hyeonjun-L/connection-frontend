@@ -10,7 +10,6 @@ import {
   NOTIFICATIONS_TAKE,
 } from '@/constants/constants';
 import useIntersect from '@/hooks/useIntersect';
-import { PlusesSVG } from '@/icons/svg';
 import {
   deleteNotifications,
   getNotifications,

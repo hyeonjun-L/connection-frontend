@@ -98,3 +98,31 @@ export const getNotificationsUnreadCount = async (): Promise<number> => {
     throw error;
   }
 };
+
+export const readNotifications = async (notificationsId: string) => {
+  try {
+    const response = await fetch(
+      `/api/notifications/read?notificationsId=${notificationsId}`,
+      {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const error: FetchError = new Error(errorData.message || '');
+      error.status = response.status;
+      throw error;
+    }
+
+    const resData = await response.json();
+    return resData;
+  } catch (error) {
+    console.error('알림 읽음 처리 오류', error);
+    throw error;
+  }
+};
