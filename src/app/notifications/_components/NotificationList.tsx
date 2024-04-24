@@ -35,7 +35,6 @@ const NotificationList = ({
   filterOption: NotificationsFilterOption;
 }) => {
   const queryClient = useQueryClient();
-  const totalItemRef = useRef(initalData.totalItemCount);
   const [deletLoading, setDeleteLoading] = useState<string | null>(null);
 
   const { userType } = useUserStore((state) => ({ userType: state.userType }));
@@ -70,7 +69,8 @@ const NotificationList = ({
     getNextPageParam: (lastPage, allpages) => {
       const currentCount = allpages.length * NOTIFICATIONS_TAKE;
 
-      return totalItemRef.current > currentCount
+      return allpages[0]?.totalItemCount &&
+        allpages[0].totalItemCount > currentCount
         ? {
             pageSize: NOTIFICATIONS_TAKE,
             filterOption,
@@ -84,8 +84,6 @@ const NotificationList = ({
     itemId,
     itemFilterOption,
   }: INotificationQuery) => {
-    totalItemRef.current -= 1;
-
     const getFilterOptionData = (option?: string) => {
       const data = queryClient.getQueryData<INotificationsPagesData>([
         'notifications',
@@ -114,7 +112,7 @@ const NotificationList = ({
 
             const { pages, pageParams } = data;
             const updatedPages = pages.map((page) => ({
-              ...page,
+              totalItemCount: page.totalItemCount - 1,
               notifications: page.notifications.filter(
                 ({ id }) => id !== itemId,
               ),

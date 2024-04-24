@@ -56,23 +56,6 @@ export interface INotifications {
   createdAt: string;
 }
 
-export interface INewNotifications {
-  createdAt: string;
-  deletedAt: null;
-  description: string;
-  lectureId?: number;
-  lecturerId?: number;
-  couponId?: number;
-  lecturePassId?: number;
-  userPassId?: number;
-  readedAt: null;
-  target: { userId: number; lecturerId: null; _id: string };
-  title: string;
-  updatedAt: string;
-  __v: number;
-  _id: string;
-}
-
 export interface IGetNotificationsData {
   notifications: INotifications[];
   totalItemCount: number;

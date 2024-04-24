@@ -88,12 +88,7 @@ const NotificationList = ({
             notificationsList ? '' : 'flex items-center gap-1'
           }`}
         >
-          알림
-          {notificationsList ? (
-            `(${alarmCount === '' ? 0 : alarmCount})`
-          ) : (
-            <div className="h-4 w-6 animate-pulse bg-gray-700" />
-          )}
+          알림 ({alarmCount === '' ? 0 : alarmCount})
         </h1>
         <Link href="/notifications" className="text-gray-500 hover:underline">
           전체보기

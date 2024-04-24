@@ -9,10 +9,10 @@ import { userType } from '@/types/auth';
 import { INotifications } from '@/types/notifications';
 
 interface NotificationItemProps {
+  userType: userType;
   notifications: INotifications;
   readNotifications: () => void;
   deleteNotifications: () => void;
-  userType: userType;
   lastNotificationsRef?: RefObject<HTMLDivElement>;
   isDeletLoading: boolean;
 }
@@ -39,7 +39,7 @@ const NotificationItem = ({
     deleteNotifications();
   };
 
-  const readNotificationHandler = (event: React.MouseEvent) => {
+  const readNotificationHandler = () => {
     readNotifications();
   };
 
@@ -56,12 +56,12 @@ const NotificationItem = ({
         >
           <div
             className={`grid ${
-              opponentId
+              opponentId && userId !== opponentId
                 ? 'grid-cols-[auto_auto_auto]'
                 : 'grid-cols-[auto_auto]'
             } items-center gap-x-3 text-sm`}
           >
-            {opponentId && (
+            {opponentId && userId !== opponentId && (
               <Profile opponentId={opponentId} opponentType={opponentType} />
             )}
             <dt className="truncate font-semibold">{title}</dt>

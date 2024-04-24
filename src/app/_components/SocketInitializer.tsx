@@ -5,6 +5,7 @@ import { io } from 'socket.io-client';
 import { CHATS_TAKE } from '@/constants/constants';
 import { useChatStore, useSocketStore } from '@/store';
 import { useNotificationsStore } from '@/store/notificationsStore';
+import { checkFilterOption } from '@/utils/notificationUtils';
 import { userType } from '@/types/auth';
 import {
   ChatPagesData,
@@ -13,7 +14,11 @@ import {
   JoinUserData,
   ExitUserData,
 } from '@/types/chat';
-import { INewNotifications } from '@/types/notifications';
+import {
+  INewNotifications,
+  INotifications,
+  INotificationsPagesData,
+} from '@/types/notifications';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT_DOMAIN ?? '';
 
@@ -46,6 +51,14 @@ const SocketInitializer = ({
   }));
 
   const queryClient = useQueryClient();
+
+  const getFilterOptionData = (option?: string) => {
+    const data = queryClient.getQueryData<INotificationsPagesData>([
+      'notifications',
+      option,
+    ]);
+    return data ? ['notifications', option] : false;
+  };
 
   useEffect(() => {
     if (userType && !isConnected) {
@@ -129,7 +142,51 @@ const SocketInitializer = ({
       });
 
       socket.on('handleNewNotification', (data: INewNotifications) => {
-        console.log(data);
+        const itemFilterOption = checkFilterOption(data);
+
+        const filterOptions = ['전체', '읽지 않은 알림', itemFilterOption];
+
+        queryClient.setQueryData(['notificationCount'], (data: number) => {
+          return data ? data + 1 : 1;
+        });
+
+        const newNotifications = { ...data, id: data._id } as INotifications;
+
+        filterOptions.forEach((option) => {
+          const filterOptionData = getFilterOptionData(option);
+          if (filterOptionData) {
+            queryClient.setQueryData<INotificationsPagesData>(
+              filterOptionData,
+              (data) => {
+                if (!data) {
+                  return {
+                    pages: [],
+                    pageParams: [undefined],
+                  };
+                }
+
+                const { pages, pageParams } = data;
+                const updatedPages = pages.map((page, index) =>
+                  index === 0
+                    ? {
+                        notifications: [
+                          newNotifications,
+                          ...page.notifications,
+                        ],
+                        totalItemCount: page.totalItemCount + 1,
+                      }
+                    : { ...page, totalItemCount: page.totalItemCount + 1 },
+                );
+
+                return {
+                  pages: updatedPages,
+                  pageParams,
+                };
+              },
+            );
+          }
+        });
+
         setNewNotifications(data);
       });
 
