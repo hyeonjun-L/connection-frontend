@@ -44,7 +44,6 @@ export const getNotifications = async (
 
 export const deleteNotifications = async ({
   itemId,
-  itemLocation,
   itemFilterOption,
 }: INotificationQuery): Promise<INotificationQuery> => {
   try {
@@ -66,7 +65,7 @@ export const deleteNotifications = async ({
       throw error;
     }
 
-    return { itemId, itemLocation, itemFilterOption };
+    return { itemId, itemFilterOption };
   } catch (error) {
     console.error('알림 삭제 오류', error);
     throw error;
@@ -101,7 +100,6 @@ export const getNotificationsUnreadCount = async (): Promise<number> => {
 
 export const readNotifications = async ({
   itemId,
-  itemLocation,
   itemFilterOption,
 }: INotificationQuery): Promise<INotificationQuery> => {
   try {
@@ -123,7 +121,7 @@ export const readNotifications = async ({
       throw error;
     }
 
-    return { itemId, itemLocation, itemFilterOption };
+    return { itemId, itemFilterOption };
   } catch (error) {
     console.error('알림 읽음 처리 오류', error);
     throw error;

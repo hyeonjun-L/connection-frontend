@@ -10,7 +10,6 @@ const useReadNotification = () => {
 
   const updatePagesData = (
     data: INotificationsPagesData,
-    itemLocation: number,
     itemId: string,
     option?: string,
   ) => {
@@ -18,36 +17,27 @@ const useReadNotification = () => {
     const updatedPages =
       option === '읽지 않은 알림'
         ? pages
-            .map((page, index) =>
-              index === itemLocation
-                ? {
-                    ...page,
-                    notifications: page.notifications.filter(
-                      ({ id }) => id !== itemId,
-                    ),
-                  }
-                : page,
-            )
+            .map((page) => ({
+              ...page,
+              notifications: page.notifications.filter(
+                ({ id }) => id !== itemId,
+              ),
+            }))
             .filter((page) => page.notifications.length > 0)
-        : pages.map((page, index) =>
-            index === itemLocation
-              ? {
-                  ...page,
-                  notifications: page.notifications.map((info) =>
-                    info.id === itemId
-                      ? { ...info, readedAt: String(new Date()) }
-                      : { ...info },
-                  ),
-                }
-              : page,
-          );
+        : pages.map((page) => ({
+            ...page,
+            notifications: page.notifications.map((info) =>
+              info.id === itemId
+                ? { ...info, readedAt: String(new Date()) }
+                : { ...info },
+            ),
+          }));
 
     return { pages: updatedPages, pageParams };
   };
 
   const readNotificationQuery = ({
     itemId,
-    itemLocation,
     itemFilterOption,
   }: INotificationQuery) => {
     const filterOptions = ['전체', '읽지 않은 알림', itemFilterOption];
@@ -67,7 +57,7 @@ const useReadNotification = () => {
           ['notifications', option],
           (data) => {
             return data
-              ? updatePagesData(data, itemLocation, itemId, option)
+              ? updatePagesData(data, itemId, option)
               : { pages: [], pageParams: [undefined] };
           },
         );

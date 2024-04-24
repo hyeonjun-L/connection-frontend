@@ -6,16 +6,26 @@ import {
   NOTIFICATIONS_TAKE,
 } from '@/constants/constants';
 import useIntersect from '@/hooks/useIntersect';
+import useReadNotification from '@/hooks/useReadNotification';
 import { getNotifications } from '@/lib/apis/notifications';
 import { formatRelativeOrShortDate } from '@/utils/dateTimeUtils';
-import { generateNotificationLink } from '@/utils/notificationUtils';
+import {
+  checkFilterOption,
+  generateNotificationLink,
+} from '@/utils/notificationUtils';
 import { userType } from '@/types/auth';
 import {
   IGetNotifications,
   NotificationsFilterOption,
 } from '@/types/notifications';
 
-const NotificationList = ({ userType }: { userType: userType }) => {
+const NotificationList = ({
+  userType,
+  alarmCount,
+}: {
+  userType: userType;
+  alarmCount: string;
+}) => {
   const fetchNotifications = ({
     pageParam,
   }: {
@@ -68,6 +78,8 @@ const NotificationList = ({ userType }: { userType: userType }) => {
     [notificationsList],
   );
 
+  const { readNotificationsMutate } = useReadNotification();
+
   return (
     <article className="absolute right-0 top-[2.625rem] flex w-[17.188rem] flex-col rounded-md bg-white text-sm shadow-vertical">
       <header className="flex items-center justify-between px-3 py-3">
@@ -78,7 +90,7 @@ const NotificationList = ({ userType }: { userType: userType }) => {
         >
           알림
           {notificationsList ? (
-            `(${notificationsList.pages[0].totalItemCount ?? 0})`
+            `(${alarmCount === '' ? 0 : alarmCount})`
           ) : (
             <div className="h-4 w-6 animate-pulse bg-gray-700" />
           )}
@@ -100,6 +112,12 @@ const NotificationList = ({ userType }: { userType: userType }) => {
                   className="group bg-sub-color1-transparent px-3 py-2"
                 >
                   <Link
+                    onClick={() =>
+                      readNotificationsMutate({
+                        itemId: id,
+                        itemFilterOption: checkFilterOption(notificationsInfo),
+                      })
+                    }
                     href={generateNotificationLink(notificationsInfo, userType)}
                   >
                     <div

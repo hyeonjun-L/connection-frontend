@@ -85,6 +85,5 @@ export interface INotificationsPagesData {
 
 export interface INotificationQuery {
   itemId: string;
-  itemLocation: number;
   itemFilterOption?: NotificationsFilterOption;
 }

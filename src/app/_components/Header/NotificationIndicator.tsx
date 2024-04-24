@@ -177,7 +177,10 @@ const NotificationIndicator = ({
           </button>
         )}
         {!isNotificationsPath && openAlarm && (
-          <NotificationList userType={userType} />
+          <NotificationList
+            alarmCount={displayAlarmCount}
+            userType={userType}
+          />
         )}
         {!isNotificationsPath &&
           previews === 'NOTIFICATIONS' &&

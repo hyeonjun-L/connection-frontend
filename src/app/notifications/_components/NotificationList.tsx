@@ -82,7 +82,6 @@ const NotificationList = ({
 
   const deleteNotificationQuery = ({
     itemId,
-    itemLocation,
     itemFilterOption,
   }: INotificationQuery) => {
     totalItemRef.current -= 1;
@@ -114,16 +113,12 @@ const NotificationList = ({
             }
 
             const { pages, pageParams } = data;
-            const updatedPages = pages.map((page, index) =>
-              index === itemLocation
-                ? {
-                    ...page,
-                    notifications: page.notifications.filter(
-                      ({ id }) => id !== itemId,
-                    ),
-                  }
-                : page,
-            );
+            const updatedPages = pages.map((page) => ({
+              ...page,
+              notifications: page.notifications.filter(
+                ({ id }) => id !== itemId,
+              ),
+            }));
 
             const filteredPages = updatedPages.filter(
               (page) => page.notifications.length > 0,
@@ -163,35 +158,31 @@ const NotificationList = ({
   return (
     <section className="flex flex-col bg-sub-color1-transparent px-4 pb-12 pt-3">
       <ul className="flex flex-col gap-3.5">
-        {notificationsData.pages.map(
-          ({ notifications: notificationsList }, page) => {
-            return notificationsList.map((notifications) => (
-              <NotificationItem
-                key={notifications.id}
-                lastNotificationsRef={
-                  hasNextPage ? lastNotificationsRef : undefined
-                }
-                deleteNotifications={() =>
-                  deleteNotificationsMutate({
-                    itemId: notifications.id,
-                    itemLocation: page,
-                    itemFilterOption: checkFilterOption(notifications),
-                  })
-                }
-                readNotifications={() =>
-                  readNotificationsMutate({
-                    itemId: notifications.id,
-                    itemLocation: page,
-                    itemFilterOption: checkFilterOption(notifications),
-                  })
-                }
-                isDeletLoading={deletLoading === notifications.id}
-                userType={userType!}
-                notifications={notifications}
-              />
-            ));
-          },
-        )}
+        {notificationsData.pages.map(({ notifications: notificationsList }) => {
+          return notificationsList.map((notifications) => (
+            <NotificationItem
+              key={notifications.id}
+              lastNotificationsRef={
+                hasNextPage ? lastNotificationsRef : undefined
+              }
+              deleteNotifications={() =>
+                deleteNotificationsMutate({
+                  itemId: notifications.id,
+                  itemFilterOption: checkFilterOption(notifications),
+                })
+              }
+              readNotifications={() =>
+                readNotificationsMutate({
+                  itemId: notifications.id,
+                  itemFilterOption: checkFilterOption(notifications),
+                })
+              }
+              isDeletLoading={deletLoading === notifications.id}
+              userType={userType!}
+              notifications={notifications}
+            />
+          ));
+        })}
         {isFetchingNextPage && (
           <li className="flex flex-col gap-3.5">
             {Array.from({ length: NOTIFICATIONS_TAKE }, (_, index) => (
