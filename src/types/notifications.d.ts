@@ -70,3 +70,8 @@ export interface INotificationQuery {
   itemId: string;
   itemFilterOption?: NotificationsFilterOption;
 }
+
+export interface ISendNotification {
+  targets: number[];
+  description: string;
+}

@@ -100,7 +100,10 @@ const MemberManage = ({ myMembers, myClassListsOption }: MemberManageProps) => {
         handleClosed={() => setIsNotificationModalOpen(false)}
         disableModalSwipe={true}
       >
-        <NotificationSenderModal memberList={memberList} />
+        <NotificationSenderModal
+          memberList={memberList}
+          totalItemCount={totalItemCount}
+        />
       </Modal>
     </>
   );
