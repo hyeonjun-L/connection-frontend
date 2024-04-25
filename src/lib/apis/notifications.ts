@@ -3,6 +3,7 @@ import {
   IGetNotifications,
   IGetNotificationsData,
   INotificationQuery,
+  ISendNotification,
 } from '@/types/notifications';
 import { FetchError } from '@/types/types';
 
@@ -124,6 +125,32 @@ export const readNotifications = async ({
     return { itemId, itemFilterOption };
   } catch (error) {
     console.error('알림 읽음 처리 오류', error);
+    throw error;
+  }
+};
+
+export const sendNotifications = async (data: ISendNotification) => {
+  try {
+    const response = await fetch('/api/notifications/send-notifications', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const error: FetchError = new Error(errorData.message || '');
+      error.status = response.status;
+      throw error;
+    }
+
+    const resData = await response.json();
+    return resData.data;
+  } catch (error) {
+    console.error('알림 전송 오류', error);
     throw error;
   }
 };
