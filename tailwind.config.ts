@@ -62,11 +62,22 @@ const config: Config = {
 
       animation: {
         vibration: 'vibration 0.1s 20',
+        'slow-bounce': 'bounce 1s infinite',
       },
       keyframes: {
         vibration: {
           '0%': { transform: 'rotate(1deg)' },
           '100%': { transform: 'rotate(-1deg)' },
+        },
+        bounce: {
+          '0%, 100%': {
+            transform: 'translateY(-10%)',
+            animationTimingFunction: 'cubic-bezier(0.8,0,1,1)',
+          },
+          '50%': {
+            transform: 'none',
+            animationTimingFunction: 'cubic-bezier(0,0,0.2,1)',
+          },
         },
       },
     },

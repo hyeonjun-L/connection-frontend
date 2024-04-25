@@ -51,7 +51,11 @@ const SidebarModal = ({ children, isOpened, handleClosed }: ModalProps) => {
                 className="absolute right-2 top-2"
                 aria-label="사이드바 닫기"
               >
-                <DoubleRightSVG width="28" height="28" className="rotate-180" />
+                <DoubleRightSVG
+                  width="28"
+                  height="28"
+                  className="rotate-180 fill-gray-500"
+                />
               </button>
 
               {children}
