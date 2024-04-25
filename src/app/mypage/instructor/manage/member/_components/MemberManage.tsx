@@ -102,7 +102,7 @@ const MemberManage = ({ myMembers, myClassListsOption }: MemberManageProps) => {
         disableModalSwipe={true}
       >
         <NotificationSenderModal
-          memberList={memberList}
+          memberList={memberList.map(({ user }) => ({ ...user }))}
           totalItemCount={totalItemCount}
         />
       </Modal>

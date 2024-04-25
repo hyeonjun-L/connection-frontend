@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import ErrorFallback from '@/app/_components/Error';
-import { ChatSVG } from '@/icons/svg';
+import { AlarmSVG, ChatSVG } from '@/icons/svg';
 import {
   getAllRegisterLists,
   getScheduleRegisterLists,
@@ -8,8 +9,11 @@ import {
 import { useClassProgressStore } from '@/store';
 import ChatButton from '@/components/Chat/ChatButton';
 import Spinner from '@/components/Loading/Spinner';
+import Modal from '@/components/Modal/Modal';
 import UserProfileMenu from '@/components/Profile/UserProfileMenu';
+import NotificationSenderModal from '@/components/uis/NotificationSenderModal';
 import { IScheduleLearnerList } from '@/types/class';
+import { UserInfo } from '@/types/instructor';
 
 interface ClassOverViewProps {
   totalClassNum?: number;
@@ -21,6 +25,7 @@ interface ClassOverViewProps {
 const ClassOverview = (props: ClassOverViewProps) => {
   const { totalClassNum, pastClassNum, selectedClass, lectureId } = props;
   const { totalClass, pastClass } = useClassProgressStore();
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
 
   const fetchRegisterList = async () => {
     if (selectedClass.id) {
@@ -48,48 +53,61 @@ const ClassOverview = (props: ClassOverViewProps) => {
     );
 
   return (
-    <aside className="flex h-fit flex-col whitespace-nowrap rounded-lg bg-white shadow-float">
-      <div className="flex h-20 divide-x divide-solid divide-gray-700 border-b border-solid border-gray-700 py-2.5 text-sm font-semibold text-gray-100">
-        <div className="flex w-1/2 items-center justify-center gap-2.5 lg:flex-col lg:gap-0">
-          진행한 클래스
-          <span className="text-xl font-bold text-sub-color1">
-            {pastClassNum || pastClass}회
-          </span>
-        </div>
-        <div className="flex w-1/2 items-center justify-center gap-2.5 lg:flex-col lg:gap-0">
-          총 클래스
-          <span className="text-xl font-bold text-gray-100">
-            {totalClassNum || totalClass}회
-          </span>
-        </div>
-      </div>
-      <div className="flex flex-col px-5 py-3.5">
-        <h3 className="flex items-center justify-between text-lg font-semibold">
-          {selectedClass.label === null
-            ? '전체 수강생 리스트'
-            : `${selectedClass.label}`}
-
-          {/* <button
-            aria-label="전체 채팅"
-            className="flex h-7 w-[5.5625rem] items-center justify-center gap-0.5 rounded-md bg-black text-sm text-white"
-          >
-            <ChatSVG width="16" height="17" fill="white" />
-            전체 채팅
-          </button> */}
-        </h3>
-        {isLoading ? (
-          <div className="mb-auto mt-5 flex h-fit items-center justify-center">
-            <Spinner />
+    <>
+      <aside className="flex h-fit flex-col whitespace-nowrap rounded-lg bg-white shadow-float">
+        <div className="flex h-20 divide-x divide-solid divide-gray-700 border-b border-solid border-gray-700 py-2.5 text-sm font-semibold text-gray-100">
+          <div className="flex w-1/2 items-center justify-center gap-2.5 lg:flex-col lg:gap-0">
+            진행한 클래스
+            <span className="text-xl font-bold text-sub-color1">
+              {pastClassNum || pastClass}회
+            </span>
           </div>
-        ) : (
-          <ul className="grid w-full grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-1">
-            {registerList.map((item, index) => (
-              <LearnerList key={index} {...item} />
-            ))}
-          </ul>
-        )}
-      </div>
-    </aside>
+          <div className="flex w-1/2 items-center justify-center gap-2.5 lg:flex-col lg:gap-0">
+            총 클래스
+            <span className="text-xl font-bold text-gray-100">
+              {totalClassNum || totalClass}회
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-col px-5 py-3.5">
+          <h3 className="flex items-center justify-between text-lg font-semibold">
+            {selectedClass.label === null
+              ? '전체 수강생 리스트'
+              : `${selectedClass.label}`}
+
+            <button
+              onClick={() => setIsNotificationModalOpen(true)}
+              aria-label="전체 알림"
+              className="flex h-7 w-[5.5625rem] items-center justify-center gap-0.5 rounded-md bg-black text-sm text-white"
+            >
+              <AlarmSVG width="16" height="17" fill="white" />
+              전체 알림
+            </button>
+          </h3>
+          {isLoading ? (
+            <div className="mb-auto mt-5 flex h-fit items-center justify-center">
+              <Spinner />
+            </div>
+          ) : (
+            <ul className="grid w-full grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-1">
+              {registerList.map((item, index) => (
+                <LearnerList key={index} {...item} />
+              ))}
+            </ul>
+          )}
+        </div>
+      </aside>
+      <Modal
+        isOpened={isNotificationModalOpen}
+        handleClosed={() => setIsNotificationModalOpen(false)}
+        disableModalSwipe={true}
+      >
+        <NotificationSenderModal
+          memberList={registerList}
+          totalItemCount={registerList.length}
+        />
+      </Modal>
+    </>
   );
 };
 

@@ -4,11 +4,12 @@ import { toast } from 'react-toastify';
 import { AlarmSVG } from '@/icons/svg';
 import { sendNotifications } from '@/lib/apis/notifications';
 import ProfileImg from '../Profile/ProfileImage';
-import { MemberData } from '@/types/instructor';
+import { IScheduleLearnerList } from '@/types/class';
+import { UserInfo } from '@/types/instructor';
 import { ISendNotification } from '@/types/notifications';
 
 interface NotificationSenderModalProps {
-  memberList: MemberData[];
+  memberList: UserInfo[] | IScheduleLearnerList[];
   totalItemCount: number;
 }
 
@@ -66,7 +67,7 @@ const NotificationSenderModal = ({
                 e.target.checked
                   ? setValue(
                       'targets',
-                      memberList.map(({ user }) => user.id),
+                      memberList.map(({ id }) => id),
                     )
                   : setValue('targets', []);
               }}
@@ -95,30 +96,30 @@ const NotificationSenderModal = ({
           }}
           render={({ field }) => (
             <ul className="grid h-fit max-h-full grid-cols-2 gap-x-2 gap-y-4 overflow-y-scroll sm:max-h-72">
-              {memberList.map(({ user }) => {
-                const checked = field.value.includes(user.id);
+              {memberList.map(({ id, nickname, userProfileImage }) => {
+                const checked = field.value.includes(id);
                 return (
-                  <li className="h-fit" key={user.id}>
+                  <li className="h-fit" key={id}>
                     <div className="flex items-center">
                       <input
-                        id={user.nickname}
+                        id={nickname}
                         type="checkbox"
                         checked={checked}
                         onChange={() =>
                           checked
                             ? field.onChange(
-                                field.value.filter((id) => id !== user.id),
+                                field.value.filter((id) => id !== id),
                               )
-                            : field.onChange([...field.value, user.id])
+                            : field.onChange([...field.value, id])
                         }
                         className="mr-2 size-[18px] accent-sub-color1"
                       />
                       <label
-                        htmlFor={user.nickname}
+                        htmlFor={nickname}
                         className="grid flex-grow cursor-pointer grid-cols-[auto_1fr] items-center"
                       >
-                        <ProfileImg src={user.userProfileImage} size="small" />
-                        <p className="truncate">{user.nickname}</p>
+                        <ProfileImg src={userProfileImage} size="small" />
+                        <p className="truncate">{nickname}</p>
                       </label>
                     </div>
                   </li>
