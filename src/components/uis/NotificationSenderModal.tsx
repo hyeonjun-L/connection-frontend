@@ -3,6 +3,7 @@ import { Controller, FieldErrors, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { AlarmSVG } from '@/icons/svg';
 import { sendNotifications } from '@/lib/apis/notifications';
+import SendNotificationsLoading from './Loading/SendNotificationsLoading';
 import ProfileImg from '../Profile/ProfileImage';
 import { IScheduleLearnerList } from '@/types/class';
 import { UserInfo } from '@/types/instructor';
@@ -19,8 +20,13 @@ const NotificationSenderModal = ({
 }: NotificationSenderModalProps) => {
   const formMethods = useForm<ISendNotification>({
     shouldFocusError: true,
+    defaultValues: {
+      description: '',
+      targets: [],
+    },
   });
-  const { handleSubmit, register, control, watch, setValue } = formMethods;
+  const { handleSubmit, register, control, watch, setValue, reset } =
+    formMethods;
 
   const selectedTargets = watch('targets', []);
 
@@ -40,14 +46,26 @@ const NotificationSenderModal = ({
 
   const { mutate: sendNotificationsMutate, isPending } = useMutation({
     mutationFn: sendNotifications,
-    onSuccess: () => toast.success('알림 전송 완료'),
+    onSuccess: () => {
+      toast.success('알림 전송 완료');
+      reset();
+    },
   });
 
   return (
     <article className="relative grid size-full max-w-[39rem] grid-rows-[auto_1fr] sm:h-auto sm:w-screen">
       <header className="flex gap-2 border-b border-solid border-gray-500 px-5 py-6 text-lg font-bold">
-        <AlarmSVG width="31" height="31" className="fill-black" />
-        알림 보내기
+        {isPending ? (
+          <>
+            <SendNotificationsLoading />
+            알림 전송 중
+          </>
+        ) : (
+          <>
+            <AlarmSVG width="31" height="31" className="fill-black" />
+            알림 보내기
+          </>
+        )}
       </header>
       <section className="grid grid-rows-[1fr_auto_3fr] overflow-hidden px-4 pb-6 pt-2 text-sm sm:block">
         <textarea
