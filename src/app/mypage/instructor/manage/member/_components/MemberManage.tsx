@@ -46,6 +46,7 @@ const MemberManage = ({ myMembers, myClassListsOption }: MemberManageProps) => {
   );
 
   const notificationModalOpen = () => {
+    changeFilterState({ take: 100 });
     setIsNotificationModalOpen(true);
   };
 

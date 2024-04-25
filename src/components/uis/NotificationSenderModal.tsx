@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { Controller, FieldErrors, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { AlarmSVG } from '@/icons/svg';
+import { sendNotifications } from '@/lib/apis/notifications';
 import ProfileImg from '../Profile/ProfileImage';
 import { MemberData } from '@/types/instructor';
 import { ISendNotification } from '@/types/notifications';
@@ -20,10 +21,10 @@ const NotificationSenderModal = ({
   });
   const { handleSubmit, register, control, watch, setValue } = formMethods;
 
-  const selectedTargets = watch('targets');
+  const selectedTargets = watch('targets', []);
 
-  const onSubmit = ({ targets, description }: ISendNotification) => {
-    console.log(targets);
+  const onSubmit = (data: ISendNotification) => {
+    sendNotificationsMutate(data);
   };
 
   const onError = (errors: FieldErrors<ISendNotification>) => {
@@ -35,6 +36,11 @@ const NotificationSenderModal = ({
       toast.error(errors.targets.message);
     }
   };
+
+  const { mutate: sendNotificationsMutate, isPending } = useMutation({
+    mutationFn: sendNotifications,
+    onSuccess: () => toast.success('알림 전송 완료'),
+  });
 
   return (
     <article className="relative grid size-full max-w-[39rem] grid-rows-[auto_1fr] sm:h-auto sm:w-screen">
@@ -66,13 +72,16 @@ const NotificationSenderModal = ({
               }}
               className="size-[18px] accent-sub-color1"
             />
-            <label htmlFor="allSelect" className="cursor-pointer">
+            <label htmlFor="allSelect" className="cursor-pointer select-none">
               전체선택
             </label>
             <p className="text-base font-bold">{totalItemCount}명</p>
           </div>
           <form onSubmit={handleSubmit(onSubmit, onError)}>
-            <button className="rounded-md border border-solid border-black bg-white px-[6px] py-[5px] text-black hover:bg-black/10 active:bg-black active:text-white">
+            <button
+              disabled={isPending}
+              className="rounded-md border border-solid border-black bg-white px-[6px] py-[5px] text-black hover:bg-black/10 active:bg-black active:text-white disabled:bg-black/10"
+            >
               {selectedTargets.length}명에게 전송하기
             </button>
           </form>
@@ -85,32 +94,33 @@ const NotificationSenderModal = ({
             required: '전송하실 회원을 선택해 주세요.',
           }}
           render={({ field }) => (
-            <ul className="grid h-fit max-h-full grid-cols-2 gap-y-4 overflow-y-scroll sm:max-h-72">
+            <ul className="grid h-fit max-h-full grid-cols-2 gap-x-2 gap-y-4 overflow-y-scroll sm:max-h-72">
               {memberList.map(({ user }) => {
                 const checked = field.value.includes(user.id);
-
                 return (
-                  <li className="flex h-fit items-center" key={user.id}>
-                    <input
-                      id={user.nickname}
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() =>
-                        checked
-                          ? field.onChange(
-                              field.value.filter((id) => id !== user.id),
-                            )
-                          : field.onChange([...field.value, user.id])
-                      }
-                      className="mr-2 size-[18px] accent-sub-color1"
-                    />
-                    <label
-                      htmlFor={user.nickname}
-                      className="grid flex-grow cursor-pointer grid-cols-[auto_1fr] items-center"
-                    >
-                      <ProfileImg src={user.userProfileImage} size="small" />
-                      <p className="truncate">{user.nickname}</p>
-                    </label>
+                  <li className="h-fit" key={user.id}>
+                    <div className="flex items-center">
+                      <input
+                        id={user.nickname}
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() =>
+                          checked
+                            ? field.onChange(
+                                field.value.filter((id) => id !== user.id),
+                              )
+                            : field.onChange([...field.value, user.id])
+                        }
+                        className="mr-2 size-[18px] accent-sub-color1"
+                      />
+                      <label
+                        htmlFor={user.nickname}
+                        className="grid flex-grow cursor-pointer grid-cols-[auto_1fr] items-center"
+                      >
+                        <ProfileImg src={user.userProfileImage} size="small" />
+                        <p className="truncate">{user.nickname}</p>
+                      </label>
+                    </div>
                   </li>
                 );
               })}

@@ -229,7 +229,7 @@ const MemberListView = ({
       <nav className="mb-5 flex justify-between">
         <Select
           name="sorting"
-          value={filterState.orderBy}
+          value={filterState.sortOption}
           onChange={(e) => updateFilter({ sortOption: e.target.value })}
           options={sortingOptions}
         />
