@@ -84,7 +84,7 @@ const PaymentRange = () => {
 
         <div className="flex">
           <button className="flex w-fit cursor-default items-center">
-            <DoubleRightSVG />
+            <DoubleRightSVG width="28" height="22" className="fill-gray-500" />
           </button>
 
           <p className="flex items-center gap-3 text-sm font-semibold text-gray-500">

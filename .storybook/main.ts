@@ -40,13 +40,9 @@ const config: StorybookConfig = {
     });
 
     config.resolve.plugins = config.resolve.plugins || [];
-    config.resolve.alias['/images/receipt-background.svg'] = path.resolve(
+    config.resolve.alias['/images'] = path.resolve(
       __dirname,
-      '../public/images/receipt-background.svg',
-    );
-    config.resolve.alias['/images/requestBox.svg'] = path.resolve(
-      __dirname,
-      '../public//images/requestBox.svg',
+      '../public/images/',
     );
 
     config.resolve.plugins.push(

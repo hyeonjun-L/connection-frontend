@@ -25,7 +25,11 @@ const Welcome = ({ nickname }: { nickname: string }) => {
         프로필 사진을 등록해보세요
       </p>
 
-      <DoubleRightSVG className="mb-4 rotate-90 fill-sub-color1" />
+      <DoubleRightSVG
+        width="28"
+        height="22"
+        className="mb-4 rotate-90 fill-sub-color1"
+      />
 
       <div className="flex w-full flex-col gap-y-2">
         <Button
