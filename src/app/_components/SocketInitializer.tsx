@@ -144,7 +144,7 @@ const SocketInitializer = ({
       socket.on('handleNewNotification', (data: INewNotifications) => {
         const itemFilterOption = checkFilterOption(data);
 
-        const filterOptions = ['전체', '읽지 않은 알림', itemFilterOption];
+        const filterOptions = ['ALL', 'UNREAD', itemFilterOption];
 
         queryClient.setQueryData(['notificationCount'], (data: number) => {
           return data ? data + 1 : 1;

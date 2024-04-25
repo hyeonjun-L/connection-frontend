@@ -15,7 +15,7 @@ const useReadNotification = () => {
   ) => {
     const { pages, pageParams } = data;
     const updatedPages =
-      option === '읽지 않은 알림'
+      option === 'UNREAD'
         ? pages
             .map((page) => ({
               ...page,
@@ -40,7 +40,7 @@ const useReadNotification = () => {
     itemId,
     itemFilterOption,
   }: INotificationQuery) => {
-    const filterOptions = ['전체', '읽지 않은 알림', itemFilterOption];
+    const filterOptions = ['ALL', 'UNREAD', itemFilterOption];
 
     queryClient.setQueryData(['notificationCount'], (data: number) =>
       data ? data - 1 : data,

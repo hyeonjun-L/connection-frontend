@@ -13,7 +13,6 @@ import Modal from '@/components/Modal/Modal';
 import UserProfileMenu from '@/components/Profile/UserProfileMenu';
 import NotificationSenderModal from '@/components/uis/NotificationSenderModal';
 import { IScheduleLearnerList } from '@/types/class';
-import { UserInfo } from '@/types/instructor';
 
 interface ClassOverViewProps {
   totalClassNum?: number;

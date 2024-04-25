@@ -1,9 +1,9 @@
 export type NotificationsFilterOption =
-  | '전체'
-  | '수강 클래스'
-  | '관심 클래스'
-  | '쿠폰/패스권'
-  | '읽지 않은 알림';
+  | 'ALL'
+  | 'RESERVED'
+  | 'LIKED'
+  | 'COUPON_OR_PASS'
+  | 'UNREAD';
 
 export type NotificationType = 'CHAT' | 'NOTIFICATIONS';
 

@@ -33,7 +33,7 @@ const NotificationList = ({
   }) =>
     getNotifications({
       pageSize: NOTIFICATIONS_TAKE,
-      filterOption: '읽지 않은 알림',
+      filterOption: 'UNREAD',
       ...pageParam,
     });
 
@@ -44,7 +44,7 @@ const NotificationList = ({
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['notifications', '읽지 않은 알림'],
+    queryKey: ['notifications', 'UNREAD'],
     queryFn: fetchNotifications,
     initialPageParam: undefined,
     getNextPageParam: (lastPage, allpages) => {
@@ -54,7 +54,7 @@ const NotificationList = ({
         allpages[0].totalItemCount > currentCount
         ? {
             pageSize: NOTIFICATIONS_TAKE,
-            filterOption: '읽지 않은 알림' as NotificationsFilterOption,
+            filterOption: 'UNREAD' as NotificationsFilterOption,
             lastItemId: lastPage?.notifications.at(-1)?.id,
           }
         : undefined;

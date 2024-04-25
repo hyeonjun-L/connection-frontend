@@ -28,12 +28,15 @@ export const POST = async (request: NextRequest) => {
     'Content-Type': 'application/json',
   };
 
-  const response = await fetch(`${END_POINT}/notifications/notificationsId`, {
-    method: 'POST',
-    credentials: 'include',
-    headers,
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    `${END_POINT}/notifications/notificationsId?recipientType=SPECIFIC_STUDENTS`,
+    {
+      method: 'POST',
+      credentials: 'include',
+      headers,
+      body: JSON.stringify(data),
+    },
+  );
 
   if (!response.ok) {
     const errorData = await response.json();

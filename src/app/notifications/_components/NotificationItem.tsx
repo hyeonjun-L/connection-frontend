@@ -26,6 +26,7 @@ const NotificationItem = ({
   deleteNotifications,
   readNotifications,
 }: NotificationItemProps) => {
+  console.log(notifications);
   const { description, createdAt, title, lecturerId, userId, readedAt } =
     notifications;
 

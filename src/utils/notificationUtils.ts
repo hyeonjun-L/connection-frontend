@@ -8,7 +8,7 @@ export const generateNotificationLink = (
   notificationDetails: INotificationType,
   userType: userType,
 ) => {
-  const { lectureId, couponId, userPassId, reservationId } =
+  const { lectureId, couponId, userPassId, reservationId, lecturerId } =
     notificationDetails;
 
   if (lectureId) {
@@ -29,6 +29,10 @@ export const generateNotificationLink = (
       : `/mypage/instructor/manage/member`;
   }
 
+  if (lecturerId) {
+    return `/instructor/${lecturerId}`;
+  }
+
   return '/';
 };
 
@@ -39,18 +43,18 @@ export const checkFilterOption = (
     notificationDetails;
 
   if (lectureId) {
-    return '관심 클래스';
+    return 'LIKED';
   }
 
   if (userPassId) {
-    return '쿠폰/패스권';
+    return 'COUPON_OR_PASS';
   }
 
   if (couponId) {
-    return '쿠폰/패스권';
+    return 'COUPON_OR_PASS';
   }
 
   if (reservationId) {
-    return '수강 클래스';
+    return 'RESERVED';
   }
 };

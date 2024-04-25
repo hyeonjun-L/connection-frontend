@@ -14,17 +14,17 @@ const page = async ({
   const user = cookieStore.get('userAccessToken')?.value;
   const { filterOption: searchParamfilterOption } = searchParams;
   const userFilterOption = [
-    '전체',
-    '수강 클래스',
-    '관심 클래스',
-    '쿠폰/패스권',
-    '읽지 않은 알림',
+    { value: 'ALL', label: '전체' },
+    { value: 'RESERVED', label: '수강 클래스' },
+    { value: 'LIKED', label: '관심 클래스' },
+    { value: 'COUPON_OR_PASS', label: '쿠폰/패스권' },
+    { value: 'UNREAD', label: '읽지 않은 알림' },
   ] as const;
 
   const instructorFilterOption = [
-    '전체',
-    '수강 클래스',
-    '읽지 않은 알림',
+    { value: 'ALL', label: '전체' },
+    { value: 'RESERVED', label: '수강 클래스' },
+    { value: 'UNREAD', label: '읽지 않은 알림' },
   ] as const;
 
   const filterOption = user ? userFilterOption : instructorFilterOption;
@@ -36,19 +36,19 @@ const page = async ({
         <h1 className="text-2xl font-semibold">알림</h1>
       </header>
       <nav className="flex flex-wrap gap-3 whitespace-nowrap border-b border-gray-500 px-[18px] py-2 text-sm sm:px-0 ">
-        {filterOption.map((filter) => (
+        {filterOption.map(({ value, label }) => (
           <Link
-            href={`/notifications?filterOption=${filter}`}
+            href={`/notifications?filterOption=${value}`}
             replace={true}
-            key={filter}
+            key={value}
             className={`flex h-7 items-center rounded-md border border-solid border-sub-color1 px-3 ${
-              (!searchParamfilterOption && filter === '전체') ||
-              searchParamfilterOption === filter
+              (!searchParamfilterOption && value === 'ALL') ||
+              searchParamfilterOption === value
                 ? 'bg-sub-color1 text-white'
                 : 'bg-white text-sub-color1 hover:bg-sub-color1-transparent'
             }`}
           >
-            {filter}
+            {label}
           </Link>
         ))}
       </nav>

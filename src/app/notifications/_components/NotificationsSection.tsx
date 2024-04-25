@@ -15,7 +15,7 @@ const NotificationsSection = async ({
 }) => {
   const filterData = {
     pageSize: NOTIFICATIONS_TAKE,
-    filterOption: (filterOption as NotificationsFilterOption) ?? '전체',
+    filterOption: (filterOption as NotificationsFilterOption) ?? 'ALL',
   };
 
   let notifications: IGetNotificationsData = {
