@@ -88,11 +88,13 @@ const NotificationList = ({
     itemFilterOption,
   }: INotificationQuery) => {
     const getFilterOptionData = (option?: string) => {
-      const data = queryClient.getQueryData<INotificationsPagesData>([
+      const hasData = queryClient.getQueryData<INotificationsPagesData>([
         'notifications',
         option,
       ]);
-      return data ? ['notifications', option] : false;
+      if (hasData) {
+        return ['notifications', option];
+      }
     };
     const filterOptions = ['ALL', 'UNREAD', itemFilterOption];
 

@@ -26,7 +26,7 @@ const ChatPreviews = ({
     staleTime: Infinity,
   });
 
-  const closePreviewHandler = (event: React.MouseEvent<HTMLDivElement>) => {
+  const closePreviewHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     closeChatPreview();
   };
@@ -42,14 +42,17 @@ const ChatPreviews = ({
         ) : (
           <>
             <ProfileImg src={data?.profileImg} size="small" />
-            <div className="flex-grow truncate text-left font-bold">
+            <p className="flex-grow truncate text-left font-bold">
               {data?.nickname}
-            </div>
+            </p>
           </>
         )}
-        <div className="absolute -right-1 -top-1" onClick={closePreviewHandler}>
+        <button
+          className="absolute -right-1 -top-1"
+          onClick={closePreviewHandler}
+        >
           <CloseSVG className="size-[17px] stroke-[#414141] stroke-[3px]" />
-        </div>
+        </button>
       </div>
       <p className="line-clamp-2 whitespace-pre-wrap text-left text-sm">
         {chat.imageUrl ? '이미지' : chat.content}

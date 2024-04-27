@@ -137,7 +137,7 @@ const NotificationIndicator = ({
     return () => stopTimer();
   }, [id, newChat, newNotifications, startTimer, userIdType]);
 
-  const displatCountHandler = (count?: number) => {
+  const displayCountHandler = (count?: number) => {
     return count
       ? count > 99
         ? '99+'
@@ -148,12 +148,12 @@ const NotificationIndicator = ({
   };
 
   const displayChatCount = useMemo(
-    () => displatCountHandler(chatCount),
+    () => displayCountHandler(chatCount),
     [chatCount],
   );
 
   const displayAlarmCount = useMemo(
-    () => displatCountHandler(alarmCount),
+    () => displayCountHandler(alarmCount),
     [alarmCount],
   );
 

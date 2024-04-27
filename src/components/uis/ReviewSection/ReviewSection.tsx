@@ -32,7 +32,7 @@ const ReviewSection = async ({
 
   try {
     const resReviews = await getReviews(filterOption, targetId, type);
-    reviews = resReviews;
+    reviews = { ...reviews, ...resReviews };
   } catch (error) {
     if (error instanceof Error) {
       const fetchError = error as FetchError;

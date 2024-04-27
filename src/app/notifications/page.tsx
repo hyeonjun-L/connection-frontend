@@ -1,9 +1,9 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import BackButton from './_components/BackButton';
 import NotificationsSectionLoading from './_components/loading/NotificationsSectionLoading';
 import NotificationsSection from './_components/NotificationsSection';
+import BackButton from '@/components/Button/BackButton';
 
 const page = async ({
   searchParams,
@@ -32,7 +32,7 @@ const page = async ({
   return (
     <main className="mx-auto mt-3 w-full max-w-[51.1rem]">
       <header className="flex items-center gap-1 border-b border-gray-500 px-[18px] py-3 sm:px-0">
-        <BackButton />
+        <BackButton size={28} />
         <h1 className="text-2xl font-semibold">알림</h1>
       </header>
       <nav className="flex flex-wrap gap-3 whitespace-nowrap border-b border-gray-500 px-[18px] py-2 text-sm sm:px-0 ">

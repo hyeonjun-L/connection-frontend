@@ -53,11 +53,13 @@ const SocketInitializer = ({
   const queryClient = useQueryClient();
 
   const getFilterOptionData = (option?: string) => {
-    const data = queryClient.getQueryData<INotificationsPagesData>([
+    const hasData = queryClient.getQueryData<INotificationsPagesData>([
       'notifications',
       option,
     ]);
-    return data ? ['notifications', option] : false;
+    if (hasData) {
+      return ['notifications', option];
+    }
   };
 
   useEffect(() => {

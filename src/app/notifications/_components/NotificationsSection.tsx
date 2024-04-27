@@ -24,7 +24,9 @@ const NotificationsSection = async ({
   };
 
   try {
-    notifications = await getNotifications(filterData);
+    const resNotifications = await getNotifications(filterData);
+
+    notifications = { ...notifications, ...resNotifications };
   } catch (error) {
     if (error instanceof Error) {
       const fetchError = error as FetchError;

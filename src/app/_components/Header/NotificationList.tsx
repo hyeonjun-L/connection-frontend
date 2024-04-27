@@ -50,14 +50,16 @@ const NotificationList = ({
     getNextPageParam: (lastPage, allpages) => {
       const currentCount = allpages.length * NOTIFICATIONS_TAKE;
 
-      return allpages[0]?.totalItemCount &&
+      if (
+        allpages[0]?.totalItemCount &&
         allpages[0].totalItemCount > currentCount
-        ? {
-            pageSize: NOTIFICATIONS_TAKE,
-            filterOption: 'UNREAD' as NotificationsFilterOption,
-            lastItemId: lastPage?.notifications.at(-1)?.id,
-          }
-        : undefined;
+      ) {
+        return {
+          pageSize: NOTIFICATIONS_TAKE,
+          filterOption: 'UNREAD' as NotificationsFilterOption,
+          lastItemId: lastPage?.notifications.at(-1)?.id,
+        };
+      }
     },
   });
 
