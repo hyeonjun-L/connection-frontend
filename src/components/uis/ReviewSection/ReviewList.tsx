@@ -79,7 +79,10 @@ const ReviewList = ({
 
   return (
     <section id="review-section" className="relative mb-20 w-full scroll-mt-16">
-      <div className="mb-4 flex w-full items-center justify-between">
+      <div
+        ref={dropDownRef}
+        className="mb-4 flex w-full items-center justify-between"
+      >
         <h2 className="flex items-center scroll-smooth text-lg font-bold">
           {type === 'lectures' ? '클래스' : '강사'} 후기
           {data.pages[0].totalItemCount}건
@@ -99,7 +102,6 @@ const ReviewList = ({
         </h2>
 
         <button
-          ref={dropDownRef}
           onClick={() => setIsListOpened((prev) => !prev)}
           className="flex items-center gap-2 text-sm font-medium"
           aria-label="리뷰 정렬"

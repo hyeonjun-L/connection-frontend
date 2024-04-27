@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { CHATS_TAKE } from '@/constants/constants';
 import { useChatStore, useSocketStore } from '@/store';
+import { useNotificationsStore } from '@/store/notificationsStore';
+import { checkFilterOption } from '@/utils/notificationUtils';
 import { userType } from '@/types/auth';
 import {
   ChatPagesData,
@@ -12,6 +14,11 @@ import {
   JoinUserData,
   ExitUserData,
 } from '@/types/chat';
+import {
+  INewNotifications,
+  INotifications,
+  INotificationsPagesData,
+} from '@/types/notifications';
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT_DOMAIN ?? '';
 
@@ -39,7 +46,21 @@ const SocketInitializer = ({
     setChatRoomSelect: state.setChatRoomSelect,
   }));
 
+  const { setNewNotifications } = useNotificationsStore((state) => ({
+    setNewNotifications: state.setNewNotifications,
+  }));
+
   const queryClient = useQueryClient();
+
+  const getFilterOptionData = (option?: string) => {
+    const hasData = queryClient.getQueryData<INotificationsPagesData>([
+      'notifications',
+      option,
+    ]);
+    if (hasData) {
+      return ['notifications', option];
+    }
+  };
 
   useEffect(() => {
     if (userType && !isConnected) {
@@ -120,6 +141,55 @@ const SocketInitializer = ({
         if (hasChatListQuery) {
           updateChatRoomList(newChat, isReceiver);
         }
+      });
+
+      socket.on('handleNewNotification', (data: INewNotifications) => {
+        const itemFilterOption = checkFilterOption(data);
+
+        const filterOptions = ['ALL', 'UNREAD', itemFilterOption];
+
+        queryClient.setQueryData(['notificationCount'], (data: number) => {
+          return data ? data + 1 : 1;
+        });
+
+        const newNotifications = { ...data, id: data._id } as INotifications;
+
+        filterOptions.forEach((option) => {
+          const filterOptionData = getFilterOptionData(option);
+          if (filterOptionData) {
+            queryClient.setQueryData<INotificationsPagesData>(
+              filterOptionData,
+              (data) => {
+                if (!data) {
+                  return {
+                    pages: [],
+                    pageParams: [undefined],
+                  };
+                }
+
+                const { pages, pageParams } = data;
+                const updatedPages = pages.map((page, index) =>
+                  index === 0
+                    ? {
+                        notifications: [
+                          newNotifications,
+                          ...page.notifications,
+                        ],
+                        totalItemCount: page.totalItemCount + 1,
+                      }
+                    : { ...page, totalItemCount: page.totalItemCount + 1 },
+                );
+
+                return {
+                  pages: updatedPages,
+                  pageParams,
+                };
+              },
+            );
+          }
+        });
+
+        setNewNotifications(data);
       });
 
       socket.emit('login', {

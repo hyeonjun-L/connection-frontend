@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import createParams from '@/utils/createParams';
 import { IClassPostResponse } from '@/types/class';
 import {
   GetMyMemberData,
@@ -114,13 +115,7 @@ export const getMyMembers = async (
   const cookieStore = cookies();
   const authorization = cookieStore.get('lecturerAccessToken')?.value;
 
-  const params = new URLSearchParams();
-
-  Object.entries(data)
-    .filter(([_, v]) => v !== undefined)
-    .forEach(([k, v]) => {
-      params.append(k, String(v));
-    });
+  const params = createParams(data);
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${authorization}`,

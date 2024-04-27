@@ -7,9 +7,14 @@ import { profileInfo, userType } from '@/types/auth';
 interface UserProfileLinksProps {
   authUser: profileInfo | null;
   userType: userType | null;
+  isMobile: boolean;
 }
 
-const UserProfileLinks = ({ authUser, userType }: UserProfileLinksProps) => {
+const UserProfileLinks = ({
+  authUser,
+  userType,
+  isMobile,
+}: UserProfileLinksProps) => {
   return (
     <div className="flex items-end gap-3">
       <h2 className="text-0 overflow-hidden indent-[-9999px]">
@@ -28,7 +33,11 @@ const UserProfileLinks = ({ authUser, userType }: UserProfileLinksProps) => {
 
       {authUser && userType && (
         <>
-          <NotificationIndicator id={authUser.id} userType={userType} />
+          <NotificationIndicator
+            id={authUser.id}
+            userType={userType}
+            isMobile={isMobile}
+          />
 
           <Profile defaultProfileImg={authUser.profileImage} />
         </>

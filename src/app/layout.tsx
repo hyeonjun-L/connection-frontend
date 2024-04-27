@@ -89,7 +89,11 @@ export default async function RootLayout({
             rooms={socketRooms}
           />
           <Header>
-            <UserProfileLinks authUser={authUser} userType={userType} />
+            <UserProfileLinks
+              authUser={authUser}
+              userType={userType}
+              isMobile={device.type === 'mobile' || device.type === 'tablet'}
+            />
           </Header>
           <ChatModal />
           <ToastContainer

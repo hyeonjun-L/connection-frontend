@@ -39,7 +39,7 @@ const page = async ({
         getRatings('lecturer'),
       ]);
     if (Array.isArray(responseReviews.item)) {
-      resReview = responseReviews;
+      resReview = { ...resReview, ...responseReviews };
     }
     ratingLists = getRatingLists;
 

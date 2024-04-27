@@ -501,7 +501,7 @@ export const ISSUER_CODE: Record<string, string> = {
 
 export const RELOAD_TOAST_TIME = 10000;
 
-export const MEMBER_MANAGE_TAKE = 10 as const;
+export const MEMBER_MANAGE_TAKE = 4 as const;
 
 export const PAYMENT_STATUS = {
   WAITING_FOR_DEPOSIT: '입금대기',
@@ -547,3 +547,11 @@ export const INCOME_HISTORY_TAKE = 5 as const;
 export const INSTRUCTOR_H2_STYLE = 'mb-2 text-lg font-bold' as const;
 
 export const REVIEW_TAKE = 4 as const;
+
+export const NOTIFICATIONS_TAKE = 5 as const;
+
+export const NOTIFICATIONS_REF_OPTIONS = {
+  root: null,
+  rootMargin: '0px',
+  threshold: 0.1,
+} as const;

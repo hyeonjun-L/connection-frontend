@@ -329,9 +329,12 @@ export interface Reservation {
   };
 }
 
-export interface MemberInfo {
-  id: number;
+export interface MemberInfo extends UserInfo {
   memo: string | null;
+}
+
+export interface UserInfo {
+  id: number;
   nickname: string;
   phoneNumber: string;
   userProfileImage: string;

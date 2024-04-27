@@ -59,7 +59,7 @@ const getCouponPassInfo = async (
     if (coupon) {
       const { totalItemCount: resTotalItemCount, itemList: resCouponList } =
         coupon;
-      CouponCount = resTotalItemCount;
+      CouponCount = resTotalItemCount ?? 0;
 
       couponList = resCouponList?.map(mapItemToCoupon) ?? [];
     }
