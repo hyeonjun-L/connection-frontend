@@ -60,19 +60,3 @@ const Profile = ({
 };
 
 export default Profile;
-{
-  /* <div
-onClick={userMenuHandler}
-className={`absolute -top-9 flex items-center justify-center ${
-  isProfileMenu
-    ? 'rounded-full border-4 border-solid border-main-color'
-    : 'p-1'
-}  md:hidden`}
->
-<ProfileImage
-  size="small"
-  src={userStoreState.userType ? profileImg : defaultProfileImg}
-  label={false}
-/>
-</div> */
-}

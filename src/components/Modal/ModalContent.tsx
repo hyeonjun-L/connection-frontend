@@ -78,6 +78,7 @@ const ModalContent = ({
   if (disableModalSwipe) {
     return (
       <div className="absolute bottom-0 z-modal h-screen w-screen bg-white sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:h-auto sm:w-auto sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-md sm:pt-0 sm:shadow-float">
+        {children}
         <button onClick={closeModalHandler} className="absolute right-6 top-5">
           <CloseSVG
             width="24"
@@ -85,7 +86,6 @@ const ModalContent = ({
             className="stroke-gray-500 stroke-2"
           />
         </button>
-        {children}
       </div>
     );
   } else {
@@ -109,6 +109,12 @@ const ModalContent = ({
         style={isSm ? { y: '-50%', x: '-50%' } : undefined}
         className="absolute bottom-0 z-modal h-[90%] w-screen rounded-t-lg bg-white pt-2.5 sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:h-auto sm:w-auto sm:rounded-md sm:pt-0 sm:shadow-float"
       >
+        <div className="mb-8 flex w-full justify-center sm:hidden">
+          <button className="h-1.5 w-16 rounded-lg bg-gray-700" />
+        </div>
+
+        {children}
+
         <button
           onClick={closeModalHandler}
           className="absolute right-2 top-2 hidden sm:block"
@@ -119,12 +125,6 @@ const ModalContent = ({
             className="stroke-gray-500 stroke-2"
           />
         </button>
-
-        <div className="mb-8 flex w-full justify-center sm:hidden">
-          <button className="h-1.5 w-16 rounded-lg bg-gray-700" />
-        </div>
-
-        {children}
       </motion.div>
     );
   }

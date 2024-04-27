@@ -85,7 +85,7 @@ const getCouponPassInfo = async (filterOption?: ISearchParams) => {
     if (result) {
       const { totalItemCount: resTotalItemCount, itemList: resCouponList } =
         result;
-      totalItemCount = resTotalItemCount;
+      totalItemCount = resTotalItemCount ?? 0;
 
       couponList = resCouponList?.map(mapItemToCoupon) ?? [];
     }

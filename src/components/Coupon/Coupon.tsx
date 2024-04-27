@@ -169,7 +169,7 @@ const Coupon = ({
         </div>
 
         {edit &&
-          (pathname.startsWith('/class') ? (
+          (pathname.startsWith('/order') ? (
             <div className="text-sm">
               <UniqueButton
                 type="button"

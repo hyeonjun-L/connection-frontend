@@ -1,4 +1,4 @@
-import { parse, format, parseISO } from 'date-fns';
+import { parse, format, parseISO, differenceInMinutes } from 'date-fns';
 import ko from 'date-fns/locale/ko';
 
 export const formatClassTime = (startDateTime: string, endDateTime: string) => {
@@ -65,3 +65,16 @@ export const formatKorean12HourTime = (date: Date | string) =>
   date instanceof Date
     ? format(date, 'a hh:mm', { locale: ko })
     : format(parseISO(date), 'a hh:mm', { locale: ko });
+
+export const formatRelativeOrShortDate = (date: Date | string) => {
+  const currentDate = new Date();
+  const targetDate = date instanceof Date ? date : parseISO(date);
+  const minutesDiff = differenceInMinutes(currentDate, targetDate);
+
+  if (minutesDiff < 60) {
+    return minutesDiff === 0 ? '방금' : `${minutesDiff}분 전`;
+  } else {
+    const hoursDiff = Math.floor(minutesDiff / 60);
+    return hoursDiff < 24 ? `${hoursDiff}시간 전` : formatShortDate(targetDate);
+  }
+};

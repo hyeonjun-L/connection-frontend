@@ -36,7 +36,7 @@ const page = async ({
       ]);
 
     ratingLists = getRatingLists;
-    writeReviews = geyWriteReviews;
+    writeReviews = { ...writeReviews, ...geyWriteReviews };
     reservationLists = getReservationLists;
   } catch (error) {
     if (error instanceof Error) {
