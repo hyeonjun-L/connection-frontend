@@ -5,6 +5,7 @@ import Banner from './_components/Banner';
 import BestClassLoading from './_components/Home/Loading/BestClassLoading';
 import BestInstructorLoading from './_components/Home/Loading/BestInstructorLoading';
 import RecentClassLoading from './_components/Home/Loading/RecentClassLoading';
+import Test from './_components/Test';
 
 const BestClass = dynamic(() => import('./_components/Home/BestClass'), {
   loading: () => <BestClassLoading />,
@@ -29,6 +30,7 @@ const Home = async () => {
       {/* 유저 로그인시에만 보여지는 맞춤 클래스 */}
       {/* <SuggestionClass /> */}
 
+      <Test />
       {/* 인기 클래스 */}
       <section className="mt-4 w-full">
         <SectionHeader
