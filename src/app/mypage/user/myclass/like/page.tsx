@@ -1,16 +1,13 @@
-import React from 'react';
-import { getLikesClassList } from '@/lib/apis/serverApis/classApi';
-import { transformToCardData } from '@/utils/apiDataProcessor';
+import { Suspense } from 'react';
 import InterrestedClass from './_components/InterrestedClass';
+import InterrestedClassLoading from './_components/loading/InterrestedClassLoading';
 
 const page = async () => {
-  const resLikesClassList = await getLikesClassList();
-
-  if (!resLikesClassList) return;
-
-  const cardDatas = transformToCardData(resLikesClassList);
-
-  return <InterrestedClass cardDatas={cardDatas} />;
+  return (
+    <Suspense fallback={<InterrestedClassLoading />}>
+      <InterrestedClass />
+    </Suspense>
+  );
 };
 
 export default page;
