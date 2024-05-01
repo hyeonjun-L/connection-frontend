@@ -1,24 +1,16 @@
 import React from 'react';
 import { getLikesClassList } from '@/lib/apis/serverApis/classApi';
 import { transformToCardData } from '@/utils/apiDataProcessor';
-import ClassPreview from '@/components/ClassPreview/ClassPreview';
-import { IClassPostResponse } from '@/types/class';
+import InterrestedClass from './_components/InterrestedClass';
 
 const page = async () => {
   const resLikesClassList = await getLikesClassList();
 
   if (!resLikesClassList) return;
 
-  const cardData = transformToCardData(resLikesClassList);
+  const cardDatas = transformToCardData(resLikesClassList);
 
-  console.log(cardData);
-
-  //   const likesClassList = transformToCardData(
-  //     resLikesClassList.map(({ lecture }) => ({ ...lecture })),
-  //     { nickname: 's', img: 's', id: 1 },
-  //   );
-
-  return <div>{/* <ClassPreview {...likesClassList[0]} />{' '} */}</div>;
+  return <InterrestedClass cardDatas={cardDatas} />;
 };
 
 export default page;
