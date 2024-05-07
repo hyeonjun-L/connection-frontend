@@ -1,4 +1,5 @@
 'use client';
+import { useQueries } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next-nprogress-bar';
@@ -6,6 +7,7 @@ import { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { RELOAD_TOAST_TIME } from '@/constants/constants';
 import { getLikesClassList } from '@/lib/apis/classApi';
+import { getLikesInstructorList } from '@/lib/apis/instructorLikesBlockApis';
 import { useUserStore } from '@/store';
 import { profileInfo, userType } from '@/types/auth';
 
@@ -21,10 +23,6 @@ const UserStoreInitializer = ({
   isMobile,
 }: UserStoreInitializerProps) => {
   const initialized = useRef(false);
-  const { setLikeClassList, likeClassList } = useUserStore((state) => ({
-    setLikeClassList: state.setLikeClassList,
-    likeClassList: state.likeClassList,
-  }));
   const store = useUserStore();
   const pathname = usePathname();
   const router = useRouter();
@@ -66,17 +64,32 @@ const UserStoreInitializer = ({
     }
   }, [reload]);
 
-  useEffect(() => {
-    if (userType === 'user') {
-      if (likeClassList.length === 0) {
-        getLikesClassList().then((data) =>
-          setLikeClassList(data.map(({ id }) => id)),
-        );
-      }
-    } else {
-      setLikeClassList([]);
-    }
-  }, [userType]);
+  useQueries({
+    queries: [
+      {
+        queryKey: ['like', 'instructor', userType],
+        queryFn: async () => {
+          if (userType === 'user') {
+            const likesInstructorList = await getLikesInstructorList();
+            return likesInstructorList.map(({ lecturerId }) => lecturerId);
+          }
+          return '';
+        },
+        staleTime: Infinity,
+      },
+      {
+        queryKey: ['like', 'class', userType],
+        queryFn: async () => {
+          if (userType === 'user') {
+            const likesClassList = await getLikesClassList();
+            return likesClassList.map(({ id }) => id);
+          }
+          return '';
+        },
+        staleTime: Infinity,
+      },
+    ],
+  });
 
   return null;
 };
