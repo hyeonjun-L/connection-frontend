@@ -19,6 +19,7 @@ import Header from './_components/Header/Header';
 import UserProfileLinks from './_components/Header/UserProfileLinks';
 import UserStoreInitializer from './_components/Header/UserStoreInitializer';
 import MobileNav from './_components/MobileNav';
+import PWAInstallPrompt from './_components/PWAInstallPrompt';
 import SocketInitializer from './_components/SocketInitializer';
 import { profileInfo, userType } from '@/types/auth';
 import type { Metadata } from 'next';
@@ -74,6 +75,9 @@ export default async function RootLayout({
 
   return (
     <html lang="ko">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body
         className={`${inter.className} mx-auto flex min-h-screen max-w-desktop flex-col`}
       >
@@ -109,7 +113,12 @@ export default async function RootLayout({
             theme="light"
           />
           <NaverMapsProviders>
-            <NprogressBarProvider>{children}</NprogressBarProvider>
+            <NprogressBarProvider>
+              {children}
+              <PWAInstallPrompt
+                isMobile={device.type === 'mobile' || device.type === 'tablet'}
+              />
+            </NprogressBarProvider>
           </NaverMapsProviders>
           <ControlOptions />
           <Footer />
