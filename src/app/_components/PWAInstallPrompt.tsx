@@ -24,26 +24,26 @@ const PWAInstallPrompt = ({ isMobile }: { isMobile: boolean }) => {
     setView(false);
   });
 
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (event: Event) => {
-      event.preventDefault();
-      setPrompt(event as BeforeInstallPromptEvent);
-    };
+  // useEffect(() => {
+  //   const handleBeforeInstallPrompt = (event: Event) => {
+  //     event.preventDefault();
+  //     setPrompt(event as BeforeInstallPromptEvent);
+  //   };
 
-    window.addEventListener(
-      'beforeinstallprompt',
-      handleBeforeInstallPrompt as EventListener,
-    );
+  //   window.addEventListener(
+  //     'beforeinstallprompt',
+  //     handleBeforeInstallPrompt as EventListener,
+  //   );
 
-    setView(checkIfMoreThan7Days);
+  //   setView(checkIfMoreThan7Days);
 
-    return () => {
-      window.removeEventListener(
-        'beforeinstallprompt',
-        handleBeforeInstallPrompt as EventListener,
-      );
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener(
+  //       'beforeinstallprompt',
+  //       handleBeforeInstallPrompt as EventListener,
+  //     );
+  //   };
+  // }, []);
 
   const checkIfMoreThan7Days = () => {
     const dateString = localStorage.getItem('appInstallModal');
