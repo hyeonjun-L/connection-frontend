@@ -1,7 +1,6 @@
 /** @type {import("next").NextConfig} */
 const { withSentryConfig } = require('@sentry/nextjs');
 const withPWA = require('next-pwa')({
-  disable: process.env.NODE_ENV === 'development',
   dest: 'public',
 });
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
