@@ -14,6 +14,7 @@ import ReactQueryProviders from '@/lib/provider/ReactQueryProviders';
 import { convertToProfileInfo } from '@/utils/apiDataProcessor';
 import ChatModal from './_components/chat/ChatModal';
 import ControlOptions from './_components/ControlOptions';
+import FirebaseInitializer from './_components/FirebaseInitializer';
 import Footer from './_components/Footer';
 import Header from './_components/Header/Header';
 import UserProfileLinks from './_components/Header/UserProfileLinks';
@@ -42,6 +43,7 @@ export default async function RootLayout({
   const cookieStore = cookies();
   const user = cookieStore.get('userAccessToken')?.value;
   const lecturer = cookieStore.get('lecturerAccessToken')?.value;
+  const deviceToken = cookieStore.get('deviceToken')?.value;
   let authUser: profileInfo | null = null;
   let userType: userType | null = null;
   let socketRooms: string[] | null = null;
@@ -92,6 +94,12 @@ export default async function RootLayout({
             userId={authUser?.id}
             rooms={socketRooms}
           />
+          {userType && (
+            <FirebaseInitializer
+              deviceToken={deviceToken}
+              userType={userType}
+            />
+          )}
           <Header>
             <UserProfileLinks
               authUser={authUser}
