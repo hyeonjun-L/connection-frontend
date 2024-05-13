@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const maxDuration = 60;
+
 export const preferredRegion = ['icn1'];
 
 export const GET = async (request: NextRequest) => {

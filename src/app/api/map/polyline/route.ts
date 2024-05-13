@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FRONT_DOMAIN } from '@/constants/constants';
 import { District, Polyline } from '@/types/address';
 
+export const maxDuration = 60;
+
 export const preferredRegion = ['icn1'];
 
 export const POST = async (request: NextRequest) => {
