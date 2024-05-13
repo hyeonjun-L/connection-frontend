@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FRONT_DOMAIN } from '@/constants/constants';
 import { District, Polyline } from '@/types/address';
 
+export const preferredRegion = ['icn1'];
+
 export const POST = async (request: NextRequest) => {
   const query = request.nextUrl.searchParams.get('query');
   const type = request.nextUrl.searchParams.get('type');
@@ -36,9 +38,9 @@ export const POST = async (request: NextRequest) => {
   );
 
   const result = await response.json();
-  
+
   console.log(result);
-  
+
   if (result.response.status !== 'OK') {
     return NextResponse.json(
       {

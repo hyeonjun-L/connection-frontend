@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const preferredRegion = ['icn1'];
+
 export const GET = async (request: NextRequest) => {
   const query = request.nextUrl.searchParams.get('query');
 
