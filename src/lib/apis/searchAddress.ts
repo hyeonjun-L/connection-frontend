@@ -34,6 +34,8 @@ export const searchAddressPoint = async (
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.log('errorData::::', errorData);
+
       const error: FetchError = new Error(errorData.message || '');
       error.status = response.status;
       throw error;
@@ -69,6 +71,7 @@ export const searchAddressPolyline = async (
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.log('errorData::::', errorData);
       const error: FetchError = new Error(errorData.message || '');
       error.status = response.status;
       throw error;

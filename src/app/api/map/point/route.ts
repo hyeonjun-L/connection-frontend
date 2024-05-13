@@ -11,6 +11,8 @@ export const GET = async (request: NextRequest) => {
     `https://api.vworld.kr/req/search?service=search&request=search&version=2.0&crs=EPSG:4326&size=1&query=${query}&type=ADDRESS&category=ROAD&format=json&errorformat=json&key=${process.env.NEXT_PUBLIC_V_WORLD_SECRET_KEY}`,
   );
 
+  console.log('response:::', response);
+
   if (!response.ok) {
     const errorData = await response.json();
     return NextResponse.json(
