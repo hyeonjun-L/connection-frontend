@@ -35,15 +35,19 @@ export const POST = async (request: NextRequest) => {
     );
   }
 
+  console.log(
+    `https://api.vworld.kr/req/data?service=data&version=2.0&request=GetFeature&format=json&errorformat=json&size=1000&page=1&data=${dataType}&attrFilter=${filterOption}:like:${query}&crs=EPSG:4326&key=${process.env.NEXT_PUBLIC_V_WORLD_SECRET_KEY}&domain=${FRONT_DOMAIN}`,
+  );
+
   const response = await fetch(
     `https://api.vworld.kr/req/data?service=data&version=2.0&request=GetFeature&format=json&errorformat=json&size=1000&page=1&data=${dataType}&attrFilter=${filterOption}:like:${query}&crs=EPSG:4326&key=${process.env.NEXT_PUBLIC_V_WORLD_SECRET_KEY}&domain=${FRONT_DOMAIN}`,
   );
 
+  console.log(response);
+
   const result = await response.json();
 
   console.log(result);
-
-  console.log('result.response:::::::', result.response);
 
   if (result.response.status !== 'OK') {
     return NextResponse.json(
