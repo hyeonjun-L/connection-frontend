@@ -43,6 +43,8 @@ export const POST = async (request: NextRequest) => {
 
   console.log(result);
 
+  console.log('result.response:::::::', result.response);
+
   if (result.response.status !== 'OK') {
     return NextResponse.json(
       {
