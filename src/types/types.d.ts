@@ -177,19 +177,19 @@ export interface instructorSearchData {
 export interface classSearchData {
   take: number;
   sortOption: 'LATEST' | 'STARS';
-  value: string | undefined;
+  isGroup: boolean;
+  value?: string;
+  searchAfter?: [number, number];
   genres: string[];
   regions: string[];
   stars: number;
-  isGroup: boolean;
-  gtePrice: number;
-  ltePrice: number;
-  gteDate: Date | undefined;
-  lteDate: Date | undefined;
-  lectureMethod: string | undefined;
   days: day[];
   timeOfDay: TimeOfDay[];
-  searchAfter?: [number, number];
+  gtePrice: number;
+  ltePrice: number;
+  lectureMethod?: string;
+  gteDate?: Date;
+  lteDate?: Date;
 }
 
 export type CityList =

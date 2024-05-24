@@ -1,18 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { CLASS_TAKE } from '@/constants/constants';
 import useChangeSearchParams from '@/hooks/useChangeSearchParams';
 import useIntersect from '@/hooks/useIntersect';
 import { NotFoundSVG } from '@/icons/svg';
 import { searchClasses } from '@/lib/apis/searchApis';
-import { accessTokenReissuance } from '@/lib/apis/userApi';
-import { useUserStore } from '@/store/userStore';
 import { transformSearchClass } from '@/utils/apiDataProcessor';
 import ClassPreview from '@/components/ClassPreview/ClassPreview';
 import Spinner from '@/components/Spinner/Spinner';
-import { ClassCardType } from '@/types/class';
-import { FetchError, classSearchData } from '@/types/types';
+import { ClassCardType, searchClassParameters } from '@/types/class';
+import { classSearchData } from '@/types/types';
 
 interface ClassListViewProps {
   searchData: classSearchData;
@@ -25,22 +24,7 @@ const ClassListView = ({
   searchData,
   classList,
 }: ClassListViewProps) => {
-  const { changeParams } = useChangeSearchParams();
-  const [classLists, setClassLists] = useState(classList);
-  const [searchState, setSearchState] = useState({ ...searchData });
-  const [isLoadingClassList, setIsLoadingClassList] = useState(false);
-  const { userType } = useUserStore((state) => ({
-    userType: state.userType,
-  }));
-
-  useEffect(() => {
-    setClassLists([...classList]);
-
-    setSearchState({
-      ...searchData,
-      searchAfter: classList.at(-1)?.searchAfter!,
-    });
-  }, [classList, searchData]);
+  const { changeParams, searchParams } = useChangeSearchParams();
 
   const options = {
     root: null,
@@ -62,34 +46,50 @@ const ClassListView = ({
     },
   ];
 
-  const updateSearchStateAndClassLists = async () => {
-    const classLists = await searchClasses(searchState, userType === 'user');
-
-    setSearchState((state) => ({
-      ...state,
-      searchAfter: classLists.at(-1)?.searchAfter,
-    }));
-    setClassLists((prev) => [...prev, ...transformSearchClass(classLists)]);
+  const fetchClassLists = async ({
+    pageParam,
+  }: {
+    pageParam: searchClassParameters;
+  }): Promise<ClassCardType[]> => {
+    const resClassList = await searchClasses({ ...searchData, ...pageParam });
+    return transformSearchClass(resClassList);
   };
 
-  const searchInstructorsHandler = async () => {
-    setIsLoadingClassList(true);
-    try {
-      await updateSearchStateAndClassLists();
-    } catch (error) {
-      const fetchError = error as FetchError;
-      if (fetchError.status === 401) {
-        await accessTokenReissuance();
-        await updateSearchStateAndClassLists();
-      } else {
-        toast.error('클래스 목록 불러오기 실패, 잠시후 다시 시도해주세요.');
-        console.error(error);
-      }
+  const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['classSearch', searchParams.toString()],
+      queryFn: fetchClassLists,
+      initialPageParam: searchData,
+      initialData: () => {
+        return {
+          pages: [classList],
+          pageParams: [searchData],
+        };
+      },
+      getNextPageParam: (lastPage, allpages) => {
+        const currentPage = allpages.length;
+
+        return lastPage
+          ? ({
+              ...searchData,
+              searchAfter: lastPage.at(-1)!.searchAfter,
+            } as searchClassParameters)
+          : undefined;
+      },
+    });
+
+  const classLists = useMemo(
+    () => data.pages.flatMap((classInfo) => classInfo),
+    [data],
+  );
+
+  const getNextPageHandler = () => {
+    if (!isFetchingNextPage) {
+      fetchNextPage();
     }
-    setIsLoadingClassList(false);
   };
 
-  const { ref } = useIntersect(searchInstructorsHandler, options);
+  const { ref } = useIntersect(getNextPageHandler, options);
 
   return (
     <div className="px-4 sm:px-9 xl:px-14">
@@ -129,9 +129,7 @@ const ClassListView = ({
         {classLists.map((classData, index) => (
           <div
             ref={
-              index === classLists.length - 1 && searchState.searchAfter
-                ? ref
-                : undefined
+              index === classLists.length - 1 && hasNextPage ? ref : undefined
             }
             key={classData.id}
           >
@@ -149,7 +147,7 @@ const ClassListView = ({
         <p>검색된 결과가 없습니다</p>
       </div>
 
-      {isLoadingClassList && (
+      {(isLoading || isFetchingNextPage) && (
         <div className="mb-5 flex justify-center">
           <Spinner />
         </div>

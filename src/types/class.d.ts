@@ -704,8 +704,8 @@ export interface searchClassParameters {
   timeOfDay?: TimeOfDay[];
   gtePrice?: number;
   ltePrice?: number;
-  lectureMethod?: string | undefined;
-  getDate?: Date;
+  lectureMethod?: string;
+  gteDate?: Date;
   lteDate?: Date;
 }
 
