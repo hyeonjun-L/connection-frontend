@@ -1,20 +1,16 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import useIntersect from '@/hooks/useIntersect';
 import { NotFoundSVG } from '@/icons/svg';
 import { searchInstructors } from '@/lib/apis/searchApis';
-import { accessTokenReissuance } from '@/lib/apis/userApi';
-import { useUserStore } from '@/store/userStore';
 import { transformSearchInstructor } from '@/utils/apiDataProcessor';
 import NavComponent from './NavComponent';
 import InstructorCard from '@/components/InstructorCard/InstructorCard';
 import Spinner from '@/components/Spinner/Spinner';
-import {
-  FetchError,
-  InstructorCardProps,
-  instructorSearchData,
-} from '@/types/types';
+import { searchInstructorParameters } from '@/types/instructor';
+import { InstructorCardProps, instructorSearchData } from '@/types/types';
 
 interface InstructorListViewProps {
   instructorList: InstructorCardProps[];
@@ -27,22 +23,8 @@ const InstructorListView = ({
   searchData,
   children,
 }: InstructorListViewProps) => {
+  const searchParams = useSearchParams();
   const [largeImg, setLargeImg] = useState(true);
-  const [instructors, setInstructors] = useState(instructorList);
-  const [searchState, setSearchState] = useState({ ...searchData });
-  const [isLoadingInstructorList, setIsLoadingInstructorList] = useState(false);
-  const { userType } = useUserStore((state) => ({
-    userType: state.userType,
-  }));
-
-  useEffect(() => {
-    setInstructors([...instructorList]);
-
-    setSearchState({
-      ...searchData,
-      searchAfter: instructorList.at(-1)?.searchAfter,
-    });
-  }, [instructorList, searchData]);
 
   useEffect(() => {
     const storedValue = localStorage.getItem('cardState');
@@ -57,38 +39,53 @@ const InstructorListView = ({
     threshold: 0.1,
   };
 
-  const updateSearchStateAndInstructorLists = async () => {
-    const instructors = await searchInstructors(
-      searchState,
-      userType === 'user',
-    );
-
-    setSearchState((state) => ({
-      ...state,
-      searchAfter: instructors.at(-1)?.searchAfter,
-    }));
-    instructorList = transformSearchInstructor(instructors);
-    setInstructors((prev) => [...prev, ...instructorList]);
+  const fetchClassLists = async ({
+    pageParam,
+  }: {
+    pageParam: searchInstructorParameters;
+  }): Promise<InstructorCardProps[]> => {
+    const resInstructorsList = await searchInstructors({
+      ...searchData,
+      ...pageParam,
+    });
+    return transformSearchInstructor(resInstructorsList);
   };
 
-  const searchInstructorsHandler = async () => {
-    setIsLoadingInstructorList(true);
-    try {
-      await updateSearchStateAndInstructorLists();
-    } catch (error) {
-      const fetchError = error as FetchError;
-      if (fetchError.status === 401) {
-        await accessTokenReissuance();
-        await updateSearchStateAndInstructorLists();
-      } else {
-        toast.error('강사 목록 불러오기 실패, 잠시후 다시 시도해주세요.');
-        console.error(error);
-      }
+  const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['instructorSearch', searchParams.toString()],
+      queryFn: fetchClassLists,
+      initialPageParam: searchData,
+      initialData: () => {
+        return {
+          pages: [instructorList],
+          pageParams: [searchData],
+        };
+      },
+      getNextPageParam: (lastPage, allpages) => {
+        const currentPage = allpages.length;
+
+        return lastPage
+          ? ({
+              ...searchData,
+              searchAfter: lastPage.at(-1)!.searchAfter,
+            } as searchInstructorParameters)
+          : undefined;
+      },
+    });
+
+  const instructors = useMemo(
+    () => data.pages.flatMap((classInfo) => classInfo),
+    [data],
+  );
+
+  const getNextPageHandler = () => {
+    if (!isFetchingNextPage) {
+      fetchNextPage();
     }
-    setIsLoadingInstructorList(false);
   };
 
-  const { ref } = useIntersect(searchInstructorsHandler, options);
+  const { ref } = useIntersect(getNextPageHandler, options);
 
   const imgStateHandler = (state: boolean) => {
     setLargeImg(state);
@@ -115,7 +112,7 @@ const InstructorListView = ({
           return (
             <div
               ref={
-                index === instructors.length - 1 && searchState.searchAfter
+                index === instructors.length - 1 && hasNextPage
                   ? ref
                   : undefined
               }
@@ -137,7 +134,7 @@ const InstructorListView = ({
         <p>검색된 결과가 없습니다</p>
       </div>
 
-      {isLoadingInstructorList && (
+      {(isLoading || isFetchingNextPage) && (
         <div className="mb-5 flex justify-center">
           <Spinner />
         </div>

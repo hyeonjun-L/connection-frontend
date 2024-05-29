@@ -37,7 +37,6 @@ export const deleteAllSearchKeywords = async () => {
 
 export const searchInstructors = async (
   data: searchInstructorParameters,
-  userState: boolean,
 ): Promise<searchInstructor[]> => {
   try {
     const params = createParams(data);
@@ -47,7 +46,6 @@ export const searchInstructors = async (
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        userState: `${userState}`,
       },
     });
 
