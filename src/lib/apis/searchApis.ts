@@ -95,7 +95,6 @@ export const searchClasses = async (
 
 export const searchPasses = async (
   data: searchPassesParameters,
-  userState: boolean,
 ): Promise<searchPass[]> => {
   try {
     const params = createParams(data);
@@ -105,7 +104,6 @@ export const searchPasses = async (
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        userState: `${userState}`,
       },
     });
 

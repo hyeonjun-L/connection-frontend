@@ -39,7 +39,7 @@ const InstructorListView = ({
     threshold: 0.1,
   };
 
-  const fetchClassLists = async ({
+  const fetchInstructorLists = async ({
     pageParam,
   }: {
     pageParam: searchInstructorParameters;
@@ -54,7 +54,7 @@ const InstructorListView = ({
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ['instructorSearch', searchParams.toString()],
-      queryFn: fetchClassLists,
+      queryFn: fetchInstructorLists,
       initialPageParam: searchData,
       initialData: () => {
         return {
