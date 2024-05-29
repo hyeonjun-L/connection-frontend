@@ -1,4 +1,5 @@
-import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
+import { jwtDecode } from 'jwt-decode';
+import { NextRequest, NextResponse } from 'next/server';
 import {
   LECTURER_NO_ACCESS,
   LOGIN_REQUIRED_URLS,
@@ -18,6 +19,15 @@ const setCookie = (response: NextResponse, name: string, value: string) => {
     sameSite: 'strict',
     path: '/',
   });
+};
+
+const isTokenExpired = (token: string) => {
+  const decoded = jwtDecode(token);
+  const currentTime = Date.now() / 1000;
+
+  if (decoded.exp && decoded.exp < currentTime) {
+    throw new Error('accessToken expired');
+  }
 };
 
 const handleInvalidToken = (request: NextRequest, includes: boolean) => {
@@ -75,28 +85,25 @@ export async function middleware(request: NextRequest) {
 
   if (authorization) {
     try {
-      if (user) {
-        await checkAccessToken('user', authorization);
+      isTokenExpired(authorization);
 
-        if (isProtectedUrl(USER_NO_ACCESS, request.nextUrl.pathname)) {
-          // 유저가 가면 안되는 lecturer 링크
+      if (user && isProtectedUrl(USER_NO_ACCESS, request.nextUrl.pathname)) {
+        // 유저가 가면 안되는 lecturer 링크
 
-          return redirectWithMessage(
-            '강사로 전환이 필요한 페이지 입니다.',
-            NextResponse.redirect(new URL('/', request.url)),
-          );
-        }
-      } else if (lecturer) {
-        await checkAccessToken('lecturer', authorization);
+        return redirectWithMessage(
+          '강사로 전환이 필요한 페이지 입니다.',
+          NextResponse.redirect(new URL('/', request.url)),
+        );
+      } else if (
+        lecturer &&
+        isProtectedUrl(LECTURER_NO_ACCESS, request.nextUrl.pathname)
+      ) {
+        // 강사가 가면 안되는 user 링크 확인
 
-        if (isProtectedUrl(LECTURER_NO_ACCESS, request.nextUrl.pathname)) {
-          // 강사가 가면 안되는 user 링크 확인
-
-          return redirectWithMessage(
-            '유저로 전환이 필요한 페이지 입니다.',
-            NextResponse.redirect(new URL('/', request.url)),
-          );
-        }
+        return redirectWithMessage(
+          '유저로 전환이 필요한 페이지 입니다.',
+          NextResponse.redirect(new URL('/', request.url)),
+        );
       }
 
       if (
