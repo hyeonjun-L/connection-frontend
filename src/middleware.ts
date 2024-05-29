@@ -6,10 +6,7 @@ import {
   NON_ACCESSIBLE_AFTER_LOGIN,
   USER_NO_ACCESS,
 } from './constants/constants';
-import {
-  checkAccessToken,
-  accessTokenReissuance,
-} from './lib/apis/serverApis/userApi';
+import { accessTokenReissuance } from './lib/apis/serverApis/userApi';
 import { FetchError } from './types/types';
 
 const setCookie = (response: NextResponse, name: string, value: string) => {
