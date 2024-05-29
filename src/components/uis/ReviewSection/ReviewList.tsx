@@ -75,6 +75,7 @@ const ReviewList = ({
             }
           : undefined;
       },
+      refetchOnWindowFocus: false,
     });
 
   return (
