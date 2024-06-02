@@ -1,15 +1,12 @@
-import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
+import { jwtDecode } from 'jwt-decode';
+import { NextRequest, NextResponse } from 'next/server';
 import {
   LECTURER_NO_ACCESS,
   LOGIN_REQUIRED_URLS,
   NON_ACCESSIBLE_AFTER_LOGIN,
   USER_NO_ACCESS,
 } from './constants/constants';
-import {
-  checkAccessToken,
-  accessTokenReissuance,
-} from './lib/apis/serverApis/userApi';
-import { FetchError } from './types/types';
+import { accessTokenReissuance } from './lib/apis/serverApis/userApi';
 
 const setCookie = (response: NextResponse, name: string, value: string) => {
   response.cookies.set(name, value, {
@@ -18,6 +15,19 @@ const setCookie = (response: NextResponse, name: string, value: string) => {
     sameSite: 'strict',
     path: '/',
   });
+};
+
+const isTokenExpired = (token: string) => {
+  try {
+    const decoded = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decoded.exp && decoded.exp < currentTime) {
+      throw new Error('accessToken expired');
+    }
+  } catch (error) {
+    throw new Error('Invalid or expired token');
+  }
 };
 
 const handleInvalidToken = (request: NextRequest, includes: boolean) => {
@@ -75,28 +85,25 @@ export async function middleware(request: NextRequest) {
 
   if (authorization) {
     try {
-      if (user) {
-        await checkAccessToken('user', authorization);
+      isTokenExpired(authorization);
 
-        if (isProtectedUrl(USER_NO_ACCESS, request.nextUrl.pathname)) {
-          // 유저가 가면 안되는 lecturer 링크
+      if (user && isProtectedUrl(USER_NO_ACCESS, request.nextUrl.pathname)) {
+        // 유저가 가면 안되는 lecturer 링크
 
-          return redirectWithMessage(
-            '강사로 전환이 필요한 페이지 입니다.',
-            NextResponse.redirect(new URL('/', request.url)),
-          );
-        }
-      } else if (lecturer) {
-        await checkAccessToken('lecturer', authorization);
+        return redirectWithMessage(
+          '강사로 전환이 필요한 페이지 입니다.',
+          NextResponse.redirect(new URL('/', request.url)),
+        );
+      } else if (
+        lecturer &&
+        isProtectedUrl(LECTURER_NO_ACCESS, request.nextUrl.pathname)
+      ) {
+        // 강사가 가면 안되는 user 링크 확인
 
-        if (isProtectedUrl(LECTURER_NO_ACCESS, request.nextUrl.pathname)) {
-          // 강사가 가면 안되는 user 링크 확인
-
-          return redirectWithMessage(
-            '유저로 전환이 필요한 페이지 입니다.',
-            NextResponse.redirect(new URL('/', request.url)),
-          );
-        }
+        return redirectWithMessage(
+          '유저로 전환이 필요한 페이지 입니다.',
+          NextResponse.redirect(new URL('/', request.url)),
+        );
       }
 
       if (
@@ -111,54 +118,35 @@ export async function middleware(request: NextRequest) {
 
       return NextResponse.next();
     } catch (error) {
-      if (error instanceof Error) {
-        const fetchError = error as FetchError;
-        if (fetchError.status === 401) {
-          const currentRefreshToken =
-            request.cookies.get('refreshToken')?.value;
-          try {
-            if (currentRefreshToken) {
-              const response = NextResponse.redirect(request.url);
+      const currentRefreshToken = request.cookies.get('refreshToken')?.value;
+      try {
+        if (currentRefreshToken) {
+          const response = NextResponse.redirect(request.url);
 
-              const { accessToken, refreshToken } = await (
-                await accessTokenReissuance(currentRefreshToken)
-              ).json();
+          const { accessToken, refreshToken } = await (
+            await accessTokenReissuance(currentRefreshToken)
+          ).json();
 
-              const tokenName = user
-                ? 'userAccessToken'
-                : 'lecturerAccessToken';
+          const tokenName = user ? 'userAccessToken' : 'lecturerAccessToken';
 
-              setCookie(response, tokenName, accessToken);
-              setCookie(response, 'refreshToken', refreshToken);
+          setCookie(response, tokenName, accessToken);
+          setCookie(response, 'refreshToken', refreshToken);
 
-              return response;
-            } else {
-              throw new Error('refreshToken 존재하지 않음');
-            }
-          } catch (error) {
-            const includes = isProtectedUrl(
-              LOGIN_REQUIRED_URLS,
-              request.nextUrl.pathname,
-            );
-            // 로그인이 필요한 링크 (강사 || 유저)
-
-            return redirectWithMessage(
-              '세션이 만료되었습니다. 다시 로그인해주세요.',
-              handleInvalidToken(request, includes),
-            );
-          }
+          return response;
         } else {
-          const includes = isProtectedUrl(
-            LOGIN_REQUIRED_URLS,
-            request.nextUrl.pathname,
-          );
-          // 로그인이 필요한 링크 (강사 || 유저)
-
-          return redirectWithMessage(
-            '세션이 만료되었습니다. 다시 로그인해주세요.',
-            handleInvalidToken(request, includes),
-          );
+          throw new Error('refreshToken 존재하지 않음');
         }
+      } catch (error) {
+        const includes = isProtectedUrl(
+          LOGIN_REQUIRED_URLS,
+          request.nextUrl.pathname,
+        );
+        // 로그인이 필요한 링크 (강사 || 유저)
+
+        return redirectWithMessage(
+          '세션이 만료되었습니다. 다시 로그인해주세요.',
+          handleInvalidToken(request, includes),
+        );
       }
     }
   }

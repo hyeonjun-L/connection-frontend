@@ -370,13 +370,44 @@ export const BANK_CODE_TO_NAME: { [key: string]: string } = {
   SD: 'SK증권',
 };
 
-export const LOGIN_REQUIRED_URLS = ['/class/create'];
+export const LOGIN_REQUIRED_URLS = [
+  '/more',
+  '/dashboard',
+  '/instructor/apply',
+  '/notifications',
+  '/order/complete',
+  '/order/fail',
+  '/receipt',
+  '/report',
+  new RegExp('/class/create'),
+  new RegExp('^/class/[^/]+/edit$'),
+  new RegExp('^/instructor/[^/]+/edit$'),
+  new RegExp('/mypage'),
+];
 
-export const LECTURER_NO_ACCESS = []; //new RegExp('^/class/[^/]+/apply$') 동적 라우터 있는 부분은 해당 방식으로 넣으면 됨
+export const LECTURER_NO_ACCESS = [
+  '/receipt',
+  '/instructor/apply',
+  new RegExp('/mypage/user'),
+  new RegExp('^/coupon/[^/]+'),
+  new RegExp('/order'),
+];
 
-export const USER_NO_ACCESS = [];
+export const USER_NO_ACCESS = [
+  '/dashboard',
+  new RegExp('/class/create'),
+  new RegExp('/mypage/instructor'),
+  new RegExp('^/class/[^/]+/edit$'),
+  new RegExp('^/instructor/[^/]+/edit$'),
+];
 
-export const NON_ACCESSIBLE_AFTER_LOGIN = ['/register', '/login'];
+export const NON_ACCESSIBLE_AFTER_LOGIN = [
+  '/register',
+  '/login',
+  '/signin',
+  '/upload-profile',
+  new RegExp('/welcome'),
+];
 
 export const LECTURE_COUPON_TAKE = 9;
 
