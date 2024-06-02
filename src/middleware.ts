@@ -7,7 +7,6 @@ import {
   USER_NO_ACCESS,
 } from './constants/constants';
 import { accessTokenReissuance } from './lib/apis/serverApis/userApi';
-import { FetchError } from './types/types';
 
 const setCookie = (response: NextResponse, name: string, value: string) => {
   response.cookies.set(name, value, {
@@ -19,11 +18,15 @@ const setCookie = (response: NextResponse, name: string, value: string) => {
 };
 
 const isTokenExpired = (token: string) => {
-  const decoded = jwtDecode(token);
-  const currentTime = Date.now() / 1000;
+  try {
+    const decoded = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
 
-  if (decoded.exp && decoded.exp < currentTime) {
-    throw new Error('accessToken expired');
+    if (decoded.exp && decoded.exp < currentTime) {
+      throw new Error('accessToken expired');
+    }
+  } catch (error) {
+    throw new Error('Invalid or expired token');
   }
 };
 
@@ -115,54 +118,35 @@ export async function middleware(request: NextRequest) {
 
       return NextResponse.next();
     } catch (error) {
-      if (error instanceof Error) {
-        const fetchError = error as FetchError;
-        if (fetchError.status === 401) {
-          const currentRefreshToken =
-            request.cookies.get('refreshToken')?.value;
-          try {
-            if (currentRefreshToken) {
-              const response = NextResponse.redirect(request.url);
+      const currentRefreshToken = request.cookies.get('refreshToken')?.value;
+      try {
+        if (currentRefreshToken) {
+          const response = NextResponse.redirect(request.url);
 
-              const { accessToken, refreshToken } = await (
-                await accessTokenReissuance(currentRefreshToken)
-              ).json();
+          const { accessToken, refreshToken } = await (
+            await accessTokenReissuance(currentRefreshToken)
+          ).json();
 
-              const tokenName = user
-                ? 'userAccessToken'
-                : 'lecturerAccessToken';
+          const tokenName = user ? 'userAccessToken' : 'lecturerAccessToken';
 
-              setCookie(response, tokenName, accessToken);
-              setCookie(response, 'refreshToken', refreshToken);
+          setCookie(response, tokenName, accessToken);
+          setCookie(response, 'refreshToken', refreshToken);
 
-              return response;
-            } else {
-              throw new Error('refreshToken 존재하지 않음');
-            }
-          } catch (error) {
-            const includes = isProtectedUrl(
-              LOGIN_REQUIRED_URLS,
-              request.nextUrl.pathname,
-            );
-            // 로그인이 필요한 링크 (강사 || 유저)
-
-            return redirectWithMessage(
-              '세션이 만료되었습니다. 다시 로그인해주세요.',
-              handleInvalidToken(request, includes),
-            );
-          }
+          return response;
         } else {
-          const includes = isProtectedUrl(
-            LOGIN_REQUIRED_URLS,
-            request.nextUrl.pathname,
-          );
-          // 로그인이 필요한 링크 (강사 || 유저)
-
-          return redirectWithMessage(
-            '세션이 만료되었습니다. 다시 로그인해주세요.',
-            handleInvalidToken(request, includes),
-          );
+          throw new Error('refreshToken 존재하지 않음');
         }
+      } catch (error) {
+        const includes = isProtectedUrl(
+          LOGIN_REQUIRED_URLS,
+          request.nextUrl.pathname,
+        );
+        // 로그인이 필요한 링크 (강사 || 유저)
+
+        return redirectWithMessage(
+          '세션이 만료되었습니다. 다시 로그인해주세요.',
+          handleInvalidToken(request, includes),
+        );
       }
     }
   }
