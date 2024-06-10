@@ -6,7 +6,6 @@ import useIntersect from '@/hooks/useIntersect';
 import { searchPasses } from '@/lib/apis/searchApis';
 import { transformSearchPasses } from '@/utils/apiDataProcessor';
 import UserPass from '@/components/Pass/UserPass';
-import Spinner from '@/components/Spinner/Spinner';
 import { searchPassesParameters, userPass } from '@/types/pass';
 
 interface PassesListViewProps {
