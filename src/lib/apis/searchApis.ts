@@ -115,7 +115,8 @@ export const searchPasses = async (
     }
 
     const resData = await response.json();
-    return resData.data.searchedPassList ?? [];
+
+    return resData.data.passList ?? [];
   } catch (error) {
     console.error(error);
     throw error;

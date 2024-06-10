@@ -2,6 +2,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { INSTRUCTOR_TAKE } from '@/constants/constants';
 import useIntersect from '@/hooks/useIntersect';
 import { NotFoundSVG } from '@/icons/svg';
 import { searchInstructors } from '@/lib/apis/searchApis';
@@ -16,12 +17,14 @@ interface InstructorListViewProps {
   instructorList: InstructorCardProps[];
   searchData: instructorSearchData;
   children: React.ReactNode;
+  totalItemCount: number;
 }
 
 const InstructorListView = ({
   instructorList,
   searchData,
   children,
+  totalItemCount,
 }: InstructorListViewProps) => {
   const searchParams = useSearchParams();
   const [largeImg, setLargeImg] = useState(true);
@@ -63,9 +66,7 @@ const InstructorListView = ({
         };
       },
       getNextPageParam: (lastPage, allpages) => {
-        const currentPage = allpages.length;
-
-        return lastPage
+        return totalItemCount > allpages.length * INSTRUCTOR_TAKE
           ? ({
               ...searchData,
               searchAfter: lastPage.at(-1)!.searchAfter,

@@ -17,12 +17,14 @@ interface ClassListViewProps {
   searchData: classSearchData;
   children: React.ReactNode;
   classList: ClassCardType[];
+  totalItemCount: number;
 }
 
 const ClassListView = ({
   children,
   searchData,
   classList,
+  totalItemCount,
 }: ClassListViewProps) => {
   const { changeParams, searchParams } = useChangeSearchParams();
 
@@ -67,9 +69,7 @@ const ClassListView = ({
         };
       },
       getNextPageParam: (lastPage, allpages) => {
-        const currentPage = allpages.length;
-
-        return lastPage
+        return totalItemCount > allpages.length * CLASS_TAKE
           ? ({
               ...searchData,
               searchAfter: lastPage.at(-1)!.searchAfter,

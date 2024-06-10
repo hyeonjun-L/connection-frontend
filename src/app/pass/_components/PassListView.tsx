@@ -1,6 +1,7 @@
 'use client';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
+import { PASSES_TAKE } from '@/constants/constants';
 import useIntersect from '@/hooks/useIntersect';
 import { searchPasses } from '@/lib/apis/searchApis';
 import { transformSearchPasses } from '@/utils/apiDataProcessor';
@@ -11,9 +12,14 @@ import { searchPassesParameters, userPass } from '@/types/pass';
 interface PassesListViewProps {
   passList: userPass[];
   searchData: searchPassesParameters;
+  totalItemCount: number;
 }
 
-const PassesListView = ({ searchData, passList }: PassesListViewProps) => {
+const PassesListView = ({
+  searchData,
+  passList,
+  totalItemCount,
+}: PassesListViewProps) => {
   const options = {
     root: null,
     rootMargin: '0px',
@@ -31,7 +37,7 @@ const PassesListView = ({ searchData, passList }: PassesListViewProps) => {
 
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ['passSearch', searchData.toString()],
+      queryKey: ['passSearch', JSON.stringify(searchData)],
       queryFn: fetchPassLists,
       initialPageParam: searchData,
       initialData: () => {
@@ -41,9 +47,7 @@ const PassesListView = ({ searchData, passList }: PassesListViewProps) => {
         };
       },
       getNextPageParam: (lastPage, allpages) => {
-        const currentPage = allpages.length;
-
-        return lastPage
+        return totalItemCount > allpages.length * PASSES_TAKE
           ? ({
               ...searchData,
               searchAfter: lastPage.at(-1)!.searchAfter,

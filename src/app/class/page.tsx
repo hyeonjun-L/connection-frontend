@@ -32,6 +32,7 @@ const classPage = async ({ searchParams }: { searchParams: SearchParams }) => {
   const user = cookieStore.get('userAccessToken')?.value;
   let bestClassList: ClassCardType[] = [];
   let classList: ClassCardType[] = [];
+  let totalItemCount: number = 0;
 
   const searchData: classSearchData = {
     take: CLASS_TAKE,
@@ -145,7 +146,10 @@ const classPage = async ({ searchParams }: { searchParams: SearchParams }) => {
       bestClassList = Array(repeatCount).fill(bestClassList).flat().slice(0, 6);
     }
 
-    classList = transformSearchClass(await searchClasses(searchData, !!user));
+    const { classList: resClassList, totalItemCount: resTotalItemCount } =
+      await searchClasses(searchData, !!user);
+    classList = transformSearchClass(resClassList);
+    totalItemCount = resTotalItemCount;
   } catch (error) {
     console.error(error);
   }
@@ -157,7 +161,11 @@ const classPage = async ({ searchParams }: { searchParams: SearchParams }) => {
       </div>
       <BestClasses bestClassList={bestClassList} />
 
-      <ClassListView searchData={searchData} classList={classList}>
+      <ClassListView
+        searchData={searchData}
+        classList={classList}
+        totalItemCount={totalItemCount}
+      >
         <Filters type="class" filterOption={filterOptions} />
       </ClassListView>
     </main>
