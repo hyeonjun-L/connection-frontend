@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { cache } from 'react';
 import createParams from '@/utils/createParams';
 import { IClassPostResponse } from '@/types/class';
 import {
@@ -43,42 +44,42 @@ export const getInstructorClassLists = async (
   }
 };
 
-export const getInstructor = async (
-  id: string,
-): Promise<instructorPostResponse | undefined> => {
-  try {
-    const cookieStroe = cookies();
-    const authorization = cookieStroe.get('userAccessToken')?.value;
+export const getInstructor = cache(
+  async (id: string): Promise<instructorPostResponse | undefined> => {
+    try {
+      const cookieStroe = cookies();
+      const authorization = cookieStroe.get('userAccessToken')?.value;
 
-    const headers: Record<string, string> = {
-      Authorization: `Bearer ${authorization}`,
-      'Content-Type': 'application/json',
-    };
+      const headers: Record<string, string> = {
+        Authorization: `Bearer ${authorization}`,
+        'Content-Type': 'application/json',
+      };
 
-    const response = await fetch(`${END_POINT}/lecturers/profile/${id}`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: authorization
-        ? headers
-        : {
-            'Content-Type': 'application/json',
-          },
-    });
+      const response = await fetch(`${END_POINT}/lecturers/profile/${id}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: authorization
+          ? headers
+          : {
+              'Content-Type': 'application/json',
+            },
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      const error: FetchError = new Error(errorData.message || '');
-      error.status = response.status;
-      throw new Error(`강사 프로필 불러오기: ${error.status} ${error}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        const error: FetchError = new Error(errorData.message || '');
+        error.status = response.status;
+        throw new Error(`강사 프로필 불러오기: ${error.status} ${error}`);
+      }
+
+      const resData = await response.json();
+
+      return resData.data.lecturerProfile;
+    } catch (error) {
+      console.error(error);
     }
-
-    const resData = await response.json();
-
-    return resData.data.lecturerProfile;
-  } catch (error) {
-    console.error(error);
-  }
-};
+  },
+);
 
 export const getBankAccount = async (): Promise<bankAccount> => {
   const cookieStore = cookies();

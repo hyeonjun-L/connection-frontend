@@ -130,6 +130,9 @@ export const searchInstructors = async (
     }
 
     const resData = await response.json();
+
+    console.log(resData);
+
     return resData.data.lecturerList ?? [];
   } catch (error) {
     console.error(error);
@@ -199,6 +202,8 @@ export const searchBestClass = async (
 
     const resData = await response.json();
 
+    console.log(resData);
+
     return resData.data.lectures;
   } catch (error) {
     console.error(error);
@@ -209,7 +214,7 @@ export const searchBestClass = async (
 export const searchClasses = async (
   data: searchClassParameters,
   userState: boolean,
-): Promise<searchClass[]> => {
+): Promise<{ classList: searchClass[]; totalItemCount: number }> => {
   try {
     const cookieStroe = cookies();
     const authorization = cookieStroe.get('userAccessToken')?.value;
@@ -235,7 +240,12 @@ export const searchClasses = async (
 
     const resData = await response.json();
 
-    return resData.data.lectureList ?? [];
+    console.log(resData.data.lectureList);
+
+    return {
+      classList: resData.data.lectureList ?? [],
+      totalItemCount: resData.data.totalItemCount,
+    };
   } catch (error) {
     console.error(error);
     throw error;
@@ -273,7 +283,9 @@ export const searchPasses = async (
     }
 
     const resData = await response.json();
-    return resData.data.searchedPassList ?? [];
+
+    console.log(resData);
+    return resData.data.passList ?? [];
   } catch (error) {
     console.error(error);
     throw error;

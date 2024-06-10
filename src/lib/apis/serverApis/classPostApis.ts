@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { cache } from 'react';
 import {
   IClassScheduleResponse,
   IClassPreviewResponse,
@@ -8,61 +9,64 @@ import {
 
 const END_POINT = process.env.NEXT_PUBLIC_API_END_POINT;
 
-export const getClassPreview = async (
-  lectureId: string,
-): Promise<IClassPreviewResponse> => {
-  const cookieStore = cookies();
-  const token = cookieStore.get('userAccessToken')?.value;
+export const getClassPreview = cache(
+  async (lectureId: string): Promise<IClassPreviewResponse> => {
+    const cookieStore = cookies();
+    const token = cookieStore.get('userAccessToken')?.value;
 
-  const headers: Record<string, string> = token
-    ? {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      }
-    : {
-        'Content-Type': 'application/json',
-      };
+    const headers: Record<string, string> = token
+      ? {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      : {
+          'Content-Type': 'application/json',
+        };
 
-  const response = await fetch(`${END_POINT}/lectures/${lectureId}/previews`, {
-    method: 'GET',
-    credentials: 'include',
-    headers,
-  }).then((data) => data.json());
+    const response = await fetch(
+      `${END_POINT}/lectures/${lectureId}/previews`,
+      {
+        method: 'GET',
+        credentials: 'include',
+        headers,
+      },
+    ).then((data) => data.json());
 
-  if (response.statusCode !== 200) {
-    throw new Error('클래스 상세 조회 상단 데이터 요청 에러!');
-  }
+    if (response.statusCode !== 200) {
+      throw new Error('클래스 상세 조회 상단 데이터 요청 에러!');
+    }
 
-  return response.data.lecturePreview;
-};
+    return response.data.lecturePreview;
+  },
+);
 
-export const getClassDetail = async (
-  lectureId: string,
-): Promise<IClassDetailResponse> => {
-  const cookieStore = cookies();
-  const token = cookieStore.get('userAccessToken')?.value;
+export const getClassDetail = cache(
+  async (lectureId: string): Promise<IClassDetailResponse> => {
+    const cookieStore = cookies();
+    const token = cookieStore.get('userAccessToken')?.value;
 
-  const headers: Record<string, string> = token
-    ? {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      }
-    : {
-        'Content-Type': 'application/json',
-      };
+    const headers: Record<string, string> = token
+      ? {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      : {
+          'Content-Type': 'application/json',
+        };
 
-  const response = await fetch(`${END_POINT}/lectures/${lectureId}/detail`, {
-    method: 'GET',
-    credentials: 'include',
-    headers,
-  }).then((data) => data.json());
+    const response = await fetch(`${END_POINT}/lectures/${lectureId}/detail`, {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    }).then((data) => data.json());
 
-  if (response.statusCode !== 200) {
-    throw new Error('클래스 상세 조회 세부 데이터 요청 에러!');
-  }
+    if (response.statusCode !== 200) {
+      throw new Error('클래스 상세 조회 세부 데이터 요청 에러!');
+    }
 
-  return response.data.lectureDetail;
-};
+    return response.data.lectureDetail;
+  },
+);
 
 export const getClassSchedules = async (
   id: string,
