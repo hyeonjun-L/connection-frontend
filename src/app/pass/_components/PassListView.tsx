@@ -70,23 +70,23 @@ const PassesListView = ({
   const { ref } = useIntersect(getNextPageHandler, options);
 
   return (
-    <>
-      <section className="mb-7 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {passes.map((passInfo, index) => (
-          <div
-            key={passInfo.id}
-            ref={index === passes.length - 1 && hasNextPage ? ref : undefined}
-          >
-            <UserPass passInfo={passInfo} />
-          </div>
-        ))}
-      </section>
-      {(isLoading || isFetchingNextPage) && (
-        <div className="mb-5 flex justify-center">
-          <Spinner />
+    <section className="mb-7 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {passes.map((passInfo, index) => (
+        <div
+          key={passInfo.id}
+          ref={index === passes.length - 1 && hasNextPage ? ref : undefined}
+        >
+          <UserPass passInfo={passInfo} />
         </div>
-      )}
-    </>
+      ))}
+      {(isLoading || isFetchingNextPage) &&
+        Array.from({ length: PASSES_TAKE }, (_, index) => (
+          <div
+            key={index}
+            className="h-[12.353rem] w-full animate-pulse rounded-md bg-gray-700"
+          />
+        ))}
+    </section>
   );
 };
 

@@ -124,6 +124,13 @@ const InstructorListView = ({
             </div>
           );
         })}
+        {(isLoading || isFetchingNextPage) &&
+          Array.from({ length: INSTRUCTOR_TAKE }, (_, index) => (
+            <div
+              key={index}
+              className="h-60 w-full animate-pulse rounded-md bg-gray-700"
+            />
+          ))}
       </div>
 
       <div
@@ -134,12 +141,6 @@ const InstructorListView = ({
         <NotFoundSVG />
         <p>검색된 결과가 없습니다</p>
       </div>
-
-      {(isLoading || isFetchingNextPage) && (
-        <div className="mb-5 flex justify-center">
-          <Spinner />
-        </div>
-      )}
     </div>
   );
 };

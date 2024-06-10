@@ -9,6 +9,7 @@ import { NotFoundSVG } from '@/icons/svg';
 import { searchClasses } from '@/lib/apis/searchApis';
 import { transformSearchClass } from '@/utils/apiDataProcessor';
 import ClassPreview from '@/components/ClassPreview/ClassPreview';
+import ClassPreviewLoading from '@/components/Loading/ClassPreviewLoading';
 import Spinner from '@/components/Spinner/Spinner';
 import { ClassCardType, searchClassParameters } from '@/types/class';
 import { classSearchData } from '@/types/types';
@@ -136,6 +137,10 @@ const ClassListView = ({
             <ClassPreview {...classData} />
           </div>
         ))}
+        {(isLoading || isFetchingNextPage) &&
+          Array.from({ length: CLASS_TAKE }, (_, index) => (
+            <ClassPreviewLoading key={index} />
+          ))}
       </div>
 
       <div
