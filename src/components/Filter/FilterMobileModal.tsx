@@ -1,3 +1,4 @@
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import {
   CITY_CODE,
@@ -25,6 +26,8 @@ const FilterMobileModal = ({
   handleClosed,
   filterComponents,
 }: MobileFullModalProps) => {
+  const initialized = useRef(false);
+  const pathname = usePathname();
   const { executeAllResets, filterList, setIsfilterModalOpen } = usefilterStore(
     (state) => ({
       executeAllResets: state.executeAllResets,
@@ -37,16 +40,28 @@ const FilterMobileModal = ({
 
   const handleKeyUp = (e: KeyboardEvent) => {
     if (e.key !== 'Escape') return;
-    handleClosed();
+    window.history.back();
   };
 
   useEffect(() => {
-    window.addEventListener('keyup', handleKeyUp);
-    document.body.style.overflow = 'hidden';
+    if (!initialized.current) {
+      window.addEventListener('keyup', handleKeyUp);
+      document.body.style.overflow = 'hidden';
+      window.history.pushState(null, '', pathname);
+
+      initialized.current = true;
+
+      window.onpopstate = () => {
+        handleClosed();
+        window.onpopstate = null;
+      };
+      return;
+    }
 
     return () => {
       document.body.style.overflow = 'unset';
       window.removeEventListener('keyup', handleKeyUp);
+      window.onpopstate = null;
     };
   }, []);
 
@@ -139,7 +154,12 @@ const FilterMobileModal = ({
       <section className="flex h-screen w-screen flex-col overflow-y-auto bg-white">
         <header className="relative flex h-24 min-h-[6rem] items-center justify-center border-b border-solid border-gray-300">
           <h1 className="mt-4 text-xl font-semibold">필터</h1>
-          <button className="absolute right-4" onClick={handleClosed}>
+          <button
+            className="absolute right-4"
+            onClick={() => {
+              window.history.back();
+            }}
+          >
             <CloseSVG
               width="24"
               height="24"
