@@ -12,6 +12,7 @@ import {
   transformSearchInstructor,
   transformSearchParamsLocation,
 } from '@/utils/apiDataProcessor';
+import fillCarouselItems from '@/utils/fillCarouselItems';
 import { regionsDecryption } from '@/utils/searchFilterFn';
 import BestInstructors from './_components/BestInstructors';
 import InstructorListView from './_components/InstructorListView';
@@ -83,14 +84,10 @@ const instructorPage = async ({
       image: instructor.lecturerProfileImageUrl[0].url,
     }));
 
-    if (bestInstructorList.length < 10) {
-      const repeatCount = Math.ceil(10 / bestInstructorList.length);
-
-      bestInstructorList = Array(repeatCount)
-        .fill(bestInstructorList)
-        .flat()
-        .slice(0, 10);
-    }
+    bestInstructorList =
+      bestInstructorList.length < 8
+        ? fillCarouselItems({ items: bestInstructorList, minItems: 8 })
+        : bestInstructorList;
 
     instructorList = transformSearchInstructor(instructors);
   } catch (error) {
@@ -102,7 +99,7 @@ const instructorPage = async ({
       <div className="my-4 px-4 sm:px-9 xl:px-14">
         <SearchInput query={searchData.value ?? ''} />
       </div>
-      {bestInstructorList.length > 0 && (
+      {bestInstructorList.length > 2 && (
         <BestInstructors list={bestInstructorList} />
       )}
 

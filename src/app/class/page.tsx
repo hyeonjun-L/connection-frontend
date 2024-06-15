@@ -19,6 +19,7 @@ import {
   transformSearchClass,
   transformSearchParamsLocation,
 } from '@/utils/apiDataProcessor';
+import fillCarouselItems from '@/utils/fillCarouselItems';
 import { regionsDecryption } from '@/utils/searchFilterFn';
 import BestClasses from './_components/BestClasses';
 import ClassListView from './_components/ClassListView';
@@ -140,10 +141,10 @@ const classPage = async ({ searchParams }: { searchParams: SearchParams }) => {
   try {
     bestClassList = transformBestClassSearch(await searchBestClass(!!user));
 
-    if (bestClassList.length < 6) {
-      const repeatCount = Math.ceil(6 / bestClassList.length);
-      bestClassList = Array(repeatCount).fill(bestClassList).flat().slice(0, 6);
-    }
+    bestClassList =
+      bestClassList.length < 6
+        ? fillCarouselItems({ items: bestClassList, minItems: 6 })
+        : bestClassList;
 
     classList = transformSearchClass(await searchClasses(searchData, !!user));
   } catch (error) {
@@ -155,7 +156,9 @@ const classPage = async ({ searchParams }: { searchParams: SearchParams }) => {
       <div className="my-4 px-4 sm:px-9 xl:px-14">
         <SearchInput query={searchData.value ?? ''} />
       </div>
-      <BestClasses bestClassList={bestClassList} />
+      {bestClassList.length > 2 && (
+        <BestClasses bestClassList={bestClassList} />
+      )}
 
       <ClassListView searchData={searchData} classList={classList}>
         <Filters type="class" filterOption={filterOptions} />

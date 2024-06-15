@@ -1,6 +1,9 @@
 import { cookies } from 'next/headers';
+import { MainTopSVG } from '@/icons/svg';
 import { searchBestInstructor } from '@/lib/apis/serverApis/searchApis';
+import fillCarouselItems from '@/utils/fillCarouselItems';
 import CarouselTemplate from '../CarouselTemplate';
+import SectionHeader from '../SectionHeader';
 import { searchBestInstructorData } from '@/types/instructor';
 
 const BestInstructor = async () => {
@@ -11,22 +14,27 @@ const BestInstructor = async () => {
   try {
     const resInstructorList = await searchBestInstructor(!!user);
 
-    if (resInstructorList.length === 0) return null;
+    if (resInstructorList.length < 3) return null;
 
-    if (resInstructorList.length < 9) {
-      const repeatCount = Math.ceil(9 / resInstructorList.length);
-
-      bestInstructorLists = Array(repeatCount)
-        .fill(resInstructorList)
-        .flat()
-        .slice(0, 8);
-    }
+    bestInstructorLists =
+      resInstructorList.length < 8
+        ? fillCarouselItems({ items: resInstructorList, minItems: 8 })
+        : resInstructorList;
   } catch (error) {
     console.error(error);
     return null;
   }
 
-  return <CarouselTemplate bestInstructorLists={bestInstructorLists} />;
+  return (
+    <section className="mt-3">
+      <SectionHeader
+        icon={<MainTopSVG />}
+        title="인기 강사 TOP8"
+        link="/instructor"
+      />
+      <CarouselTemplate bestInstructorLists={bestInstructorLists} />;
+    </section>
+  );
 };
 
 export default BestInstructor;
