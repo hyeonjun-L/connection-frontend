@@ -694,7 +694,7 @@ export interface searchBestClassData {
 export interface searchClassParameters {
   take: number;
   sortOption: 'LATEST' | 'STARS';
-  isGroup: boolean;
+  isGroup?: boolean;
   value?: string;
   searchAfter?: [number, number];
   genres?: string[];

@@ -104,7 +104,7 @@ const FilterMobileModal = ({
     },
     인원: (value) => ({
       name: 'group',
-      value: value === '그룹레슨' ? '' : value,
+      value: value === '전체' ? '' : value,
     }),
     '진행 방식': (value) => ({
       name: 'method',

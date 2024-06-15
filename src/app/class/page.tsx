@@ -4,7 +4,6 @@ import {
   DANCE_GENRE,
   FILTER_TIME,
   FILTER_WEEK,
-  GROUP_FILTER_LIST,
   METHOD_FILTER_LIST,
   PRICE_FILTER_MAX,
   PRICE_FILTER_MIN,
@@ -60,7 +59,7 @@ const classPage = async ({ searchParams }: { searchParams: SearchParams }) => {
       searchParams.stars && Number.isInteger(Number(searchParams.stars))
         ? Number(searchParams.stars)
         : 0,
-    isGroup: searchParams.group === '프라이빗 레슨(1:1)' ? false : true,
+    isGroup: searchParams.group ? searchParams.group === '그룹레슨' : undefined,
     gtePrice:
       searchParams.gtePrice && Number.isInteger(Number(searchParams.gtePrice))
         ? Number(searchParams.gtePrice)
@@ -132,10 +131,7 @@ const classPage = async ({ searchParams }: { searchParams: SearchParams }) => {
         return found ? found.label : '';
       }),
     },
-    group:
-      searchParams.group && GROUP_FILTER_LIST.includes(searchParams.group)
-        ? searchParams.group
-        : '그룹레슨',
+    group: searchData.isGroup === undefined ? '전체' : searchParams.group!,
   };
 
   try {

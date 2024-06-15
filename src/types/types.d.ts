@@ -177,7 +177,7 @@ export interface instructorSearchData {
 export interface classSearchData {
   take: number;
   sortOption: 'LATEST' | 'STARS';
-  isGroup: boolean;
+  isGroup?: boolean;
   value?: string;
   searchAfter?: [number, number];
   genres: string[];
