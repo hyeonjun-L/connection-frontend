@@ -55,7 +55,7 @@ const FilterList = ({ filterOption, type }: FilterListProps) => {
           />,
           <DateFilterContainer filterOption={filterOption.date!} key="date" />,
           <GroupFilterContainer
-            filterOption={filterOption.group!}
+            filterOption={filterOption.group}
             key="group"
           />,
           <MethodFilter filterOption={filterOption.method!} key="method" />,
