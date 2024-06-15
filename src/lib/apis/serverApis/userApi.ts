@@ -107,33 +107,3 @@ export const accessTokenReissuance = async (
 
   return new Response(JSON.stringify(result));
 };
-
-export const checkAccessToken = async (
-  tokenType: 'user' | 'lecturer',
-  token: string,
-) => {
-  const point =
-    tokenType === 'user' ? 'user-access-token' : 'lecturer-access-token';
-
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${token}`,
-  };
-
-  const response = await fetch(
-    `${END_POINT_DOMAIN}/auth/token/verify/${point}`,
-    {
-      method: 'GET',
-      credentials: 'include',
-      headers,
-    },
-  );
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    const error: FetchError = new Error(errorData.message || '');
-    error.status = response.status;
-    throw error;
-  }
-
-  return response;
-};
