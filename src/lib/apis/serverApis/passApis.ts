@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { cache } from 'react';
 import createParams from '@/utils/createParams';
 import {
   IPassInfoForIdData,
@@ -79,40 +80,40 @@ export const getIssuedPassList = async (
   return { item, count: totalItemCount };
 };
 
-export const getPassInfoForId = async (
-  passId: string | number,
-): Promise<IPassInfoForIdData | undefined> => {
-  try {
-    const cookieStore = cookies();
-    const authorization = cookieStore.get('userAccessToken')?.value;
+export const getPassInfoForId = cache(
+  async (passId: string | number): Promise<IPassInfoForIdData | undefined> => {
+    try {
+      const cookieStore = cookies();
+      const authorization = cookieStore.get('userAccessToken')?.value;
 
-    const headers: Record<string, string> = authorization
-      ? {
-          Authorization: `Bearer ${authorization}`,
-          'Content-Type': 'application/json',
-        }
-      : { 'Content-Type': 'application/json' };
+      const headers: Record<string, string> = authorization
+        ? {
+            Authorization: `Bearer ${authorization}`,
+            'Content-Type': 'application/json',
+          }
+        : { 'Content-Type': 'application/json' };
 
-    const response = await fetch(`${END_POINT}/passes/${passId}`, {
-      method: 'GET',
-      credentials: 'include',
-      headers,
-    });
+      const response = await fetch(`${END_POINT}/passes/${passId}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers,
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      const error: FetchError = new Error(errorData.message || '');
-      error.status = response.status;
-      throw new Error(`패스권 조회 오류: ${error.status} ${error}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        const error: FetchError = new Error(errorData.message || '');
+        error.status = response.status;
+        throw new Error(`패스권 조회 오류: ${error.status} ${error}`);
+      }
+
+      const resData = await response.json();
+
+      return resData.data.pass;
+    } catch (error) {
+      console.error(error);
     }
-
-    const resData = await response.json();
-
-    return resData.data.pass;
-  } catch (error) {
-    console.error(error);
-  }
-};
+  },
+);
 
 export const getSalesStatusPass = async (
   passId: number,

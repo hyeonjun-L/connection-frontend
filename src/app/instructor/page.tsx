@@ -35,6 +35,7 @@ const instructorPage = async ({
   let instructorList: InstructorCardProps[] = [];
   let bestInstructorList: { id: number; image: string; nickname: string }[] =
     [];
+  let totalItemCount = 0;
 
   const searchData: instructorSearchData = {
     take: INSTRUCTOR_TAKE,
@@ -71,12 +72,13 @@ const instructorPage = async ({
   };
 
   try {
-    const [instructors, bestInstructors] = await Promise.all([
+    const [
+      { totalItemCount: resTotalItemCount, instructorList: resInstructorList },
+      bestInstructors,
+    ] = await Promise.all([
       searchInstructors(searchData, !!user),
       searchBestInstructor(!!user),
     ]);
-
-    searchData.searchAfter = instructors.at(-1)?.searchAfter;
 
     bestInstructorList = bestInstructors.map((instructor) => ({
       ...instructor,
@@ -92,7 +94,8 @@ const instructorPage = async ({
         .slice(0, 10);
     }
 
-    instructorList = transformSearchInstructor(instructors);
+    totalItemCount = resTotalItemCount;
+    instructorList = transformSearchInstructor(resInstructorList);
   } catch (error) {
     console.error(error);
   }
@@ -109,6 +112,7 @@ const instructorPage = async ({
       <InstructorListView
         instructorList={instructorList}
         searchData={searchData}
+        totalItemCount={totalItemCount}
       >
         <Filters type="instructor" filterOption={filterOptions} />
       </InstructorListView>

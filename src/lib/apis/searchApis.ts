@@ -37,7 +37,6 @@ export const deleteAllSearchKeywords = async () => {
 
 export const searchInstructors = async (
   data: searchInstructorParameters,
-  userState: boolean,
 ): Promise<searchInstructor[]> => {
   try {
     const params = createParams(data);
@@ -47,7 +46,6 @@ export const searchInstructors = async (
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        userState: `${userState}`,
       },
     });
 
@@ -68,7 +66,6 @@ export const searchInstructors = async (
 
 export const searchClasses = async (
   data: searchClassParameters,
-  userState: boolean,
 ): Promise<searchClass[]> => {
   try {
     const params = createParams(data);
@@ -78,7 +75,6 @@ export const searchClasses = async (
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        userState: `${userState}`,
       },
     });
 
@@ -99,7 +95,6 @@ export const searchClasses = async (
 
 export const searchPasses = async (
   data: searchPassesParameters,
-  userState: boolean,
 ): Promise<searchPass[]> => {
   try {
     const params = createParams(data);
@@ -109,7 +104,6 @@ export const searchPasses = async (
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        userState: `${userState}`,
       },
     });
 
@@ -121,7 +115,8 @@ export const searchPasses = async (
     }
 
     const resData = await response.json();
-    return resData.data.searchedPassList ?? [];
+
+    return resData.data.passList ?? [];
   } catch (error) {
     console.error(error);
     throw error;

@@ -4,7 +4,6 @@ import {
   DANCE_GENRE,
   FILTER_TIME,
   FILTER_WEEK,
-  GROUP_FILTER_LIST,
   METHOD_FILTER_LIST,
   PRICE_FILTER_MAX,
   PRICE_FILTER_MIN,
@@ -32,6 +31,7 @@ const classPage = async ({ searchParams }: { searchParams: SearchParams }) => {
   const user = cookieStore.get('userAccessToken')?.value;
   let bestClassList: ClassCardType[] = [];
   let classList: ClassCardType[] = [];
+  let totalItemCount: number = 0;
 
   const searchData: classSearchData = {
     take: CLASS_TAKE,
@@ -59,7 +59,7 @@ const classPage = async ({ searchParams }: { searchParams: SearchParams }) => {
       searchParams.stars && Number.isInteger(Number(searchParams.stars))
         ? Number(searchParams.stars)
         : 0,
-    isGroup: searchParams.group === '프라이빗 레슨(1:1)' ? false : true,
+    isGroup: searchParams.group ? searchParams.group === '그룹레슨' : undefined,
     gtePrice:
       searchParams.gtePrice && Number.isInteger(Number(searchParams.gtePrice))
         ? Number(searchParams.gtePrice)
@@ -131,10 +131,7 @@ const classPage = async ({ searchParams }: { searchParams: SearchParams }) => {
         return found ? found.label : '';
       }),
     },
-    group:
-      searchParams.group && GROUP_FILTER_LIST.includes(searchParams.group)
-        ? searchParams.group
-        : '그룹레슨',
+    group: searchData.isGroup === undefined ? '전체' : searchParams.group!,
   };
 
   try {
@@ -145,7 +142,10 @@ const classPage = async ({ searchParams }: { searchParams: SearchParams }) => {
       bestClassList = Array(repeatCount).fill(bestClassList).flat().slice(0, 6);
     }
 
-    classList = transformSearchClass(await searchClasses(searchData, !!user));
+    const { classList: resClassList, totalItemCount: resTotalItemCount } =
+      await searchClasses(searchData, !!user);
+    classList = transformSearchClass(resClassList);
+    totalItemCount = resTotalItemCount;
   } catch (error) {
     console.error(error);
   }
@@ -157,7 +157,11 @@ const classPage = async ({ searchParams }: { searchParams: SearchParams }) => {
       </div>
       <BestClasses bestClassList={bestClassList} />
 
-      <ClassListView searchData={searchData} classList={classList}>
+      <ClassListView
+        searchData={searchData}
+        classList={classList}
+        totalItemCount={totalItemCount}
+      >
         <Filters type="class" filterOption={filterOptions} />
       </ClassListView>
     </main>

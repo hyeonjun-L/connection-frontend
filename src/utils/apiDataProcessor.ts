@@ -498,7 +498,6 @@ export const transformSearchInstructor = (lecturers: searchInstructor[]) => {
       searchAfter,
     }) => ({
       id,
-      searchAfter,
       isLiked,
       largeImg: false,
       name: nickname,
@@ -511,6 +510,7 @@ export const transformSearchInstructor = (lecturers: searchInstructor[]) => {
       imgURL: lecturerImages,
       average: stars,
       href: `instructor/${id}`,
+      searchAfter,
     }),
   );
 };

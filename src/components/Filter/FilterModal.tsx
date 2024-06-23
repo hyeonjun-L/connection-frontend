@@ -21,10 +21,12 @@ const FilterModal = ({
   onApply,
   onClose,
 }: IFilterModal) => {
-  const { isScrolling, setIsfilterModalOpen } = usefilterStore((state) => ({
-    isScrolling: state.isScrolling,
-    setIsfilterModalOpen: state.setIsfilterModalOpen,
-  }));
+  const { isScrolling, setIsfilterModalOpen, setOpenFilterLabel } =
+    usefilterStore((state) => ({
+      isScrolling: state.isScrolling,
+      setIsfilterModalOpen: state.setIsfilterModalOpen,
+      setOpenFilterLabel: state.setOpenFilterLabel,
+    }));
   const { width } = useWindowSize();
   const [isOpened, setIsOpened] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -95,7 +97,10 @@ const FilterModal = ({
       </button>
       <button
         className="box-border flex items-center rounded-[0.625rem] border border-solid border-sub-color1 py-1 pl-3 pr-1 font-medium sm:hidden "
-        onClick={() => setIsfilterModalOpen(true)}
+        onClick={() => {
+          setIsfilterModalOpen(true);
+          setOpenFilterLabel(label);
+        }}
       >
         {label}
         <ArrowUpSVG className="h-[34px] w-[34px] rotate-180 fill-sub-color1" />
