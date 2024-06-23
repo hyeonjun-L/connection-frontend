@@ -30,26 +30,11 @@ const Home = async () => {
       {/* <SuggestionClass /> */}
 
       {/* 인기 클래스 */}
-      <section className="mt-4 w-full">
-        <SectionHeader
-          icon={<MainPopularSVG />}
-          title="인기 클래스"
-          link="/class"
-        />
-
-        <BestClass />
-      </section>
+      <BestClass />
 
       {/* 인기 강사 TOP 8 */}
-      <section className="mt-3">
-        <SectionHeader
-          icon={<MainTopSVG />}
-          title="인기 강사 TOP8"
-          link="/instructor"
-        />
 
-        <BestInstructor />
-      </section>
+      <BestInstructor />
 
       {/* 최신 클래스 */}
 
@@ -74,20 +59,3 @@ const Home = async () => {
 };
 
 export default Home;
-interface ISectionHeader {
-  icon: React.ReactNode;
-  title: string;
-  link: string;
-}
-
-const SectionHeader = ({ icon, title, link }: ISectionHeader) => (
-  <h2 className="mb-3 flex w-full items-center justify-between px-4 sm:px-9">
-    <span className="flex items-center gap-1 text-lg font-bold">
-      {icon}
-      {title}
-    </span>
-    <Link href={link} className="text-sm text-gray-500 underline">
-      전체보기
-    </Link>
-  </h2>
-);
