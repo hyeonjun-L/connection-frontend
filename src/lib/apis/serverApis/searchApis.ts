@@ -105,7 +105,7 @@ export const searchAll = async (
 export const searchInstructors = async (
   data: searchInstructorParameters,
   userState: boolean,
-): Promise<searchInstructor[]> => {
+): Promise<{ totalItemCount: number; instructorList: searchInstructor[] }> => {
   try {
     const cookieStroe = cookies();
     const authorization = cookieStroe.get('userAccessToken')?.value;
@@ -130,7 +130,11 @@ export const searchInstructors = async (
     }
 
     const resData = await response.json();
-    return resData.data.lecturerList ?? [];
+
+    return {
+      totalItemCount: resData.data.totalItemCount,
+      instructorList: resData.data.lecturerList ?? [],
+    };
   } catch (error) {
     console.error(error);
     throw error;
@@ -209,7 +213,7 @@ export const searchBestClass = async (
 export const searchClasses = async (
   data: searchClassParameters,
   userState: boolean,
-): Promise<searchClass[]> => {
+): Promise<{ classList: searchClass[]; totalItemCount: number }> => {
   try {
     const cookieStroe = cookies();
     const authorization = cookieStroe.get('userAccessToken')?.value;
@@ -235,7 +239,10 @@ export const searchClasses = async (
 
     const resData = await response.json();
 
-    return resData.data.lectureList ?? [];
+    return {
+      classList: resData.data.lectureList ?? [],
+      totalItemCount: resData.data.totalItemCount,
+    };
   } catch (error) {
     console.error(error);
     throw error;
@@ -245,7 +252,7 @@ export const searchClasses = async (
 export const searchPasses = async (
   data: searchPassesParameters,
   userState: boolean,
-): Promise<searchPass[]> => {
+): Promise<{ totalItemCount: number; passList: searchPass[] }> => {
   try {
     const cookieStroe = cookies();
     const authorization = cookieStroe.get('userAccessToken')?.value;
@@ -273,7 +280,10 @@ export const searchPasses = async (
     }
 
     const resData = await response.json();
-    return resData.data.searchedPassList ?? [];
+    return {
+      totalItemCount: resData.data.totalItemCount,
+      passList: resData.data.passList ?? [],
+    };
   } catch (error) {
     console.error(error);
     throw error;

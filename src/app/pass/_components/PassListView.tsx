@@ -1,91 +1,91 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { PASSES_TAKE } from '@/constants/constants';
 import useIntersect from '@/hooks/useIntersect';
 import { searchPasses } from '@/lib/apis/searchApis';
-import { accessTokenReissuance } from '@/lib/apis/userApi';
-import { useUserStore } from '@/store';
 import { transformSearchPasses } from '@/utils/apiDataProcessor';
 import UserPass from '@/components/Pass/UserPass';
-import Spinner from '@/components/Spinner/Spinner';
 import { searchPassesParameters, userPass } from '@/types/pass';
-import { FetchError } from '@/types/types';
 
 interface PassesListViewProps {
   passList: userPass[];
   searchData: searchPassesParameters;
+  totalItemCount: number;
 }
 
 const PassesListView = ({
-  searchData: currentSearchData,
+  searchData,
   passList,
+  totalItemCount,
 }: PassesListViewProps) => {
-  const [passes, setPasses] = useState(passList);
-  const [isLastItem, setIsLastItem] = useState(false);
-  const [isLoadingPassesList, setIsLoadingPassesList] = useState(false);
-  const { userType } = useUserStore((state) => ({
-    userType: state.userType,
-  }));
-
-  useEffect(() => {
-    setPasses(passList);
-    setIsLastItem(false);
-  }, [passList]);
-
   const options = {
     root: null,
     rootMargin: '0px',
     threshold: 0.1,
   };
 
-  const updateSearchPassesList = async () => {
-    const searchData = {
-      ...currentSearchData,
-      searchAfter: passes.at(-1)?.searchAfter,
-    };
-
-    const passList = await searchPasses(searchData, userType === 'user');
-    setIsLastItem(!passList.length);
-    setPasses((prev) => [...prev, ...transformSearchPasses(passList)]);
+  const fetchPassLists = async ({
+    pageParam,
+  }: {
+    pageParam: searchPassesParameters;
+  }): Promise<userPass[]> => {
+    const resPassList = await searchPasses({ ...searchData, ...pageParam });
+    return transformSearchPasses(resPassList);
   };
 
-  const searchPassesHandler = async () => {
-    setIsLoadingPassesList(true);
-    try {
-      await updateSearchPassesList();
-    } catch (error) {
-      const fetchError = error as FetchError;
-      if (fetchError.status === 401) {
-        await accessTokenReissuance();
-        await updateSearchPassesList();
-      } else {
-        toast.error('패스권 목록 불러오기 실패, 잠시후 다시 시도해주세요.');
-        console.error(error);
-      }
+  const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['passSearch', JSON.stringify(searchData)],
+      queryFn: fetchPassLists,
+      initialPageParam: searchData,
+      initialData: () => {
+        return {
+          pages: [passList],
+          pageParams: [searchData],
+        };
+      },
+      getNextPageParam: (lastPage, allpages) => {
+        return totalItemCount > allpages.length * PASSES_TAKE
+          ? ({
+              ...searchData,
+              searchAfter: lastPage.at(-1)!.searchAfter,
+            } as searchPassesParameters)
+          : undefined;
+      },
+    });
+
+  const passes = useMemo(
+    () => data.pages.flatMap((classInfo) => classInfo),
+    [data],
+  );
+
+  const getNextPageHandler = () => {
+    if (!isFetchingNextPage) {
+      fetchNextPage();
     }
-    setIsLoadingPassesList(false);
   };
 
-  const { ref } = useIntersect(searchPassesHandler, options);
+  const { ref } = useIntersect(getNextPageHandler, options);
 
   return (
-    <>
-      <section className="mb-7 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {passes.map((passInfo, index) => (
-          <div
-            key={passInfo.id}
-            ref={index === passes.length - 1 && !isLastItem ? ref : undefined}
-          >
-            <UserPass passInfo={passInfo} />
-          </div>
-        ))}
-      </section>
-      {isLoadingPassesList && (
-        <div className="mb-5 flex justify-center">
-          <Spinner />
+    <section className="mb-7 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {passes.map((passInfo, index) => (
+        <div
+          key={passInfo.id}
+          ref={index === passes.length - 1 && hasNextPage ? ref : undefined}
+        >
+          <UserPass passInfo={passInfo} />
         </div>
-      )}
-    </>
+      ))}
+      {(isLoading || isFetchingNextPage) &&
+        Array.from({ length: PASSES_TAKE }, (_, index) => (
+          <div
+            key={index}
+            className="h-[12.353rem] w-full animate-pulse rounded-md bg-gray-700"
+          />
+        ))}
+    </section>
   );
 };
 

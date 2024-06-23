@@ -12,6 +12,7 @@ import {
   transformSearchInstructor,
   transformSearchParamsLocation,
 } from '@/utils/apiDataProcessor';
+import fillCarouselItems from '@/utils/fillCarouselItems';
 import { regionsDecryption } from '@/utils/searchFilterFn';
 import BestInstructors from './_components/BestInstructors';
 import InstructorListView from './_components/InstructorListView';
@@ -35,6 +36,7 @@ const instructorPage = async ({
   let instructorList: InstructorCardProps[] = [];
   let bestInstructorList: { id: number; image: string; nickname: string }[] =
     [];
+  let totalItemCount = 0;
 
   const searchData: instructorSearchData = {
     take: INSTRUCTOR_TAKE,
@@ -71,28 +73,26 @@ const instructorPage = async ({
   };
 
   try {
-    const [instructors, bestInstructors] = await Promise.all([
+    const [
+      { totalItemCount: resTotalItemCount, instructorList: resInstructorList },
+      bestInstructors,
+    ] = await Promise.all([
       searchInstructors(searchData, !!user),
       searchBestInstructor(!!user),
     ]);
-
-    searchData.searchAfter = instructors.at(-1)?.searchAfter;
 
     bestInstructorList = bestInstructors.map((instructor) => ({
       ...instructor,
       image: instructor.lecturerProfileImageUrl[0].url,
     }));
 
-    if (bestInstructorList.length < 10) {
-      const repeatCount = Math.ceil(10 / bestInstructorList.length);
+    bestInstructorList =
+      bestInstructorList.length < 8
+        ? fillCarouselItems({ items: bestInstructorList, minItems: 8 })
+        : bestInstructorList;
 
-      bestInstructorList = Array(repeatCount)
-        .fill(bestInstructorList)
-        .flat()
-        .slice(0, 10);
-    }
-
-    instructorList = transformSearchInstructor(instructors);
+    totalItemCount = resTotalItemCount;
+    instructorList = transformSearchInstructor(resInstructorList);
   } catch (error) {
     console.error(error);
   }
@@ -102,13 +102,14 @@ const instructorPage = async ({
       <div className="my-4 px-4 sm:px-9 xl:px-14">
         <SearchInput query={searchData.value ?? ''} />
       </div>
-      {bestInstructorList.length > 0 && (
+      {bestInstructorList.length > 2 && (
         <BestInstructors list={bestInstructorList} />
       )}
 
       <InstructorListView
         instructorList={instructorList}
         searchData={searchData}
+        totalItemCount={totalItemCount}
       >
         <Filters type="instructor" filterOption={filterOptions} />
       </InstructorListView>

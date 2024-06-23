@@ -694,7 +694,7 @@ export interface searchBestClassData {
 export interface searchClassParameters {
   take: number;
   sortOption: 'LATEST' | 'STARS';
-  isGroup: boolean;
+  isGroup?: boolean;
   value?: string;
   searchAfter?: [number, number];
   genres?: string[];
@@ -704,8 +704,8 @@ export interface searchClassParameters {
   timeOfDay?: TimeOfDay[];
   gtePrice?: number;
   ltePrice?: number;
-  lectureMethod?: string | undefined;
-  getDate?: Date;
+  lectureMethod?: string;
+  gteDate?: Date;
   lteDate?: Date;
 }
 

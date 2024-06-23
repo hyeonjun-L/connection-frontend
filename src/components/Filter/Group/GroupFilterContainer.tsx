@@ -33,7 +33,7 @@ const GroupFilterContainer = ({ filterOption }: GroupFilterContainerProps) => {
   const onApply = () => {
     changeParams({
       name: 'group',
-      value: selectFilter === '그룹레슨' ? '' : selectFilter,
+      value: selectFilter === '전체' ? '' : selectFilter,
     });
   };
 

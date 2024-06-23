@@ -1,7 +1,10 @@
 import { cookies } from 'next/headers';
+import { MainPopularSVG } from '@/icons/svg';
 import { searchBestClass } from '@/lib/apis/serverApis/searchApis';
 import { transformBestClassSearch } from '@/utils/apiDataProcessor';
+import fillCarouselItems from '@/utils/fillCarouselItems';
 import CarouselTemplate from '../CarouselTemplate';
+import SectionHeader from '../SectionHeader';
 
 const BestClass = async () => {
   let bestClassList = [];
@@ -13,22 +16,27 @@ const BestClass = async () => {
       await searchBestClass(!!user),
     );
 
-    if (resBestClassList.length === 0) return null;
+    if (resBestClassList.length < 3) return null;
 
-    if (resBestClassList.length < 6) {
-      const repeatCount = Math.ceil(6 / resBestClassList.length);
-
-      bestClassList = Array(repeatCount)
-        .fill(resBestClassList)
-        .flat()
-        .slice(0, 5);
-    }
+    bestClassList =
+      resBestClassList.length < 6
+        ? fillCarouselItems({ items: resBestClassList, minItems: 6 })
+        : resBestClassList;
   } catch (error) {
     console.error(error);
     return null;
   }
 
-  return <CarouselTemplate bestClassList={bestClassList} />;
+  return (
+    <section className="mt-4 w-full">
+      <SectionHeader
+        icon={<MainPopularSVG />}
+        title="인기 클래스"
+        link="/class"
+      />
+      <CarouselTemplate bestClassList={bestClassList} />;
+    </section>
+  );
 };
 
 export default BestClass;

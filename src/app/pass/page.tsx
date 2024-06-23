@@ -19,6 +19,7 @@ const page = async ({
   const user = cookieStore.get('userAccessToken')?.value;
 
   let passList: userPass[] = [];
+  let totalItemCount = 0;
 
   const searchData = {
     take: PASSES_TAKE,
@@ -33,17 +34,25 @@ const page = async ({
   };
 
   try {
-    const passes = await searchPasses(searchData, !!user);
+    const { passList: resPassList, totalItemCount: resTotalItemCount } =
+      await searchPasses(searchData, !!user);
 
-    passList = transformSearchPasses(passes);
-  } catch (error) {}
+    passList = transformSearchPasses(resPassList);
+    totalItemCount = resTotalItemCount;
+  } catch (error) {
+    console.error(error);
+  }
 
   return (
     <main className="mt-4 flex flex-col gap-4 px-4 sm:px-9 xl:px-14">
       <SearchInput query={searchParams.query ?? ''} />
 
       <NavComponent sortOption={searchData.sortOption} />
-      <PassListView passList={passList} searchData={searchData} />
+      <PassListView
+        passList={passList}
+        searchData={searchData}
+        totalItemCount={totalItemCount}
+      />
     </main>
   );
 };

@@ -1,8 +1,4 @@
-import {
-  GROUP_FILTER_DEFAULT,
-  PRICE_FILTER_MAX,
-  PRICE_FILTER_MIN,
-} from '@/constants/constants';
+import { PRICE_FILTER_MAX, PRICE_FILTER_MIN } from '@/constants/constants';
 import FilterList from './FilterList';
 import OptionList from './OptionList';
 import { WARD_LIST } from '../../constants/administrativeDistrict';
@@ -70,7 +66,7 @@ const Filters = async ({ type, filterOption }: FiltersProps) => {
 
         acc.push(...weekItems, ...timeItems);
       }
-    } else if (key === 'group' && value === GROUP_FILTER_DEFAULT) {
+    } else if (key === 'group' && value === '전체') {
       return acc;
     } else if (key === 'method' && value === '전체') {
       return acc;
